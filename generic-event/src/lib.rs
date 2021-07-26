@@ -8,6 +8,9 @@ use frame_system::ensure_signed;
 #[cfg(test)]
 mod tests;
 
+#[cfg(test)]
+mod mock;
+
 pub trait Config: frame_system::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 }
