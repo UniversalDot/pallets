@@ -25,6 +25,19 @@ fn test() {
 		let expected_event = Event::generic_event(RawEvent::EmitInput(1, 32));
 
 		// iterate through array of `EventRecord`s
-		assert_eq!(System::events()[0].event, expected_event,);
+		assert_eq!(System::events()[0].event, expected_event);
+	})
+}
+
+#[test]
+fn test_second_event() {
+    ExternalityBuilder::build().execute_with(|| {
+		assert_ok!(GenericEvent::do_something(Origin::signed(2), 77));
+
+		// construct event that should be emitted in the method call directly above
+		let expected_event = Event::generic_event(RawEvent::EmitInput(2, 77));
+
+		// iterate through array of `EventRecord`s
+		assert_eq!(System::events()[0].event, expected_event);
 	})
 }
