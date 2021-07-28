@@ -8,6 +8,9 @@ use frame_system::ensure_signed;
 use sp_runtime::print;
 
 #[cfg(test)]
+mod mock;
+
+#[cfg(test)]
 mod tests;
 
 pub trait Config: frame_system::Config {}
