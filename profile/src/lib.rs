@@ -12,7 +12,7 @@ use sp_std::collections::btree_set::BTreeSet;
 use sp_std::prelude::*;
 
 #[cfg(test)]
-// mod tests;
+mod tests;
 
 /// A maximum number of members. When membership reaches this number, no new members may join.
 pub const MAX_MEMBERS: u32 = 16;
