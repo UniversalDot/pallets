@@ -12,6 +12,9 @@ use sp_std::collections::btree_set::BTreeSet;
 use sp_std::prelude::*;
 
 #[cfg(test)]
+mod mock;
+
+#[cfg(test)]
 mod tests;
 
 /// A maximum number of members. When membership reaches this number, no new members may join.
