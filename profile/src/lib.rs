@@ -99,8 +99,20 @@ decl_module! {
 
 			Ok(())
 		}
-		
 
+
+		//Remove value for the Value 
+		#[weight = 10_000]
+		fn remove_value(origin) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+
+			Value::kill();
+
+			Self::deposit_event(RawEvent::ValueRemoved);
+
+			Ok(())
+		}
+		
 		/// Adds a member to the membership set
 		#[weight = 10_000]
 		fn add_member(origin) -> DispatchResult {

@@ -101,3 +101,18 @@ fn get_value_works() {
 		assert_ok!(MapSet::get_value(Origin::signed(1)));
 	})
 }
+
+#[test]
+fn remove_value_works() {
+	ExternalityBuilder::build().execute_with(|| {
+		assert_ok!(MapSet::set_value(Origin::signed(1), 7));
+		assert_ok!(MapSet::remove_value(Origin::signed(1)));
+
+		let expected_event1 = Event::map_set(RawEvent::ValueAdded);
+		let expected_event2 = Event::map_set(RawEvent::ValueRemoved);
+
+		//System events holds an array of all events thrown. (Indexed starting at 0)
+		assert_eq!(System::events()[0].event, expected_event1,);
+		assert_eq!(System::events()[1].event, expected_event2,);
+	})
+}
