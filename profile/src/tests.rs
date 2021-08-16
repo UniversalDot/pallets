@@ -88,6 +88,10 @@ fn remove_member_handles_errors() {
 fn add_value_works() {
 	ExternalityBuilder::build().execute_with(|| {
 		assert_ok!(MapSet::set_value(Origin::signed(1), 6));
+
+		let expected_event = Event::map_set(RawEvent::ValueAdded);
+
+		assert_eq!(System::events()[0].event, expected_event,);
 	})
 }
 

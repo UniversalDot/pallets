@@ -52,6 +52,12 @@ decl_event!(
 		MemberAdded(AccountId),
 		/// Removed a member
 		MemberRemoved(AccountId),
+
+		/// Added value
+		ValueAdded,
+
+		/// Removed Value
+		ValueRemoved,
 	}
 );
 
@@ -78,6 +84,8 @@ decl_module! {
 			let sender = ensure_signed(origin)?;
 
 			Value::put(value);
+
+			Self::deposit_event(RawEvent::ValueAdded);
 
 			Ok(())
 		}
