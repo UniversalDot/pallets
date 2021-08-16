@@ -90,3 +90,10 @@ fn add_value_works() {
 		assert_ok!(MapSet::set_value(Origin::signed(1), 6));
 	})
 }
+
+#[test]
+fn get_value_works() {
+	ExternalityBuilder::build().execute_with(|| {
+		assert_ok!(MapSet::get_value(Origin::signed(1)));
+	})
+}

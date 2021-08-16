@@ -81,6 +81,16 @@ decl_module! {
 
 			Ok(())
 		}
+
+		//Get value for the Value 
+		#[weight = 10_000]
+		fn get_value(origin) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+
+			Value::get();
+
+			Ok(())
+		}
 		
 
 		/// Adds a member to the membership set
