@@ -37,6 +37,9 @@ decl_storage! {
 		// The total number of members stored in the map.
 		// Because the map does not store its size internally, we must store it separately
 		MemberCount: u32;
+
+		//Store value as u64
+		Value: u64;
 	}
 }
 
@@ -68,6 +71,17 @@ decl_module! {
 		fn deposit_event() = default;
 
 		type Error = Error<T>;
+
+		//Set value for the Value 
+		#[weight = 10_000]
+		fn set_value(origin, value: u64) -> DispatchResult {
+			let sender = ensure_signed(origin)?;
+
+			Value::put(value);
+
+			Ok(())
+		}
+		
 
 		/// Adds a member to the membership set
 		#[weight = 10_000]
