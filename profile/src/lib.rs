@@ -115,6 +115,16 @@ decl_module! {
 
 			Ok(())
 		}
+
+		//Set HashMap 
+		#[weight = 10_000]
+		fn set_hash_map(origin, value: u32) -> DispatchResult {
+			let owner = ensure_signed(origin)?;
+
+			<SimpleMap<T>>::insert(&owner, value);
+
+			Ok(())
+		}
 		
 		/// Adds a member to the membership set
 		#[weight = 10_000]

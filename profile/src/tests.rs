@@ -116,3 +116,10 @@ fn remove_value_works() {
 		assert_eq!(System::events()[1].event, expected_event2,);
 	})
 }
+
+#[test]
+fn add_hash_map_works() {
+	ExternalityBuilder::build().execute_with(|| {
+		assert_ok!(MapSet::set_hash_map(Origin::signed(1), 7));
+	})
+}
