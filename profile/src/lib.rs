@@ -10,6 +10,8 @@ use frame_support::{
 use frame_system::ensure_signed;
 use sp_std::collections::btree_set::BTreeSet;
 use sp_std::prelude::*;
+use frame_support::codec::{Encode, Decode};
+
 
 #[cfg(test)]
 mod mock;
@@ -28,6 +30,13 @@ pub trait AccountSet {
 	type AccountId;
 
 	fn accounts() -> BTreeSet<Self::AccountId>;
+}
+
+#[derive(Encode, Decode, Default, Clone, PartialEq)]
+pub struct Profile<Hash> {
+	pub content: Hash,
+	pub reputation: u32,
+	pub created: Option<u32>,
 }
 
 decl_storage! {
