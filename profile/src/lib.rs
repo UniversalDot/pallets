@@ -81,7 +81,7 @@ decl_module! {
 		//Set value for the Value 
 		#[weight = 10_000]
 		fn set_value(origin, value: u64) -> DispatchResult {
-			let sender = ensure_signed(origin)?;
+			let _sender = ensure_signed(origin)?;
 
 			Value::put(value);
 
@@ -93,7 +93,7 @@ decl_module! {
 		//Get value for the Value 
 		#[weight = 10_000]
 		fn get_value(origin) -> DispatchResult {
-			let sender = ensure_signed(origin)?;
+			let _sender = ensure_signed(origin)?;
 
 			Value::get();
 
@@ -104,7 +104,7 @@ decl_module! {
 		//Remove value for the Value 
 		#[weight = 10_000]
 		fn remove_value(origin) -> DispatchResult {
-			let sender = ensure_signed(origin)?;
+			let _sender = ensure_signed(origin)?;
 
 			Value::kill();
 
