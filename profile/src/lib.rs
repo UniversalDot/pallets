@@ -40,6 +40,9 @@ decl_storage! {
 
 		//Store value as u64
 		Value: u64;
+
+		//Create HashMap called SimpleMap. The hash map is created out of AccountID and u32 types.
+		SimpleMap get(fn simple_map): map hasher(blake2_128_concat) T::AccountId => u32;
 	}
 }
 
