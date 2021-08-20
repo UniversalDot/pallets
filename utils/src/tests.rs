@@ -18,6 +18,9 @@ fn log_2_should_work() {
         // Log2 of 512 should be 9
         assert_eq!(log_2(512), Some(9));
 
+        // Log2 of 1024 should be 10
+        assert_eq!(log_2(1024), Some(10));
+
         // Log2 of u32::MAX (4294967295) should be 31
         assert_eq!(log_2(u32::MAX), Some(31));
     });
