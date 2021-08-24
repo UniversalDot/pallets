@@ -32,15 +32,15 @@ pub type SpaceId = u64;
 pub type PostId = u64;
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct WhoAndWhen<T: Trait> {
+pub struct ProfileOrigin<T: Trait> {
     pub account: T::AccountId,
     pub block: T::BlockNumber,
     pub time: T::Moment,
 }
 
-impl<T: Trait> WhoAndWhen<T> {
+impl<T: Trait> ProfileOrigin<T> {
     pub fn new(account: T::AccountId) -> Self {
-        WhoAndWhen {
+        ProfileOrigin {
             account,
             block: <system::Module<T>>::block_number(),
             time: <pallet_timestamp::Module<T>>::now(),

@@ -10,7 +10,7 @@ use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
 use frame_system::{self as system, ensure_signed};
 
-use pallet_utils::{Module as Utils, WhoAndWhen, Content};
+use pallet_utils::{Module as Utils, ProfileOrigin, Content};
 
 // pub mod rpc;
 
@@ -25,8 +25,8 @@ pub struct SocialAccount<T: Trait> {
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
 pub struct Profile<T: Trait> {
-    pub created: WhoAndWhen<T>,
-    pub updated: Option<WhoAndWhen<T>>,
+    pub created: ProfileOrigin<T>,
+    pub updated: Option<ProfileOrigin<T>>,
     pub content: Content
 }
 
@@ -95,7 +95,7 @@ decl_module! {
 
       social_account.profile = Some(
         Profile {
-          created: WhoAndWhen::<T>::new(owner.clone()),
+          created: ProfileOrigin::<T>::new(owner.clone()),
           updated: None,
           content
         }
@@ -129,7 +129,7 @@ decl_module! {
       }
 
       if is_update_applied {
-        profile.updated = Some(WhoAndWhen::<T>::new(owner.clone()));
+        profile.updated = Some(ProfileOrigin::<T>::new(owner.clone()));
         social_account.profile = Some(profile.clone());
 
         <SocialAccountById<T>>::insert(owner.clone(), social_account);
