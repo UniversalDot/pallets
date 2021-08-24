@@ -15,7 +15,7 @@ use pallet_utils::{Module as Utils, ProfileOrigin, Content};
 // pub mod rpc;
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct SocialAccount<T: Trait> {
+pub struct Account<T: Trait> {
     pub followers_count: u32,
     pub following_accounts_count: u16,
     pub following_spaces_count: u16,
@@ -48,8 +48,8 @@ pub trait Trait: system::Trait
 // This pallet's storage items.
 decl_storage! {
     trait Store for Module<T: Trait> as ProfilesModule {
-        pub SocialAccountById get(fn social_account_by_id):
-            map hasher(blake2_128_concat) T::AccountId => Option<SocialAccount<T>>;
+        pub AccountById get(fn social_account_by_id):
+            map hasher(blake2_128_concat) T::AccountId => Option<Account<T>>;
     }
 }
 
@@ -65,7 +65,7 @@ decl_event!(
 decl_error! {
     pub enum Error for Module<T: Trait> {
         /// Social account was not found by id.
-        SocialAccountNotFound,
+        AccountNotFound,
         /// Profile is already created for this account.
         ProfileAlreadyCreated,
         /// Nothing to update in a profile.
@@ -90,17 +90,17 @@ decl_module! {
 
       Utils::<T>::is_valid_content(content.clone())?;
 
-      let mut social_account = Self::get_or_new_social_account(owner.clone());
-      ensure!(social_account.profile.is_none(), Error::<T>::ProfileAlreadyCreated);
+      let mut account = Self::get_or_new_social_account(owner.clone());
+      ensure!(account.profile.is_none(), Error::<T>::ProfileAlreadyCreated);
 
-      social_account.profile = Some(
+      account.profile = Some(
         Profile {
           created: ProfileOrigin::<T>::new(owner.clone()),
           updated: None,
           content
         }
       );
-      <SocialAccountById<T>>::insert(owner.clone(), social_account);
+      <AccountById<T>>::insert(owner.clone(), account);
 
       Self::deposit_event(RawEvent::ProfileCreated(owner));
       Ok(())
@@ -114,8 +114,8 @@ decl_module! {
 
       ensure!(has_updates, Error::<T>::NoUpdatesForProfile);
 
-      let mut social_account = Self::social_account_by_id(owner.clone()).ok_or(Error::<T>::SocialAccountNotFound)?;
-      let mut profile = social_account.profile.ok_or(Error::<T>::AccountHasNoProfile)?;
+      let mut account = Self::social_account_by_id(owner.clone()).ok_or(Error::<T>::AccountNotFound)?;
+      let mut profile = account.profile.ok_or(Error::<T>::AccountHasNoProfile)?;
       let mut is_update_applied = false;
       let mut old_data = ProfileUpdate::default();
 
@@ -130,9 +130,9 @@ decl_module! {
 
       if is_update_applied {
         profile.updated = Some(ProfileOrigin::<T>::new(owner.clone()));
-        social_account.profile = Some(profile.clone());
+        account.profile = Some(profile.clone());
 
-        <SocialAccountById<T>>::insert(owner.clone(), social_account);
+        <AccountById<T>>::insert(owner.clone(), account);
         T::AfterProfileUpdated::after_profile_updated(owner.clone(), &profile, old_data);
 
         Self::deposit_event(RawEvent::ProfileUpdated(owner));
@@ -142,7 +142,7 @@ decl_module! {
   }
 }
 
-impl <T: Trait> SocialAccount<T> {
+impl <T: Trait> Account<T> {
     pub fn inc_followers(&mut self) {
         self.followers_count = self.followers_count.saturating_add(1);
     }
@@ -168,7 +168,7 @@ impl <T: Trait> SocialAccount<T> {
     }
 }
 
-impl<T: Trait> SocialAccount<T> {
+impl<T: Trait> Account<T> {
     #[allow(clippy::comparison_chain)]
     pub fn change_reputation(&mut self, diff: i16) {
         if diff > 0 {
@@ -188,9 +188,9 @@ impl Default for ProfileUpdate {
 }
 
 impl<T: Trait> Module<T> {
-    pub fn get_or_new_social_account(account: T::AccountId) -> SocialAccount<T> {
+    pub fn get_or_new_social_account(account: T::AccountId) -> Account<T> {
         Self::social_account_by_id(account).unwrap_or(
-            SocialAccount {
+            Account {
                 followers_count: 0,
                 following_accounts_count: 0,
                 following_spaces_count: 0,
