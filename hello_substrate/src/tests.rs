@@ -1,7 +1,10 @@
 use crate::{self as hello_substrate, Config};
-use frame_support::{ construct_runtime, parameter_types };
-
+use frame_support::{
+	assert_noop, assert_ok, construct_runtime, dispatch::DispatchError, parameter_types,
+};
+use frame_system::RawOrigin;
 use sp_core::H256;
+use sp_io::TestExternalities;
 use sp_runtime::{
 	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
@@ -52,3 +55,33 @@ impl frame_system::Config for TestRuntime {
 }
 
 impl Config for TestRuntime {}
+
+struct ExternalityBuilder;
+
+impl ExternalityBuilder {
+	pub fn build() -> TestExternalities {
+		let storage = frame_system::GenesisConfig::default()
+			.build_storage::<TestRuntime>()
+			.unwrap();
+		let mut ext = TestExternalities::from(storage);
+		ext.execute_with(|| System::set_block_number(1));
+		ext
+	}
+}
+
+#[test]
+fn say_hello_works() {
+	ExternalityBuilder::build().execute_with(|| {
+		assert_ok!(HelloSubstrate::say_hello(Origin::signed(1)));
+	})
+}
+
+#[test]
+fn say_hello_no_root() {
+	ExternalityBuilder::build().execute_with(|| {
+		assert_noop!(
+			HelloSubstrate::say_hello(RawOrigin::Root.into()),
+			DispatchError::BadOrigin
+		);
+	})
+}
