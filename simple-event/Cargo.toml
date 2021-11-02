@@ -3,7 +3,7 @@ name = "simple-event"
 version = "3.0.0"
 edition = "2018"
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-repository = 'https://github.com/substrate-developer-hub/recipes'
+repository = 'https://github.com/UniversalDot/pallets'
 description = "A pallet that emits simple events that do not encapsulate generic data types"
 license = "GPL-3.0-or-later"
 

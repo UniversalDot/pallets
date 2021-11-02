@@ -5,6 +5,7 @@ authors = ['DappForce <dappforce@pm.me>', 'JosephKnecht <info@universaldot,found
 edition = '2018'
 license = 'GPL-3.0-only'
 description = 'Pallet to manage social accounts and profiles'
+repository = 'https://github.com/UniversalDot/pallets'
 keywords = ['blockchain', 'cryptocurrency', 'social-network', 'news-feed', 'marketplace']
 categories = ['cryptography::cryptocurrencies']
 

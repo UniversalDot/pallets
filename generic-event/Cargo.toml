@@ -3,7 +3,7 @@ name = "generic-event"
 version = "3.0.0"
 edition = "2018"
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-repository = 'https://github.com/substrate-developer-hub/recipes'
+repository = 'https://github.com/UniversalDot/pallets'
 description = "A pallet that raises events encapsulating data types from the configuration trait"
 license = "GPL-3.0-or-later"
 
