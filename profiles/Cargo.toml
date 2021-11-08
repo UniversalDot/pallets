@@ -1,47 +1,73 @@
 [package]
-name = 'pallet-profiles'
-version = '0.6.1'
-authors = ['DappForce <dappforce@pm.me>', 'JosephKnecht <info@universaldot,foundation>']
+name = 'pallet-profile'
+version = '4.0.0-dev'
+description = 'FRAME pallet template for defining custom runtime logic.'
+authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+homepage = 'https://substrate.io/'
 edition = '2018'
-license = 'GPL-3.0-only'
-description = 'Pallet to manage social accounts and profiles'
-repository = 'https://github.com/UniversalDot/pallets'
-keywords = ['blockchain', 'cryptocurrency', 'social-network', 'news-feed', 'marketplace']
-categories = ['cryptography::cryptocurrencies']
+license = 'Unlicense'
+publish = false
+repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
 
-[features]
-default = ['std']
-std = [
-    'serde',
-    'codec/std',
-    'frame-support/std',
-    'frame-system/std',
-    'sp-runtime/std',
-    'sp-std/std',
-    'pallet-permissions/std',
-    'pallet-utils/std',
-]
-
-[dependencies.serde]
-optional = true
-features = ['derive']
-version = "1.0.119"
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
 
 [dependencies.codec]
 default-features = false
 features = ['derive']
 package = 'parity-scale-codec'
-version = '1.3.4'
+version = '2.0.0'
 
-[dependencies]
-impl-trait-for-tuples = '0.1.3'
+[dependencies.frame-benchmarking]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+optional = true
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
 
-# Local dependencies
-pallet-permissions = { default-features = false, path = '../permissions' }
-pallet-utils = { default-features = false, path = '../utils' }
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
 
-# Substrate dependencies
-frame-support = { default-features = false, version = '2.0.1' }
-frame-system = { default-features = false, version = '2.0.1' }
-sp-runtime = { default-features = false, version = '2.0.1' }
-sp-std = { default-features = false, version = '2.0.1' }
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
+
+[dependencies.scale-info]
+default-features = false
+features = ['derive']
+version = '1.0'
+
+[dev-dependencies.sp-core]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-io]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
+
+[dev-dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-11'
+version = '4.0.0-dev'
+
+[features]
+default = ['std']
+runtime-benchmarks = ['frame-benchmarking']
+std = [
+    'codec/std',
+    'scale-info/std',
+    'frame-support/std',
+    'frame-system/std',
+    'frame-benchmarking/std',
+]
+try-runtime = ['frame-support/try-runtime']

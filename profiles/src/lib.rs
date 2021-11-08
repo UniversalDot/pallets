@@ -1,207 +1,102 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::{Decode, Encode};
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, ensure,
-    dispatch::DispatchResult,
-    traits::Get
-};
-use sp_runtime::RuntimeDebug;
-use sp_std::prelude::*;
-use frame_system::{self as system, ensure_signed};
+/// Edit this file to define custom logic or remove it if it is not needed.
+/// Learn more about FRAME and the core library of Substrate FRAME pallets:
+/// <https://docs.substrate.io/v3/runtime/frame>
+pub use pallet::*;
 
-use pallet_utils::{Module as Utils, ProfileOrigin, Content};
+#[cfg(test)]
+mod mock;
 
-// pub mod rpc;
+#[cfg(test)]
+mod tests;
 
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct Account<T: Trait> {
-    pub followers_count: u32,
-    pub following_accounts_count: u16,
-    pub following_spaces_count: u16,
-    pub reputation: u32,
-    pub profile: Option<Profile<T>>,
-}
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
 
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct Profile<T: Trait> {
-    pub created: ProfileOrigin<T>,
-    pub updated: Option<ProfileOrigin<T>>,
-    pub content: Content
-}
+#[frame_support::pallet]
+pub mod pallet {
+	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
+	use frame_system::pallet_prelude::*;
 
-#[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct ProfileUpdate {
-    pub content: Option<Content>,
-}
+	/// Configure the pallet by specifying the parameters and types on which it depends.
+	#[pallet::config]
+	pub trait Config: frame_system::Config {
+		/// Because this pallet emits events, it depends on the runtime's definition of an event.
+		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+	}
 
-/// The pallet's configuration trait.
-pub trait Trait: system::Trait
-    + pallet_utils::Trait
-{
-    /// The overarching event type.
-    type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	#[pallet::pallet]
+	#[pallet::generate_store(pub(super) trait Store)]
+	pub struct Pallet<T>(_);
 
-    type AfterProfileUpdated: AfterProfileUpdated<Self>;
-}
+	// The pallet's runtime storage items.
+	// https://docs.substrate.io/v3/runtime/storage
+	#[pallet::storage]
+	#[pallet::getter(fn something)]
+	// Learn more about declaring storage items:
+	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
+	pub type Something<T> = StorageValue<_, u32>;
 
-// This pallet's storage items.
-decl_storage! {
-    trait Store for Module<T: Trait> as ProfilesModule {
-        pub AccountById get(fn social_account_by_id):
-            map hasher(blake2_128_concat) T::AccountId => Option<Account<T>>;
-    }
-}
+	// Pallets use events to inform users when important changes are made.
+	// https://docs.substrate.io/v3/runtime/events-and-errors
+	#[pallet::event]
+	#[pallet::generate_deposit(pub(super) fn deposit_event)]
+	pub enum Event<T: Config> {
+		/// Event documentation should end with an array that provides descriptive names for event
+		/// parameters. [something, who]
+		SomethingStored(u32, T::AccountId),
+	}
 
-decl_event!(
-    pub enum Event<T> where
-        <T as system::Trait>::AccountId,
-    {
-        ProfileCreated(AccountId),
-        ProfileUpdated(AccountId),
-    }
-);
+	// Errors inform users that something went wrong.
+	#[pallet::error]
+	pub enum Error<T> {
+		/// Error names should be descriptive.
+		NoneValue,
+		/// Errors should have helpful documentation associated with them.
+		StorageOverflow,
+	}
 
-decl_error! {
-    pub enum Error for Module<T: Trait> {
-        /// Social account was not found by id.
-        AccountNotFound,
-        /// Profile is already created for this account.
-        ProfileAlreadyCreated,
-        /// Nothing to update in a profile.
-        NoUpdatesForProfile,
-        /// Account has no profile yet.
-        AccountHasNoProfile,
-    }
-}
+	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
+	// These functions materialize as "extrinsics", which are often compared to transactions.
+	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
+	#[pallet::call]
+	impl<T: Config> Pallet<T> {
+		/// An example dispatchable that takes a singles value as a parameter, writes the value to
+		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
 
-decl_module! {
-  pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+			// Update storage.
+			<Something<T>>::put(something);
 
-    // Initializing errors
-    type Error = Error<T>;
+			// Emit an event.
+			Self::deposit_event(Event::SomethingStored(something, who));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
 
-    // Initializing events
-    fn deposit_event() = default;
+		/// An example dispatchable that may throw a custom error.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
+			let _who = ensure_signed(origin)?;
 
-    #[weight = 100_000 + T::DbWeight::get().reads_writes(1, 2)]
-    pub fn create_profile(origin, content: Content) -> DispatchResult {
-      let owner = ensure_signed(origin)?;
-
-      Utils::<T>::is_valid_content(content.clone())?;
-
-      let mut account = Self::get_or_new_social_account(owner.clone());
-      ensure!(account.profile.is_none(), Error::<T>::ProfileAlreadyCreated);
-
-      account.profile = Some(
-        Profile {
-          created: ProfileOrigin::<T>::new(owner.clone()),
-          updated: None,
-          content
-        }
-      );
-      <AccountById<T>>::insert(owner.clone(), account);
-
-      Self::deposit_event(RawEvent::ProfileCreated(owner));
-      Ok(())
-    }
-
-    #[weight = 100_000 + T::DbWeight::get().reads_writes(1, 2)]
-    pub fn update_profile(origin, update: ProfileUpdate) -> DispatchResult {
-      let owner = ensure_signed(origin)?;
-
-      let has_updates = update.content.is_some();
-
-      ensure!(has_updates, Error::<T>::NoUpdatesForProfile);
-
-      let mut account = Self::social_account_by_id(owner.clone()).ok_or(Error::<T>::AccountNotFound)?;
-      let mut profile = account.profile.ok_or(Error::<T>::AccountHasNoProfile)?;
-      let mut is_update_applied = false;
-      let mut old_data = ProfileUpdate::default();
-
-      if let Some(content) = update.content {
-        if content != profile.content {
-          Utils::<T>::is_valid_content(content.clone())?;
-          old_data.content = Some(profile.content);
-          profile.content = content;
-          is_update_applied = true;
-        }
-      }
-
-      if is_update_applied {
-        profile.updated = Some(ProfileOrigin::<T>::new(owner.clone()));
-        account.profile = Some(profile.clone());
-
-        <AccountById<T>>::insert(owner.clone(), account);
-        T::AfterProfileUpdated::after_profile_updated(owner.clone(), &profile, old_data);
-
-        Self::deposit_event(RawEvent::ProfileUpdated(owner));
-      }
-      Ok(())
-    }
-  }
-}
-
-impl <T: Trait> Account<T> {
-    pub fn inc_followers(&mut self) {
-        self.followers_count = self.followers_count.saturating_add(1);
-    }
-
-    pub fn dec_followers(&mut self) {
-        self.followers_count = self.followers_count.saturating_sub(1);
-    }
-
-    pub fn inc_following_accounts(&mut self) {
-        self.following_accounts_count = self.following_accounts_count.saturating_add(1);
-    }
-
-    pub fn dec_following_accounts(&mut self) {
-        self.following_accounts_count = self.following_accounts_count.saturating_sub(1);
-    }
-
-    pub fn inc_following_spaces(&mut self) {
-        self.following_spaces_count = self.following_spaces_count.saturating_add(1);
-    }
-
-    pub fn dec_following_spaces(&mut self) {
-        self.following_spaces_count = self.following_spaces_count.saturating_sub(1);
-    }
-}
-
-impl<T: Trait> Account<T> {
-    #[allow(clippy::comparison_chain)]
-    pub fn change_reputation(&mut self, diff: i16) {
-        if diff > 0 {
-            self.reputation = self.reputation.saturating_add(diff.abs() as u32);
-        } else if diff < 0 {
-            self.reputation = self.reputation.saturating_sub(diff.abs() as u32);
-        }
-    }
-}
-
-impl Default for ProfileUpdate {
-    fn default() -> Self {
-        ProfileUpdate {
-            content: None
-        }
-    }
-}
-
-impl<T: Trait> Module<T> {
-    pub fn get_or_new_social_account(account: T::AccountId) -> Account<T> {
-        Self::social_account_by_id(account).unwrap_or(
-            Account {
-                followers_count: 0,
-                following_accounts_count: 0,
-                following_spaces_count: 0,
-                reputation: 1,
-                profile: None,
-            }
-        )
-    }
-}
-
-#[impl_trait_for_tuples::impl_for_tuples(10)]
-pub trait AfterProfileUpdated<T: Trait> {
-    fn after_profile_updated(account: T::AccountId, post: &Profile<T>, old_data: ProfileUpdate);
+			// Read a value from storage.
+			match <Something<T>>::get() {
+				// Return an error if the value has not been set.
+				None => Err(Error::<T>::NoneValue)?,
+				Some(old) => {
+					// Increment the value read from storage; will error in the event of overflow.
+					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
+					// Update the value in storage with the incremented result.
+					<Something<T>>::put(new);
+					Ok(())
+				},
+			}
+		}
+	}
 }
