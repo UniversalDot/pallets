@@ -5,9 +5,9 @@ use frame_support::{assert_noop, assert_ok};
 fn it_works_for_default_value() {
 	new_test_ext().execute_with(|| {
 		// Dispatch a signed extrinsic.
-		assert_ok!(TemplateModule::do_something(Origin::signed(1), 42));
+		assert_ok!(Profile::do_something(Origin::signed(1), 42));
 		// Read pallet storage and assert an expected result.
-		assert_eq!(TemplateModule::something(), Some(42));
+		assert_eq!(Profile::something(), Some(42));
 	});
 }
 
@@ -15,7 +15,7 @@ fn it_works_for_default_value() {
 fn correct_error_for_none_value() {
 	new_test_ext().execute_with(|| {
 		// Ensure the expected error is thrown when no value is present.
-		assert_noop!(TemplateModule::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
+		assert_noop!(Profile::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
 	});
 }
 
@@ -23,6 +23,6 @@ fn correct_error_for_none_value() {
 fn stores_value_in_map() {
 	new_test_ext().execute_with(|| {
 		// Ensure something is stored in map
-		assert_ok!(TemplateModule::set_single_entry(Origin::signed(1), 17));
+		assert_ok!(Profile::set_single_entry(Origin::signed(1), 17));
 	});
 }
