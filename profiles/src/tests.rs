@@ -18,3 +18,11 @@ fn correct_error_for_none_value() {
 		assert_noop!(TemplateModule::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
 	});
 }
+
+#[test]
+fn stores_value_in_map() {
+	new_test_ext().execute_with(|| {
+		// Ensure something is stored in map
+		assert_ok!(TemplateModule::set_single_entry(Origin::signed(1), 17));
+	});
+}
