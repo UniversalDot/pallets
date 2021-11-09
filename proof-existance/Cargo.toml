@@ -1,9 +1,9 @@
 [package]
 name = 'proof-existance'
-version = '3.0.0-monthly-2021-10'
-description = 'FRAME pallet template for defining custom runtime logic.'
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-homepage = 'https://substrate.io/'
+version = '0.0.1'
+description = 'FRAME pallet that verifies the existance of a file through a hash'
+authors = ['Substrate DevHub', 'UniversalDot Foundation']
+homepage = 'https://universaldot.foundation'
 edition = '2018'
 license = 'Unlicense'
 publish = false
