@@ -43,6 +43,12 @@ pub mod pallet {
 	}
 
     // ACTION #3: Implementation to handle Gender type in Kitty struct.
+	// Implementation to handle Gender type in Kitty struct.
+	impl Default for Gender {
+		fn default() -> Self {
+			Gender::Male
+		}
+	}
 	
 
   #[pallet::pallet]
