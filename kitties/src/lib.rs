@@ -148,6 +148,7 @@ pub mod pallet {
       let sender = ensure_signed(origin)?;
 
       // ACTION #1a: Checking Kitty owner
+	  ensure!(Self::is_kitty_owner(&kitty_id, &sender)?, <Error<T>>::NotKittyOwner);
 
       let mut kitty = Self::kitties(&kitty_id).ok_or(<Error<T>>::KittyNotExist)?;
 
@@ -196,8 +197,8 @@ pub mod pallet {
       let sender = ensure_signed(origin)?;
 
       // Check: Verify `sender` owns both kitties (and both kitties exist).
-    //   ensure!(Self::is_kitty_owner(&parent1, &sender)?, <Error<T>>::NotKittyOwner);
-    //   ensure!(Self::is_kitty_owner(&parent2, &sender)?, <Error<T>>::NotKittyOwner);
+      ensure!(Self::is_kitty_owner(&parent1, &sender)?, <Error<T>>::NotKittyOwner);
+      ensure!(Self::is_kitty_owner(&parent2, &sender)?, <Error<T>>::NotKittyOwner);
 
       // ACTION #9: Breed two Kitties using unique DNA
 
@@ -267,6 +268,12 @@ pub mod pallet {
     }
 
     // ACTION #1b
+	pub fn is_kitty_owner(kitty_id: &T::Hash, sender: &T::AccountId) -> Result<bool, Error<T>> {
+		match Self::kitties(kitty_id) {
+			Some(kitty) => Ok(kitty.owner == *sender),
+			None => Err(<Error<T>>::KittyNotExist)
+		}
+	}
 
     // ACTION #5: Write transfer_kitty_to
   }
