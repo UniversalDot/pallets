@@ -246,6 +246,7 @@ pub mod pallet {
       ensure!(Self::is_kitty_owner(&parent2, &sender)?, <Error<T>>::NotKittyOwner);
 
       // ACTION #9: Breed two Kitties using unique DNA
+	  let new_dna = Self::breed_dna(&parent1, &parent2)?;
 
       // ACTION #10: Mint new Kitty using new DNA
 
