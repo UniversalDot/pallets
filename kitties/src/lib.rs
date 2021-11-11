@@ -249,6 +249,7 @@ pub mod pallet {
 	  let new_dna = Self::breed_dna(&parent1, &parent2)?;
 
       // ACTION #10: Mint new Kitty using new DNA
+	  Self::mint(&sender, Some(new_dna), None)?;
 
       Ok(())
     }
