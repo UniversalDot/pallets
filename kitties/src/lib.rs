@@ -157,6 +157,7 @@ pub mod pallet {
 	  <Kitties<T>>::insert(&kitty_id,kitty);
 
       // ACTION #3: Deposit a "PriceSet" event.
+	  Self::deposit_event(Event::PriceSet(sender, kitty_id, new_price));
 
       Ok(())
     }
