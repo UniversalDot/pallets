@@ -216,6 +216,8 @@ pub mod pallet {
 		let to_owned = <KittiesOwned<T>>::get(&buyer);
 		ensure!((to_owned.len() as u32) <= T::MaxKittyOwned::get(), <Error<T>>::ExceedMaxKittyOwned);
 
+		let seller = kitty.owner.clone();
+
 
       // ACTION #8: Update Balances using the Currency trait.
 
