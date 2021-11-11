@@ -2,8 +2,8 @@
 
 pub use pallet::*;
 
-mod mock;
-mod tests;
+// mod mock;
+// mod tests;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -45,7 +45,7 @@ pub mod pallet {
 
   #[pallet::pallet]
   #[pallet::generate_store(pub(super) trait Store)]
-  #[pallet::generate_storage_info]
+//   #[pallet::generate_storage_info]
   pub struct Pallet<T>(_);
 
   // Configure the pallet by specifying the parameters and types on which it depends.
@@ -196,8 +196,8 @@ pub mod pallet {
       let sender = ensure_signed(origin)?;
 
       // Check: Verify `sender` owns both kitties (and both kitties exist).
-      ensure!(Self::is_kitty_owner(&parent1, &sender)?, <Error<T>>::NotKittyOwner);
-      ensure!(Self::is_kitty_owner(&parent2, &sender)?, <Error<T>>::NotKittyOwner);
+    //   ensure!(Self::is_kitty_owner(&parent1, &sender)?, <Error<T>>::NotKittyOwner);
+    //   ensure!(Self::is_kitty_owner(&parent2, &sender)?, <Error<T>>::NotKittyOwner);
 
       // ACTION #9: Breed two Kitties using unique DNA
 
