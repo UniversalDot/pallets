@@ -212,7 +212,10 @@ pub mod pallet {
 		// Check the buyer has enough free balance
 		ensure!(T::Currency::free_balance(&buyer) >= bid_price, <Error<T>>::NotEnoughBalance);
 
-      // ACTION #7: Check if buyer can receive Kitty.
+		// ACTION #7: Check if buyer can receive Kitty.
+		let to_owned = <KittiesOwned<T>>::get(&buyer);
+		ensure!((to_owned.len() as u32) <= T::MaxKittyOwned::get(), <Error<T>>::ExceedMaxKittyOwned);
+
 
       // ACTION #8: Update Balances using the Currency trait.
 
