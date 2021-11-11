@@ -197,11 +197,20 @@ pub mod pallet {
     ) -> DispatchResult {
       let buyer = ensure_signed(origin)?;
 
-      // Check the kitty exists and buyer is not the current kitty owner
-      let kitty = Self::kitties(&kitty_id).ok_or(<Error<T>>::KittyNotExist)?;
-      ensure!(kitty.owner != buyer, <Error<T>>::BuyerIsKittyOwner);
+		// Check the kitty exists and buyer is not the current kitty owner
+		let kitty = Self::kitties(&kitty_id).ok_or(<Error<T>>::KittyNotExist)?;
+		ensure!(kitty.owner != buyer, <Error<T>>::BuyerIsKittyOwner);
 
-      // ACTION #6: Check if the Kitty is for sale.
+		// ACTION #6: Check if the Kitty is for sale.
+		// Check the kitty is for sale and the kitty ask price <= bid_price
+		if let Some(ask_price) = kitty.price {
+			ensure!(ask_price <= bid_price, <Error<T>>::KittyBidPriceTooLow);
+		} else {
+			Err(<Error<T>>::KittyNotForSale)?;
+		}
+
+// Check the buyer has enough free balance
+ensure!(T::Currency::free_balance(&buyer) >= bid_price, <Error<T>>::NotEnoughBalance);
 
       // ACTION #7: Check if buyer can receive Kitty.
 
