@@ -153,6 +153,8 @@ pub mod pallet {
       let mut kitty = Self::kitties(&kitty_id).ok_or(<Error<T>>::KittyNotExist)?;
 
       // ACTION #2: Set the Kitty price and update new Kitty infomation to storage.
+	  kitty.price = new_price.clone();
+	  <Kitties<T>>::insert(&kitty_id,kitty);
 
       // ACTION #3: Deposit a "PriceSet" event.
 
