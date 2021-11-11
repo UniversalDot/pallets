@@ -220,6 +220,11 @@ pub mod pallet {
 
 
       // ACTION #8: Update Balances using the Currency trait.
+	  T::Currency::transfer(&buyer, &seller, bid_price, ExistenceRequirement::KeepAlive)?;
+
+	  Self::transfer_kitty_to(&kitty_id, &seller)?;
+
+	  Self::deposit_event(Event::Bought(buyer, seller, kitty_id, bid_price));
 
       Ok(())
     }
