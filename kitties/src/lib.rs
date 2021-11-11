@@ -119,7 +119,30 @@ pub mod pallet {
   pub(super) type KittiesOwned<T: Config> =
     StorageMap<_, Twox64Concat, T::AccountId, BoundedVec<T::Hash, T::MaxKittyOwned>, ValueQuery>;
 
-  // ACTION #11: Our pallet's genesis configuration.
+	// ACTION #11: Our pallet's genesis configuration.
+	// Our pallet's genesis configuration.
+	#[pallet::genesis_config]
+	pub struct GenesisConfig<T: Config> {
+		pub kitties: Vec<(T::AccountId, [u8; 16], Gender)>,
+	}
+
+	// Required to implement default for GenesisConfig.
+	#[cfg(feature = "std")]
+	impl<T: Config> Default for GenesisConfig<T> {
+		fn default() -> GenesisConfig<T> {
+			GenesisConfig { kitties: vec![] }
+		}
+	}
+
+	#[pallet::genesis_build]
+	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+		fn build(&self) {
+			// When building a kitty from genesis config, we require the dna and gender to be supplied.
+			for (acct, dna, gender) in &self.kitties {
+				let _ = <Pallet<T>>::mint(acct, Some(dna.clone()), Some(gender.clone()));
+			}
+		}
+	}
 
   #[pallet::call]
   impl<T: Config> Pallet<T> {
