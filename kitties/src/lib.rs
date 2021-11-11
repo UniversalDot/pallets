@@ -209,8 +209,8 @@ pub mod pallet {
 			Err(<Error<T>>::KittyNotForSale)?;
 		}
 
-// Check the buyer has enough free balance
-ensure!(T::Currency::free_balance(&buyer) >= bid_price, <Error<T>>::NotEnoughBalance);
+		// Check the buyer has enough free balance
+		ensure!(T::Currency::free_balance(&buyer) >= bid_price, <Error<T>>::NotEnoughBalance);
 
       // ACTION #7: Check if buyer can receive Kitty.
 
