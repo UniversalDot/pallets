@@ -9,7 +9,7 @@ To build each pallet, run:
 cargo build
 ```
 
-Optionally, you can install cloppu which is a rust tool that check for Rush to improve common mistakes. To install clippy: https://github.com/rust-lang/rust-clippy
+Optionally, you can install clippy which is a rust tool that check for Rust to improve common mistakes. To install clippy: https://github.com/rust-lang/rust-clippy
 
 To run clippy locally, run: 
 
