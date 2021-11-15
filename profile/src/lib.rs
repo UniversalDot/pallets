@@ -18,12 +18,34 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use frame_support::{ traits::{Currency}};
+	use scale_info::TypeInfo;
+
+
+	// Account, Balance are used in Profile Struct
+	type AccountOf<T> = <T as frame_system::Config>::AccountId;
+	type BalanceOf<T> =
+		<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
+
+
+	// Struct for holding Kitty information.
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
+	#[scale_info(skip_type_params(T))]
+	pub struct Profile<T: Config> {
+		pub interests: u32,   // Using 16 bytes to represent a kitty DNA
+		pub balance: Option<BalanceOf<T>>,
+		pub reputation: u32,
+		pub owner: AccountOf<T>,
+	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		/// The Currency handler for the Profile pallet.
+		type Currency: Currency<Self::AccountId>;
 	}
 
 	#[pallet::pallet]
