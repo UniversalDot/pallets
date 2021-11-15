@@ -5,14 +5,14 @@
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
-#[cfg(test)]
-mod mock;
+// #[cfg(test)]
+// mod mock;
 
-#[cfg(test)]
-mod tests;
+// #[cfg(test)]
+// mod tests;
 
-#[cfg(feature = "runtime-benchmarks")]
-mod benchmarking;
+// #[cfg(feature = "runtime-benchmarks")]
+// mod benchmarking;
 
 #[frame_support::pallet]
 pub mod pallet {
@@ -38,24 +38,14 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	pub type Something<T> = StorageValue<_, u32>;
 
-
-
-	#[pallet::storage]
-	#[pallet::getter(fn simple_map)]
-	pub(super) type SimpleMap<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::AccountId, u32, ValueQuery>;
-
 	// Pallets use events to inform users when important changes are made.
-	// https://docs.substrate.io/v3/runtime/events-and-errors
+	// https://docs.substrate.io/v3/runtime/events
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
-
-        /// A user has set their entry
-		EntrySet(T::AccountId, u32),
 	}
 
 	// Errors inform users that something went wrong.
@@ -72,20 +62,6 @@ pub mod pallet {
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-
-        // Set the value stored at a particular key
-		#[pallet::weight(10_000)]
-		pub fn set_single_entry(origin: OriginFor<T>, entry: u32) -> DispatchResultWithPostInfo {
-			// A user can only set their own entry
-			let user = ensure_signed(origin)?;
-
-			<SimpleMap<T>>::insert(&user, entry);
-
-			Self::deposit_event(Event::EntrySet(user, entry));
-			Ok(().into())
-		}
-
-
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
