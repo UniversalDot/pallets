@@ -60,6 +60,11 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	pub type Something<T> = StorageValue<_, u32>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn profiles)]
+	/// Stores a Profiles's unique properties in a StorageMap.
+	pub(super) type Profiles<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Profile<T>>;
+
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
 	#[pallet::event]
