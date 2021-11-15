@@ -68,6 +68,13 @@ pub mod pallet {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
+
+		/// Profile was successfully created. 
+		Created(T::AccountId, T::Hash),
+		
+		/// Profile was updated.
+		Updated(T::AccountId, T::Hash),
+
 	}
 
 	// Errors inform users that something went wrong.
