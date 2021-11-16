@@ -175,6 +175,12 @@ pub mod pallet {
 			Ok(profile_id)
 		}
 
+		// public function to update already existing profiles
+		// TODO: Add functionality
+		pub fn update_profile() {
+
+		}
+
 	}
 
 }
