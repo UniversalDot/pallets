@@ -163,7 +163,7 @@ pub mod pallet {
 				owner: owner.clone(),
 				interests: 77,   // Using 16 bytes to represent a kitty DNA
 				balance: None,
-				reputation: 777,
+				reputation: 0,
 			};
 
 			// TODO: Insert profile into HashMap
