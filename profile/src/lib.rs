@@ -124,8 +124,8 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let account = ensure_signed(origin)?;
 
-			// let profile_id = Self::generate_profile(&account)?;
-			// log::info!("A profile is created with ID: {:?}.", profile_id);
+			let profile_id = Self::generate_profile(&account)?;
+			log::info!("A profile is created with ID: {:?}.", profile_id);
 
 			// Update storage.
 			<Something<T>>::put(something);
