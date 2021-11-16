@@ -124,14 +124,14 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let account = ensure_signed(origin)?;
 
-			let profile_id = Self::generate_profile(&account)?;
-			log::info!("A profile is created with ID: {:?}.", profile_id);
+			// let profile_id = Self::generate_profile(&account)?;
+			// log::info!("A profile is created with ID: {:?}.", profile_id);
 
 			// Update storage.
 			<Something<T>>::put(something);
 
 			// Emit an event.
-			Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			// Self::deposit_event(Event::ProfileCreated(account, profile_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
