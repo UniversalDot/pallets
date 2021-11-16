@@ -186,29 +186,29 @@ pub mod pallet {
     }
 
     // ACTION #4: transfer
-	#[pallet::weight(100)]
-	pub fn transfer( 
-	  origin: OriginFor<T>,
-	  to: T::AccountId,
-	  kitty_id: T::Hash	
-		) -> DispatchResult {
-		let from = ensure_signed(origin)?;
+    #[pallet::weight(100)]
+    pub fn transfer( 
+      origin: OriginFor<T>,
+      to: T::AccountId,
+      kitty_id: T::Hash	
+      ) -> DispatchResult {
+      let from = ensure_signed(origin)?;
 
-		ensure!(Self::is_kitty_owner(&kitty_id, &to)?, <Error<T>>::NotKittyOwner);
+      ensure!(Self::is_kitty_owner(&kitty_id, &to)?, <Error<T>>::NotKittyOwner);
 
-		// Verify the kitty is not transferring back to its owner.
-		ensure!(from != to, <Error<T>>::TransferToSelf);
+      // Verify the kitty is not transferring back to its owner.
+      ensure!(from != to, <Error<T>>::TransferToSelf);
 
-		// Verify the recipient has the capacity to receive one more kitty
-		let to_owned = <KittiesOwned<T>>::get(&to);
-		ensure!((to_owned.len() as u32) < T::MaxKittyOwned::get(), <Error<T>>::ExceedMaxKittyOwned);
+      // Verify the recipient has the capacity to receive one more kitty
+      let to_owned = <KittiesOwned<T>>::get(&to);
+      ensure!((to_owned.len() as u32) < T::MaxKittyOwned::get(), <Error<T>>::ExceedMaxKittyOwned);
 
-		Self::transfer_kitty_to(&kitty_id, &to)?;
+      Self::transfer_kitty_to(&kitty_id, &to)?;
 
-		Self::deposit_event(Event::Transferred(from, to, kitty_id));
+      Self::deposit_event(Event::Transferred(from, to, kitty_id));
 
-		Ok(())
-	}
+      Ok(())
+    }
 
     // buy_kitty
     #[transactional]
