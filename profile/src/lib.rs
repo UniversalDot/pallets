@@ -122,13 +122,16 @@ pub mod pallet {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
-			let who = ensure_signed(origin)?;
+			let account = ensure_signed(origin)?;
+
+			let profile_id = Self::generate_profile(&account, something)?;
+			log::info!("A profile is created with ID: {:?}.", profile_id);
 
 			// Update storage.
 			<Something<T>>::put(something);
 
 			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, who));
+			Self::deposit_event(Event::SomethingStored(something, account));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -156,13 +159,13 @@ pub mod pallet {
 	// ** Helper internal functions ** //
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
-		pub fn generate_profile(owner: &T::AccountId) -> Result<T::Hash, Error<T>> {
+		pub fn generate_profile(owner: &T::AccountId, interests: u32) -> Result<T::Hash, Error<T>> {
 			
 			// Populate Profile struct
 			// TODO: Remove hardcoded elements and get user unput
 			let profile = Profile::<T> {
 				owner: owner.clone(),
-				interests: 77,   // Using 16 bytes to represent a kitty DNA
+				interests: interests,   // Using input to create interests
 				balance: None,
 				reputation: 0,
 			};
