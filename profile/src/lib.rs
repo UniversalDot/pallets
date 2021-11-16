@@ -131,7 +131,7 @@ pub mod pallet {
 			<Something<T>>::put(something);
 
 			// Emit an event.
-			// Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			Self::deposit_event(Event::ProfileCreated(account, profile_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
