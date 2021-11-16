@@ -77,7 +77,7 @@ pub mod pallet {
 		SomethingStored(u32, T::AccountId),
 
 		/// Profile was successfully created. 
-		Created(T::AccountId, T::Hash),
+		ProfileCreated(T::AccountId, T::Hash),
 		
 		/// Profile was updated.
 		Updated(T::AccountId, T::Hash),
@@ -128,10 +128,10 @@ pub mod pallet {
 			log::info!("A profile is created with ID: {:?}.", profile_id);
 
 			// Update storage.
-			<Something<T>>::put(something);
+			// <Something<T>>::put(something);
 
 			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, account));
+			Self::deposit_event(Event::ProfileCreated(account, profile_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
