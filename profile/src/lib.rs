@@ -18,7 +18,9 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
-	use frame_support::{ traits::{Currency}};
+	use frame_support::{
+		sp_runtime::traits::Hash, 
+		traits::{Currency}};
 	use scale_info::TypeInfo;
 
 
@@ -32,10 +34,10 @@ pub mod pallet {
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Profile<T: Config> {
+		pub owner: AccountOf<T>,
 		pub interests: u32,   // Using 16 bytes to represent a kitty DNA
 		pub balance: Option<BalanceOf<T>>,
 		pub reputation: u32,
-		pub owner: AccountOf<T>,
 	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -153,7 +155,23 @@ pub mod pallet {
 
 	// ** Helper internal functions ** //
 	impl<T:Config> Pallet<T> {
-		
+		// Generates initial Profile.
+		pub fn generate_profile(owner: &T::AccountId) -> Result<T::Hash, Error<T>> {
+			
+			// Populate Profile struct
+			let profile = Profile::<T> {
+				owner: owner.clone(),
+				interests: 77,   // Using 16 bytes to represent a kitty DNA
+				balance: None,
+				reputation: 777,
+			};
+
+			// TODO: Insert profile into HashMap
+
+			let profile_id = T::Hashing::hash_of(&profile);
+			Ok(profile_id)
+		}
+
 	}
 
 }
