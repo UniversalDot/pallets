@@ -159,6 +159,7 @@ pub mod pallet {
 		pub fn generate_profile(owner: &T::AccountId) -> Result<T::Hash, Error<T>> {
 			
 			// Populate Profile struct
+			// TODO: Remove hardcoded elements and get user unput
 			let profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: 77,   // Using 16 bytes to represent a kitty DNA
@@ -166,9 +167,11 @@ pub mod pallet {
 				reputation: 0,
 			};
 
-			// TODO: Insert profile into HashMap
-
 			let profile_id = T::Hashing::hash_of(&profile);
+
+			// Insert profile into HashMap
+			<Profiles<T>>::insert(profile_id, profile);
+
 			Ok(profile_id)
 		}
 
