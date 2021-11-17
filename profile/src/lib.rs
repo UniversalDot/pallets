@@ -130,7 +130,7 @@ pub mod pallet {
 			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Ensure that each account can create single profile.
-			ensure!(Self::profile_exists(&account, &profile_id)?, <Error<T>>::ProfileAlreadyCreated);
+			// ensure!(Self::profile_exists(&account, &profile_id)?, <Error<T>>::ProfileAlreadyCreated);
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated(account, profile_id));
