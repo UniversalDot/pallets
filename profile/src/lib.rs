@@ -22,6 +22,7 @@ pub mod pallet {
 		sp_runtime::traits::Hash, 
 		traits::{Currency}};
 	use scale_info::TypeInfo;
+	use sp_std::vec::Vec;
 
 
 	// Account, Balance are used in Profile Struct
