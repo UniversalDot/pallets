@@ -163,10 +163,10 @@ pub mod pallet {
 		// Generates initial Profile.
 		pub fn generate_profile(owner: &T::AccountId, something: u32) -> Result<T::Hash, Error<T>> {
 			
+			// Get current balance of owner
 			let balance = T::Currency::free_balance(&owner);
 
 			// Populate Profile struct
-			// TODO: Remove hardcoded elements and get user unput
 			let profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: something,   // Using input to create interests
