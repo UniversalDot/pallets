@@ -35,7 +35,7 @@ pub mod pallet {
 	#[scale_info(skip_type_params(T))]
 	pub struct Profile<T: Config> {
 		pub owner: AccountOf<T>,
-		pub interests: u32,   // TODO: Wrap interests in string vector instead of u32
+		pub interests: Vec<u8>,   // TODO: Wrap interests in string vector instead of u32
 		pub balance: Option<BalanceOf<T>>,
 		pub reputation: u32,
 	}
@@ -120,7 +120,7 @@ pub mod pallet {
 
 		/// Dispatchable call that enables every new actor to create personal profile in storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_profile(origin: OriginFor<T>, something: u32) -> DispatchResult {
+		pub fn create_profile(origin: OriginFor<T>, something: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
@@ -161,7 +161,7 @@ pub mod pallet {
 	// ** Helper internal functions ** //
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
-		pub fn generate_profile(owner: &T::AccountId, something: u32) -> Result<T::Hash, Error<T>> {
+		pub fn generate_profile(owner: &T::AccountId, something: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Get current balance of owner
 			let balance = T::Currency::free_balance(&owner);
