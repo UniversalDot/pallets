@@ -91,6 +91,8 @@ pub mod pallet {
 		NoneValue,
 		/// Errors should have helpful documentation associated with them.
 		StorageOverflow,
+		/// One Account can only create a single profile. If profile is created throws error.
+		ProfileAlreadyCreated,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -125,10 +127,10 @@ pub mod pallet {
 			let account = ensure_signed(origin)?;
 
 			let profile_id = Self::generate_profile(&account, something)?;
-			log::info!("A profile is created with ID: {:?}.", profile_id);
+			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
 
-			// Update storage.
-			// <Something<T>>::put(something);
+			// Ensure that each account can create single profile.
+			ensure!(Self::profile_exists(&account, &profile_id)?, <Error<T>>::ProfileAlreadyCreated);
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated(account, profile_id));
@@ -182,6 +184,15 @@ pub mod pallet {
 		// TODO: Add functionality
 		pub fn update_profile() {
 
+		}
+
+		/// Check if profile already exists for account.
+		/// If profile exists return Ok, otherwise throw error.
+		pub fn profile_exists(account: &T::AccountId, profile_id: &T::Hash) -> Result<bool, Error<T>> {
+			match Self::profiles(profile_id) {
+				Some(profile) => Ok (profile.owner != *account),
+				None => Err(<Error<T>>::ProfileAlreadyCreated)
+			}
 		}
 
 	}
