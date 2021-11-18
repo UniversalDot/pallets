@@ -152,7 +152,7 @@ pub mod pallet {
 			// Read a value from storage.
 			match <Something<T>>::get() {
 				// Return an error if the value has not been set.
-				None => Err(Error::<T>::NoneValue)?,
+				None => Err(Error::<T>::NoneValue.into()),
 				Some(old) => {
 					// Increment the value read from storage; will error in the event of overflow.
 					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
@@ -170,7 +170,7 @@ pub mod pallet {
 		pub fn generate_profile(owner: &T::AccountId, something: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Get current balance of owner
-			let balance = T::Currency::free_balance(&owner);
+			let balance = T::Currency::free_balance(owner);
 
 			// Populate Profile struct
 			let mut profile = Profile::<T> {
@@ -207,6 +207,8 @@ pub mod pallet {
 
 	}
 
+	// Change the reputation on a Profile
+	// TODO: Create better reputation function 
 	impl<T:Config> Profile<T> {
 		pub fn change_reputation(&mut self) {
 			self.reputation += 1;
