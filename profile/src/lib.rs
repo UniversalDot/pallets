@@ -173,7 +173,7 @@ pub mod pallet {
 			let balance = T::Currency::free_balance(&owner);
 
 			// Populate Profile struct
-			let profile = Profile::<T> {
+			let mut profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: something,   // Using input to create interests
 				balance: Some(balance),
@@ -181,6 +181,8 @@ pub mod pallet {
 			};
 
 			let profile_id = T::Hashing::hash_of(&profile);
+
+			profile.change_reputation();
 
 			// Insert profile into HashMap
 			<Profiles<T>>::insert(profile_id, profile);
@@ -190,8 +192,8 @@ pub mod pallet {
 
 		// public function to update already existing profiles
 		// TODO: Add functionality
-		pub fn update_profile() {
-
+		pub fn update_profile(&mut self) {
+			 
 		}
 
 		/// Check if profile already exists for account.
@@ -204,5 +206,11 @@ pub mod pallet {
 		}
 
 	}
+
+	impl<T:Config> Profile<T> {
+		pub fn change_reputation(&mut self) {
+			self.reputation += 1;
+		}
+	} 
 
 }
