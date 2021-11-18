@@ -1,7 +1,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
+//! # Profile Module
+//!
+//! Each AccountID is able to create profiles that add specific metadata
+//!  to their account. This metadata is used to enrich AccountID with additional
+//!  properties such as reputation, interests, etc. 
+
+
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
@@ -31,12 +36,12 @@ pub mod pallet {
 		<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 
-	// Struct for holding Kitty information.
+	// Struct for holding Profile information.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Profile<T: Config> {
 		pub owner: AccountOf<T>,
-		pub interests: Vec<u8>,   // TODO: Wrap interests in string vector instead of u32
+		pub interests: Vec<u8>,
 		pub balance: Option<BalanceOf<T>>,
 		pub reputation: u32,
 	}
@@ -92,7 +97,7 @@ pub mod pallet {
 		NoneValue,
 		/// Errors should have helpful documentation associated with them.
 		StorageOverflow,
-		/// One Account can only create a single profile. If profile is created throws error.
+		/// One Account can only create a single profile. 
 		ProfileAlreadyCreated,
 	}
 
