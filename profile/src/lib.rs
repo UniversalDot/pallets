@@ -126,13 +126,13 @@ pub mod pallet {
 
 		/// Dispatchable call that enables every new actor to create personal profile in storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_profile(origin: OriginFor<T>, something: Vec<u8>) -> DispatchResult {
+		pub fn create_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let account = ensure_signed(origin)?;
 
-			let profile_id = Self::generate_profile(&account, something)?;
+			let profile_id = Self::generate_profile(&account, interests)?;
 			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Ensure that each account can create single profile.
