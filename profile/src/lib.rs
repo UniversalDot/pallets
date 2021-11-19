@@ -167,7 +167,7 @@ pub mod pallet {
 	// ** Helper internal functions ** //
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
-		pub fn generate_profile(owner: &T::AccountId, something: Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn generate_profile(owner: &T::AccountId, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Get current balance of owner
 			let balance = T::Currency::free_balance(owner);
@@ -175,7 +175,7 @@ pub mod pallet {
 			// Populate Profile struct
 			let mut profile = Profile::<T> {
 				owner: owner.clone(),
-				interests: something,   // Using input to create interests
+				interests: interests_vec,
 				balance: Some(balance),
 				reputation: 0,
 			};
