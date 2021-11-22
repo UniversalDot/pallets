@@ -71,7 +71,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn profiles)]
 	/// Stores a Profiles's unique properties in a StorageMap.
-	pub(super) type Profiles<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Profile<T>>;
+	pub(super) type Profiles<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Profile<T>>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -185,7 +185,7 @@ pub mod pallet {
 			profile.change_reputation();
 
 			// Insert profile into HashMap
-			<Profiles<T>>::insert(profile_id, profile);
+			<Profiles<T>>::insert(owner, profile);
 
 			Ok(profile_id)
 		}
@@ -199,7 +199,7 @@ pub mod pallet {
 		/// Check if profile already exists for account.
 		/// If profile exists return Ok, otherwise throw error.
 		pub fn profile_exists(account: &T::AccountId, profile_id: &T::Hash) -> Result<bool, Error<T>> {
-			match Self::profiles(profile_id) {
+			match Self::profiles(account) {
 				Some(profile) => Ok (profile.owner != *account),
 				None => Err(<Error<T>>::ProfileAlreadyCreated)
 			}
