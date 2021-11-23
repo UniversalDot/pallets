@@ -66,6 +66,11 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	pub type Something<T> = StorageValue<_, u32>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn tasks)]
+	// Store Tasks in a  Storage Map where key: hash, value: struct Task
+	pub type Tasks<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Task<T>>;
+
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
 	#[pallet::event]
