@@ -18,6 +18,21 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use scale_info::TypeInfo;
+
+	// Use AccountId from frame_system
+	type AccountOf<T> = <T as frame_system::Config>::AccountId;
+
+	  // Struct for holding Kitty information.
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
+	#[scale_info(skip_type_params(T))]
+	pub struct Task<T: Config> {
+		pub creator: AccountOf<T>,   // Using 16 bytes to represent a kitty DNA
+		pub requirements: Vec<u8>,
+		pub status: TaskStatus,
+		pub budget: u32,
+		pub owner: AccountOf<T>,
+	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
