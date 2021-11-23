@@ -20,6 +20,9 @@ pub mod pallet {
 	use frame_system::pallet_prelude::*;
 	use scale_info::TypeInfo;
 
+	#[cfg(feature = "std")]
+	use frame_support::serde::{Deserialize, Serialize};
+
 	// Use AccountId from frame_system
 	type AccountOf<T> = <T as frame_system::Config>::AccountId;
 
@@ -27,12 +30,22 @@ pub mod pallet {
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
-		pub creator: AccountOf<T>,   // Using 16 bytes to represent a kitty DNA
+		pub creator: AccountOf<T>,
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
 		pub budget: u32,
 		pub owner: AccountOf<T>,
 	}
+
+	// Set Gender type in Kitty struct.
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
+	#[scale_info(skip_type_params(T))]
+  	#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+  	pub enum TaskStatus {
+    	Created,
+    	InProgress,
+		Closed,
+  	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
