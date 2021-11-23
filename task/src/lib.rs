@@ -83,6 +83,9 @@ pub mod pallet {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
+
+		/// Event for creation of task [AccountID, hash task]
+		TaskCreated(T::AccountId, T::Hash),
 	}
 
 	// Errors inform users that something went wrong.
@@ -103,6 +106,22 @@ pub mod pallet {
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
+
+			// Update storage.
+			<Something<T>>::put(something);
+
+			// Emit an event.
+			Self::deposit_event(Event::SomethingStored(something, who));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn create_task(origin: OriginFor<T>, something: u32) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
