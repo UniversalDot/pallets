@@ -67,6 +67,10 @@ pub mod pallet {
 	pub type Something<T> = StorageValue<_, u32>;
 
 	#[pallet::storage]
+	#[pallet::getter(fn task_count)]
+	pub(super) type TaskCount<T: Config> = StorageValue<_, u64, ValueQuery>;
+
+	#[pallet::storage]
 	#[pallet::getter(fn tasks)]
 	// Store Tasks in a  Storage Map where key: hash, value: struct Task
 	pub(super) type Tasks<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Task<T>>;
