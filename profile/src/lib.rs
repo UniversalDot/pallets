@@ -86,7 +86,7 @@ pub mod pallet {
 		ProfileCreated(T::AccountId, T::Hash),
 		
 		/// Profile was updated.
-		Updated(T::AccountId, T::Hash),
+		ProfileUpdated(T::AccountId, T::Hash),
 
 	}
 
@@ -136,10 +136,30 @@ pub mod pallet {
 			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Ensure that each account can create single profile.
-			// ensure!(Self::profile_exists(&account, &profile_id)?, <Error<T>>::ProfileAlreadyCreated);
+			// ensure!(Self::profile_exists(&account)?, <Error<T>>::ProfileAlreadyCreated);
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
+		/// Dispatchable call that enables profiles to be updated.
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let account = ensure_signed(origin)?;
+
+			// let profile_id = Self::mutate_profile(&account, interests)?;
+			// log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
+
+			// Ensure that each account can create single profile.
+			// ensure!(Self::profile_exists(&account)?, <Error<T>>::ProfileAlreadyCreated);
+
+			// Emit an event.
+			// Self::deposit_event(Event::ProfileUpdated(account, profile_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -192,13 +212,15 @@ pub mod pallet {
 
 		// public function to update already existing profiles
 		// TODO: Add functionality
-		pub fn update_profile(&mut self) {
-			 
-		}
+		// pub fn mutate_profile(owner: &T::AccountId, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
+
+
+		// }
 
 		/// Check if profile already exists for account.
 		/// If profile exists return Ok, otherwise throw error.
-		pub fn profile_exists(account: &T::AccountId, profile_id: &T::Hash) -> Result<bool, Error<T>> {
+		/// TODO: FIX this check
+		pub fn profile_exists(account: &T::AccountId) -> Result<bool, Error<T>> {
 			match Self::profiles(account) {
 				Some(profile) => Ok (profile.owner != *account),
 				None => Err(<Error<T>>::ProfileAlreadyCreated)
@@ -213,6 +235,12 @@ pub mod pallet {
 		pub fn change_reputation(&mut self) {
 			self.reputation += 1;
 		}
+
+		pub fn change_interests(&mut self, new_interests: Vec<u8>) {
+			self.interests = new_interests;
+		}
+
+
 	} 
 
 }

@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-profile'
-version = '0.0.46'
+version = '0.0.47'
 description = 'FRAME pallet for creating profiles'
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
 homepage = 'https://substrate.io/'
