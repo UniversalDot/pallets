@@ -64,6 +64,12 @@ version = '4.0.0-dev'
 default-features = false
 version = '1.0.119'
 
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
 [features]
 default = ['std']
 runtime-benchmarks = ['frame-benchmarking']
