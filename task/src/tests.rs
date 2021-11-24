@@ -18,3 +18,14 @@ fn correct_error_for_none_value() {
 		assert_noop!(Task::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
 	});
 }
+
+#[test]
+fn create_new_task(){
+	new_test_ext().execute_with( || {
+		let mut vec = Vec::new();
+		vec.push(2);
+		
+		// Ensure new task can be creted with [signer, requirements vector, buget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec, 7));
+	});
+}
