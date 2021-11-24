@@ -211,6 +211,12 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			Ok(task_id)
 		}
+
+		pub fn assign_task(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+
+
+			Ok(())
+		}
 	}
 
 }
