@@ -159,6 +159,9 @@ pub mod pallet {
 	//Helper functions
 	impl<T:Config> Pallet<T> {
 
+		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: u32) {
+			
+		}
 	}
 
 }
