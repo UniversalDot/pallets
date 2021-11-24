@@ -100,6 +100,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		NoneValue,
 		/// Errors should have helpful documentation associated with them.
 		StorageOverflow,
+		// Reached maximum number of tasks.
+		TaskCountOverflow,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -176,8 +178,13 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			};
 
 			let task_id = T::Hashing::hash_of(&task);
-
+			
+			// Insert task into Hashmap
 			<Tasks<T>>::insert(task_id, task);
+
+			// Increase task count
+			let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
+			<TaskCount<T>>::put(new_count);
 
 			Ok(task_id)
 		}
