@@ -155,4 +155,10 @@ pub mod pallet {
 			}
 		}
 	}
+	
+	//Helper functions
+	impl<T:Config> Pallet<T> {
+
+	}
+
 }
