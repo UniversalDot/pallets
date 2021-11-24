@@ -89,8 +89,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
 
-		/// Event for creation of task [AccountID, hash task]
+		/// Event for creation of task [AccountID, hash id]
 		TaskCreated(T::AccountId, T::Hash),
+
+		/// Task assigned to new account [AccountID, hash id]
+		TaskAssigned(T::AccountId, T::Hash),
 	}
 
 	// Errors inform users that something went wrong.
@@ -100,8 +103,10 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		NoneValue,
 		/// Errors should have helpful documentation associated with them.
 		StorageOverflow,
-		// Reached maximum number of tasks.
+		/// Reached maximum number of tasks.
 		TaskCountOverflow,
+		/// The given task doesn't exists. Try again
+		TaskNotExist,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -135,11 +140,29 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			let signer = ensure_signed(origin)?;
 
 			// Update storage.
-			// <Something<T>>::put(something);
 			let task_id = Self::new_task(&signer, requirements, budget)?;
+
+			// TODO: Check if user has balance to create task
 
 			// Emit a Task Created Event.
 			Self::deposit_event(Event::TaskCreated(signer,task_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let signer = ensure_signed(origin)?;
+
+			// Update storage.
+			// <Something<T>>::put(something);
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist);
+
+			// Emit a Task Created Event.
+			Self::deposit_event(Event::TaskAssigned(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
