@@ -29,3 +29,17 @@ fn create_new_task(){
 		assert_ok!(Task::create_task(Origin::signed(1), vec, 7));
 	});
 }
+
+#[test]
+fn increase_task_count_when_creating_task(){
+	new_test_ext().execute_with( || {
+		let mut vec = Vec::new();
+		vec.push(2);
+		
+		// Ensure new task can be creted with [signer, requirements vector, buget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec, 7));
+
+		// Assert that count is incremented by 1 after task creation
+		assert_eq!(Task::task_count(), 1);
+	});
+}
