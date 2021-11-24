@@ -135,8 +135,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// <Something<T>>::put(something);
 			let task_id = Self::new_task(&signer, requirements, budget)?;
 
-			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(budget, signer));
+			// Emit a Task Created Event.
+			Self::deposit_event(Event::TaskCreated(signer,task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
