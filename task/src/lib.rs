@@ -159,7 +159,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			// Update storage.
 			// <Something<T>>::put(something);
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist);
+			// let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist);
+			Self::assign_task(&signer, task_id)?;
 
 			// Emit a Task Created Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -213,7 +214,14 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		}
 
 		pub fn assign_task(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
+			let task_creator = task.creator.clone();
+
+			task.owner = to.clone();
+			task.status = TaskStatus::InProgress;
+
+			<Tasks<T>>::insert(task_id, task);
 
 			Ok(())
 		}
