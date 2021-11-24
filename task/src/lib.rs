@@ -16,8 +16,12 @@ mod benchmarking;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
+	//TODO: Better import
+	use crate::TaskStatus::Created;
+use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use frame_support::{
+		sp_runtime::traits::Hash};
 	use scale_info::TypeInfo;
 
 	#[cfg(feature = "std")]
@@ -121,17 +125,18 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_task(origin: OriginFor<T>, something: u32) -> DispatchResult {
+		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: u32) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
-			let who = ensure_signed(origin)?;
+			let signer = ensure_signed(origin)?;
 
 			// Update storage.
-			<Something<T>>::put(something);
+			// <Something<T>>::put(something);
+			let task_id = Self::new_task(&signer, requirements, budget)?;
 
 			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, who));
+			Self::deposit_event(Event::SomethingStored(budget, signer));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -159,8 +164,21 @@ pub mod pallet {
 	//Helper functions
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: u32) {
+		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: u32) -> Result<T::Hash, Error<T>> {
 			
+			let task = Task::<T> {
+				creator: new_creator.clone(),
+				requirements: requirements,
+				status: Created,
+				budget: budget,
+				owner: new_creator.clone(),
+			};
+
+			let task_id = T::Hashing::hash_of(&task);
+
+			<Tasks<T>>::insert(task_id, task);
+
+			Ok(task_id)
 		}
 	}
 
