@@ -23,6 +23,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_support::{
 		sp_runtime::traits::Hash};
 	use scale_info::TypeInfo;
+	use sp_std::vec::Vec;
 
 	#[cfg(feature = "std")]
 	use frame_support::serde::{Deserialize, Serialize};
