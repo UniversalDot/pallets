@@ -94,6 +94,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		/// Task assigned to new account [AccountID, hash id]
 		TaskAssigned(T::AccountId, T::Hash),
+
+		/// Task completed by assigned account [AccountID, hash id]
+		TaskCompleted(T::AccountId, T::Hash),
 	}
 
 	// Errors inform users that something went wrong.
@@ -180,8 +183,10 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Complete task and update storage.
 			Self::mark_finished(&signer, task_id)?;
 
+			//TODO: Task can only be completed by the owner. Otherwise, Error
+
 			// Emit a Task Created Event.
-			// Self::deposit_event(Event::TaskAssigned(signer, task_id));
+			Self::deposit_event(Event::TaskCompleted(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
