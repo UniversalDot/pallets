@@ -132,6 +132,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			Ok(())
 		}
 
+
+		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: u32) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
@@ -150,6 +152,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			Ok(())
 		}
 
+		/// An dispatchable call that starts a task by assigning to new account.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
