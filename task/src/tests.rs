@@ -62,3 +62,19 @@ fn increase_task_count_when_creating_two_tasks(){
 		assert_eq!(Task::task_count(), 2);
 	});
 }
+
+#[test]
+fn assign_task_in_progress(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		let task = Task::create_task(Origin::signed(1), vec1, 7);
+
+		//TODO: Get taskID
+		
+		//assert_ok!(Task::start_task(Origin::signed(2), task_id));
+	});
+}
+
