@@ -160,13 +160,28 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
-			// Update storage.
-			// <Something<T>>::put(something);
-			// let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist);
+			// Assign task and update storage.
 			Self::assign_task(&signer, task_id)?;
 
 			// Emit a Task Created Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
+		/// An dispatchable call that starts a task by assigning to new account.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn complete_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let signer = ensure_signed(origin)?;
+
+			// Complete task and update storage.
+			Self::mark_finished(&signer, task_id)?;
+
+			// Emit a Task Created Event.
+			// Self::deposit_event(Event::TaskAssigned(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -225,6 +240,20 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			task.status = TaskStatus::InProgress;
 
 			<Tasks<T>>::insert(task_id, task);
+
+			Ok(())
+		}
+
+
+		pub fn mark_finished(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+
+			let task_creator = task.creator.clone();
+
+			task.owner = to.clone();
+			task.status = TaskStatus::Closed;
+
+			<Tasks<T>>::remove(task_id);
 
 			Ok(())
 		}
