@@ -146,7 +146,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			// Update storage.
 			let task_id = Self::new_task(&signer, requirements, budget)?;
-
 			// TODO: Check if user has balance to create task
 
 			// Emit a Task Created Event.
@@ -258,7 +257,12 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			task.owner = to.clone();
 			task.status = TaskStatus::Closed;
 
+			// remove task once closed
 			<Tasks<T>>::remove(task_id);
+
+			// Reduce task count
+			let new_count = Self::task_count().saturating_sub(1);
+			<TaskCount<T>>::put(new_count);
 
 			Ok(())
 		}
