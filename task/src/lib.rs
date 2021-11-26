@@ -258,7 +258,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			task.status = TaskStatus::Closed;
 
 			// remove task once closed
-			<Tasks<T>>::remove(task_id);
+			<Tasks<T>>::insert(task_id, task);
 
 			// Reduce task count
 			let new_count = Self::task_count().saturating_sub(1);
@@ -266,6 +266,19 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			Ok(())
 		}
+
+		pub fn delete_task(owner: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			
+			// remove task once closed
+			<Tasks<T>>::remove(task_id);
+
+			// Reduce task count
+			let new_count = Self::task_count().saturating_sub(1);
+			<TaskCount<T>>::put(new_count);
+			
+			Ok(())
+		}
+
 	}
 
 }
