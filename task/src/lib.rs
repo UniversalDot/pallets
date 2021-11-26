@@ -190,6 +190,25 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			Ok(())
 		}
 
+		/// An dispatchable call that starts a task by assigning to new account.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let signer = ensure_signed(origin)?;
+
+			// Complete task and update storage.
+			Self::delete_task(&signer, task_id)?;
+
+			//TODO: Task can only be deleted by the creator. Otherwise, Error
+
+			// Emit a Task Created Event.
+			Self::deposit_event(Event::TaskCompleted(signer, task_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
 		/// An example dispatchable that may throw a custom error.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
@@ -255,14 +274,16 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			task.owner = to.clone();
 			task.status = TaskStatus::Closed;
 
-			// remove task once closed
+			// Insert into update task
 			<Tasks<T>>::insert(task_id, task);
 
 			Ok(())
 		}
 
 		pub fn delete_task(owner: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
-			
+			//Check if the owner is the one who created task
+
+
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);
 
