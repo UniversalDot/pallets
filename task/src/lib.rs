@@ -110,6 +110,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		TaskCountOverflow,
 		/// The given task doesn't exists. Try again
 		TaskNotExist,
+		/// Only the creator of task has the rights to remove task
+		OnlyCreatorClosesTask
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -255,6 +257,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		}
 
 		pub fn assign_task(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
 			let task_creator = task.creator.clone();
@@ -269,6 +272,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 
 		pub fn mark_finished(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
 			task.owner = to.clone();
@@ -281,7 +285,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		}
 
 		pub fn delete_task(owner: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+			// Check if task exists
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			
 			//Check if the owner is the one who created task
+			ensure!(Self::is_task_creator(&task_id, &owner)?, <Error<T>>::OnlyCreatorClosesTask);
 
 
 			// remove task once closed
@@ -292,6 +300,13 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			<TaskCount<T>>::put(new_count);
 			
 			Ok(())
+		}
+
+		pub fn is_task_creator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, Error<T>> {
+			match Self::tasks(task_id) {
+				Some(task) => Ok(task.creator == *task_closer),
+				None => Err(<Error<T>>::TaskNotExist)
+			}
 		}
 
 	}
