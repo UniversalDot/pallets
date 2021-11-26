@@ -25,7 +25,7 @@ fn create_new_task(){
 		let mut vec = Vec::new();
 		vec.push(2);
 		
-		// Ensure new task can be creted with [signer, requirements vector, buget]
+		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec, 7));
 	});
 }
@@ -36,7 +36,7 @@ fn increase_task_count_when_creating_task(){
 		let mut vec = Vec::new();
 		vec.push(2);
 		
-		// Ensure new task can be creted with [signer, requirements vector, buget]
+		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec, 7));
 
 		// Assert that count is incremented by 1 after task creation
@@ -54,7 +54,7 @@ fn increase_task_count_when_creating_two_tasks(){
 		let mut vec2 = Vec::new();
 		vec2.push(7);
 		
-		// Ensure new task can be creted with [signer, requirements vector, buget]
+		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
 		assert_ok!(Task::create_task(Origin::signed(1), vec2, 99));
 
@@ -70,7 +70,6 @@ fn assign_task_in_progress(){
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
-		let task = Task::create_task(Origin::signed(1), vec1, 7);
 
 		//TODO: Get taskID
 		
@@ -78,3 +77,22 @@ fn assign_task_in_progress(){
 	});
 }
 
+
+#[test]
+fn decrease_task_count_when_removing_task(){
+	new_test_ext().execute_with( || {
+		
+		let mut vec = Vec::new();
+		vec.push(2);
+		
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec, 8));
+
+
+		// TODO:Remove task
+		// Task::remove_task()
+		// Assert that count is incremented by 1 after task creation
+		assert_eq!(Task::task_count(), 1);
+
+	});
+}
