@@ -252,17 +252,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		pub fn mark_finished(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
-			let task_creator = task.creator.clone();
-
 			task.owner = to.clone();
 			task.status = TaskStatus::Closed;
 
 			// remove task once closed
 			<Tasks<T>>::insert(task_id, task);
-
-			// Reduce task count
-			let new_count = Self::task_count().saturating_sub(1);
-			<TaskCount<T>>::put(new_count);
 
 			Ok(())
 		}
