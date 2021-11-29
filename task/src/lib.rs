@@ -22,7 +22,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
 		sp_runtime::traits:: Hash,
-		traits::{Currency, tokens::ExistenceRequirement}};
+		traits::{Currency, tokens::ExistenceRequirement}, 
+		transactional};
 	use scale_info::TypeInfo;
 	use sp_std::vec::Vec;
 
@@ -199,6 +200,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		}
 
 		/// An dispatchable call that starts a task by assigning to new account.
+		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
@@ -214,7 +216,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
 			log::info!("owner {:?}.", owner);
-			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive )?;
+			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
