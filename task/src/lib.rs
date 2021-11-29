@@ -210,7 +210,10 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Transfer budget amount from creator to owner
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			let owner = task.owner.clone();
-			let budget = task.budget;
+			let budget = task.budget.clone();
+			log::info!("budget {:?}.", budget);
+			log::info!("signer {:?}.", signer);
+			log::info!("owner {:?}.", owner);
 			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive )?;
 
 			// Complete task and update storage.
