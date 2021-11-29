@@ -203,8 +203,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
 
-			//TODO: Task can only be deleted by the creator. Otherwise, Error
-
 			// Emit a Task Created Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
@@ -290,7 +288,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_creator(&task_id, &owner)?, <Error<T>>::OnlyCreatorClosesTask);
-
 
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);

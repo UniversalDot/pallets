@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-task'
-version = '0.0.14'
+version = '0.0.15'
 description = 'FRAME pallet for creating tasks'
 authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
 homepage = 'https://substrate.io/'
