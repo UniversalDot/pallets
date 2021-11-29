@@ -22,7 +22,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
 		sp_runtime::traits:: Hash,
-		traits::{Currency}};
+		traits::{Currency, tokens::ExistenceRequirement}};
 	use scale_info::TypeInfo;
 	use sp_std::vec::Vec;
 
@@ -182,7 +182,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		}
 
 		/// An dispatchable call that starts a task by assigning to new account.
-		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(2,1))]
 		pub fn complete_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
@@ -192,7 +192,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Complete task and update storage.
 			Self::mark_finished(&signer, task_id)?;
 
-			//TODO: Task can only be completed by the owner. Otherwise, Error
+			// Transfer budget amount from creator to owner
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let owner = task.owner.clone();
+			let budget = task.budget;
+			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive )?;
 
 			// Emit a Task Completed Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
