@@ -120,7 +120,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		/// The given task doesn't exists. Try again
 		TaskNotExist,
 		/// Only the creator of task has the rights to remove task
-		OnlyCreatorClosesTask
+		OnlyCreatorClosesTask,
+		/// Not enough balance to pay
+		NotEnoughBalance,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -208,15 +210,20 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
+			
+
+
 
 			// Transfer budget amount from creator to owner
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let owner = task.owner.clone();
-			let budget = task.budget.clone();
+			let task_owner = task.owner.clone();
+			let budget = task.budget;
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", owner);
-			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive)?;
+			log::info!("owner {:?}.", task_owner);
+			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
+
+			T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
