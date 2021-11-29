@@ -21,7 +21,8 @@ pub mod pallet {
 use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
-		sp_runtime::traits::Hash};
+		sp_runtime::traits:: Hash,
+		traits::{Currency}};
 	use scale_info::TypeInfo;
 	use sp_std::vec::Vec;
 
@@ -30,6 +31,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 	// Use AccountId from frame_system
 	type AccountOf<T> = <T as frame_system::Config>::AccountId;
+	type BalanceOf<T> =<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 	  // Struct for holding Kitty information.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
@@ -38,7 +40,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		pub creator: AccountOf<T>,
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
-		pub budget: u32,
+		pub budget: BalanceOf<T>,
 		pub owner: AccountOf<T>,
 	}
 
@@ -57,6 +59,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		/// Currency type that is linked with AccountID
+		type Currency: Currency<Self::AccountId>;
 	}
 
 	#[pallet::pallet]
@@ -143,7 +148,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: u32) -> DispatchResult {
+		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
@@ -235,7 +240,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	//Helper functions
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: u32) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>) -> Result<T::Hash, Error<T>> {
 			
 			let task = Task::<T> {
 				creator: new_creator.clone(),
