@@ -97,6 +97,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		/// Task completed by assigned account [AccountID, hash id]
 		TaskCompleted(T::AccountId, T::Hash),
+
+		/// Task removed [AccountID, hash id]
+		TaskRemoved(T::AccountId, T::Hash),
 	}
 
 	// Errors inform users that something went wrong.
@@ -167,7 +170,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Assign task and update storage.
 			Self::assign_task(&signer, task_id)?;
 
-			// Emit a Task Created Event.
+			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
@@ -186,7 +189,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			//TODO: Task can only be completed by the owner. Otherwise, Error
 
-			// Emit a Task Created Event.
+			// Emit a Task Completed Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
@@ -203,8 +206,8 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
 
-			// Emit a Task Created Event.
-			Self::deposit_event(Event::TaskCompleted(signer, task_id));
+			// Emit a Task Removed Event.
+			Self::deposit_event(Event::TaskRemoved(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
