@@ -192,12 +192,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Complete task and update storage.
 			Self::mark_finished(&signer, task_id)?;
 
-			// Transfer budget amount from creator to owner
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let owner = task.owner.clone();
-			let budget = task.budget;
-			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive )?;
-
 			// Emit a Task Completed Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
 			// Return a successful DispatchResultWithPostInfo
@@ -211,6 +205,13 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
+
+
+			// Transfer budget amount from creator to owner
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let owner = task.owner.clone();
+			let budget = task.budget;
+			T::Currency::transfer(&signer, &owner, budget, ExistenceRequirement::KeepAlive )?;
 
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
