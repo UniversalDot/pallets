@@ -5,7 +5,7 @@ description = 'Custom pallet for creation decentrilize autonomous organization. 
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
 edition = '2018'
-license = 'Unlicense'
+license = 'Apache-2.0'
 publish = false
 repository = 'https://github.com/UniversalDot/pallets'
 
