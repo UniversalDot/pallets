@@ -180,7 +180,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Assign task and update storage.
 			Self::assign_task(&signer, task_id)?;
 
-
+			// TODO: Investigate why Currency transfer doesn't work 
 			// Transfer budget amount from creator to owner
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			let task_owner = task.owner.clone();
