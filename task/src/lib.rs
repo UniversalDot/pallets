@@ -151,7 +151,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>) -> DispatchResult {
+		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>) -> DispatchResultWithPostInfo {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
@@ -159,12 +159,14 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			// Update storage.
 			let task_id = Self::new_task(&signer, requirements, budget)?;
+			
 			// TODO: Check if user has balance to create task
+			// T::Currency::reserve(&signer, budget).map_err(|_| "locker can't afford to lock the amount requested")?;
 
 			// Emit a Task Created Event.
 			Self::deposit_event(Event::TaskCreated(signer,task_id));
 			// Return a successful DispatchResultWithPostInfo
-			Ok(())
+			Ok(().into())
 		}
 
 		/// An dispatchable call that starts a task by assigning to new account.
@@ -177,6 +179,18 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 			// Assign task and update storage.
 			Self::assign_task(&signer, task_id)?;
+
+
+			// Transfer budget amount from creator to owner
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let task_owner = task.owner.clone();
+			let budget = task.budget;
+			log::info!("budget {:?}.", budget);
+			log::info!("signer {:?}.", signer);
+			log::info!("owner {:?}.", task_owner);
+			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
+
+			T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -209,21 +223,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
-
-			
-
-
-
-			// Transfer budget amount from creator to owner
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let task_owner = task.owner.clone();
-			let budget = task.budget;
-			log::info!("budget {:?}.", budget);
-			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", task_owner);
-			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-
-			T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Complete task and update storage.
 			Self::delete_task(&signer, task_id)?;
