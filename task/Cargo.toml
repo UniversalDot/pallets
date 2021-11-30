@@ -2,8 +2,8 @@
 name = 'pallet-task'
 version = '0.0.23'
 description = 'FRAME pallet for creating tasks'
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
-homepage = 'https://substrate.io/'
+authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
+homepage = 'https://universaldot.foundation'
 edition = '2018'
 license = 'Unlicense'
 publish = false
