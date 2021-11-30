@@ -1,7 +1,16 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
+//! # DAO Module
+//!
+//! Organizes People with a common Vision to work on projects.
+//! This module works as an extension to the Task module since 
+//! it enables the creation of large projects which collect many tasks.
+//! 
+//! A visionary user is able to propose a Vision for the future. 
+//! Within the vision, a specified Road-map is create that is broken 
+//! down into tasks. Thus a DAO is a collection of tasks who are undertaken 
+//! by people that believe in the vision of the Founder. 
+//!  
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
