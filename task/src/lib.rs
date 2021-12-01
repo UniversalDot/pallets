@@ -72,12 +72,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
-	#[pallet::getter(fn something)]
-	// Learn more about declaring storage items:
-	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
-	pub type Something<T> = StorageValue<_, u32>;
-
-	#[pallet::storage]
 	#[pallet::getter(fn task_count)]
 	pub(super) type TaskCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
@@ -91,10 +85,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [something, who]
-		SomethingStored(u32, T::AccountId),
-
 		/// Event for creation of task [AccountID, hash id]
 		TaskCreated(T::AccountId, T::Hash),
 
@@ -111,10 +101,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-		/// Error names should be descriptive.
-		NoneValue,
-		/// Errors should have helpful documentation associated with them.
-		StorageOverflow,
 		/// Reached maximum number of tasks.
 		TaskCountOverflow,
 		/// The given task doesn't exists. Try again
@@ -130,25 +116,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/// An example dispatchable that takes a singles value as a parameter, writes the value to
-		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
-			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
-			let who = ensure_signed(origin)?;
-
-			// Update storage.
-			<Something<T>>::put(something);
-
-			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, who));
-			// Return a successful DispatchResultWithPostInfo
-			Ok(())
-		}
-
-
 		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>) -> DispatchResultWithPostInfo {
@@ -232,28 +199,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
-
-		/// An example dispatchable that may throw a custom error.
-		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
-			let _who = ensure_signed(origin)?;
-
-			// Read a value from storage.
-			match <Something<T>>::get() {
-				// Return an error if the value has not been set.
-				None => Err(Error::<T>::NoneValue)?,
-				Some(old) => {
-					// Increment the value read from storage; will error in the event of overflow.
-					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-					// Update the value in storage with the incremented result.
-					<Something<T>>::put(new);
-					Ok(())
-				},
-			}
-		}
 	}
 	
-	//Helper functions
+	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
 		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>) -> Result<T::Hash, Error<T>> {
