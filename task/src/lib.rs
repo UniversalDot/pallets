@@ -249,19 +249,24 @@ pub mod pallet {
 			let prev_owner = task.owner.clone();
 
 
-			// Change ownership of task
-			// <TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
-			// 	if let Some(index) = owned.iter().position(|&id| id == *task_id) {
-			// 		owned.swap_remove(index);
-			// 		return Ok(());
-			// 	}
-			// 	Err(())
-			// }).map_err(|_| <Error<T>>::TaskNotExist)?;
+			// Remove task ownership of previous owner 
+			<TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
+				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
+					owned.swap_remove(index);
+					return Ok(());
+				}
+				Err(())
+			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
 			task.owner = to.clone();
 			task.status = TaskStatus::InProgress;
 
 			<Tasks<T>>::insert(task_id, task);
+
+			// Assign task to new owner
+			<TasksOwned<T>>::try_mutate(to, |vec| {
+				vec.try_push(*task_id)
+			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
 
 			Ok(())
 		}

@@ -61,13 +61,6 @@ fn assign_task_to_owner(){
 		let task = Task::tasks(hash).expect("should found the task");
 
 		assert_eq!(task.owner, 10);
-
-		
-		// assert_ok!(Task::start_task(Origin::signed(2), hash));
-		// let hash = Task::tasks_owned(2)[0];
-		// let task = Task::tasks(hash).expect("should found the task");
-
-		// assert_eq!(task.owner, 2);
 	});
 }
 
@@ -87,13 +80,13 @@ fn start_tasks_assigns_new_owner(){
 		assert_eq!(task.owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 
-		// Ensure task is started by new owner (user 10)
+		// Ensure task is started by new owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
-		assert_eq!(Task::tasks_owned(1).len(), 0);
 		
-		// TODO: Fix
-		//assert_eq!(Task::tasks_owned(2).len(), 1);
-		// assert_eq!(task.owner, 1);
+		// Ensure when task is starter user 1 has 0 tasks, and user 2 has 1
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+		assert_eq!(Task::tasks_owned(2).len(), 1);
+
 	});
 }
 
