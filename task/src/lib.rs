@@ -282,8 +282,6 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
-			let task_creator = task.creator.clone();
-
 			task.owner = to.clone();
 			task.status = TaskStatus::InProgress;
 
@@ -308,7 +306,7 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		pub fn delete_task(owner: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_creator(&task_id, &owner)?, <Error<T>>::OnlyCreatorClosesTask);
