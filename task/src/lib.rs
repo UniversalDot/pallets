@@ -249,14 +249,14 @@ pub mod pallet {
 			let prev_owner = task.owner.clone();
 
 
-			// Remove `kitty_id` from the KittyOwned vector of `prev_kitty_owner`
-			<TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
-				if let Some(ind) = owned.iter().position(|&id| id == *task_id) {
-					owned.swap_remove(ind);
-					return Ok(());
-				}
-				Err(())
-			}).map_err(|_| <Error<T>>::TaskNotExist)?;
+			// Change ownership of task
+			// <TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
+			// 	if let Some(index) = owned.iter().position(|&id| id == *task_id) {
+			// 		owned.swap_remove(index);
+			// 		return Ok(());
+			// 	}
+			// 	Err(())
+			// }).map_err(|_| <Error<T>>::TaskNotExist)?;
 
 			task.owner = to.clone();
 			task.status = TaskStatus::InProgress;
