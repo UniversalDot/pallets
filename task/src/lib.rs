@@ -185,7 +185,7 @@ pub mod pallet {
 			let signer = ensure_signed(origin)?;
 
 			// Complete task and update storage.
-			Self::mark_finished(&signer, task_id)?;
+			Self::mark_finished(&signer, &task_id)?;
 
 			// Emit a Task Completed Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
@@ -246,10 +246,8 @@ pub mod pallet {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
-			let prev_owner = task.owner.clone();
-
-
-			// Remove task ownership of previous owner 
+			// Remove task ownership of previous owner
+			let prev_owner = task.owner.clone(); 
 			<TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
 				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
 					owned.swap_remove(index);
@@ -258,9 +256,9 @@ pub mod pallet {
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
+			// Change task properties and insert
 			task.owner = to.clone();
 			task.status = TaskStatus::InProgress;
-
 			<Tasks<T>>::insert(task_id, task);
 
 			// Assign task to new owner
@@ -272,15 +270,32 @@ pub mod pallet {
 		}
 
 
-		pub fn mark_finished(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+		pub fn mark_finished(to: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
+
+			// Remove task ownership from current signer 
+			// let prev_owner = task.owner.clone(); 
+			<TasksOwned<T>>::try_mutate(&to, |owned| {
+				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
+					owned.swap_remove(index);
+					return Ok(());
+				}
+				Err(())
+			}).map_err(|_| <Error<T>>::TaskNotExist)?;
+
 			task.owner = to.clone();
 			task.status = TaskStatus::Closed;
+			let task_creator = task.creator.clone();
 
 			// Insert into update task
 			<Tasks<T>>::insert(task_id, task);
+
+			// Assign task to new owner (original creator)
+			<TasksOwned<T>>::try_mutate(task_creator, |vec| {
+				vec.try_push(*task_id)
+			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
 
 			Ok(())
 		}
