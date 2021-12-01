@@ -5,16 +5,14 @@
 //! Each AccountID is able to create profiles that add specific metadata
 //!  to their account. This metadata is used to enrich AccountID with additional
 //!  properties such as reputation, interests, etc. 
-
-
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
-// #[cfg(test)]
-// mod mock;
+#[cfg(test)]
+mod mock;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
