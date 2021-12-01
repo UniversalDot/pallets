@@ -208,11 +208,12 @@ fn decrease_task_count_when_removing_task(){
 		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec, 8));
 
+		// Get hash of task owned
+		let hash = Task::tasks_owned(1)[0];
+		let _task = Task::tasks(hash).expect("should found the task");
 
-		// TODO:Remove task
-		// Task::remove_task()
-		// Assert that count is incremented by 1 after task creation
-		assert_eq!(Task::task_count(), 1);
-
+		// Removing task decreases count
+		assert_ok!(Task::remove_task(Origin::signed(1), hash));
+		assert_eq!(Task::task_count(), 0);
 	});
 }
