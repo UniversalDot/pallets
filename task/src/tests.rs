@@ -2,6 +2,7 @@ use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
 
+
 #[test]
 fn create_new_task(){
 	new_test_ext().execute_with( || {
@@ -47,7 +48,7 @@ fn increase_task_count_when_creating_two_tasks(){
 }
 
 #[test]
-fn assign_task_in_progress(){
+fn assign_task_to_owner(){
 	new_test_ext().execute_with( || {
 
 		let mut vec1 = Vec::new();
@@ -56,9 +57,17 @@ fn assign_task_in_progress(){
 		assert_ok!(Task::create_task(Origin::signed(10), vec1, 7));
 
 		//TODO: Get taskID
-		//let task = Task::tasks(10).len();
+		let hash = Task::tasks_owned(10)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+
+		assert_eq!(task.owner, 10);
+
 		
-		//assert_ok!(Task::start_task(Origin::signed(2), task_id));
+		// assert_ok!(Task::start_task(Origin::signed(2), hash));
+		// let hash = Task::tasks_owned(2)[0];
+		// let task = Task::tasks(hash).expect("should found the task");
+
+		// assert_eq!(task.owner, 2);
 	});
 }
 

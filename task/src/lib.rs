@@ -18,7 +18,7 @@ mod benchmarking;
 pub mod pallet {
 	//TODO: Better import
 	use crate::TaskStatus::Created;
-use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
+	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
 		sp_runtime::traits:: Hash,
@@ -63,6 +63,10 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 
 		/// Currency type that is linked with AccountID
 		type Currency: Currency<Self::AccountId>;
+
+		/// The maximum amount of tasks a single account can own.
+		#[pallet::constant]
+		type MaxTasksOwned: Get<u32>;
 	}
 
 	#[pallet::pallet]
@@ -79,6 +83,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	#[pallet::getter(fn tasks)]
 	// Store Tasks in a  Storage Map where key: hash, value: struct Task
 	pub(super) type Tasks<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Task<T>>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn tasks_owned)]
+	/// Keeps track of what accounts own what Kitty.
+	pub(super) type TasksOwned<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, BoundedVec<T::Hash, T::MaxTasksOwned>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -109,6 +118,9 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 		OnlyCreatorClosesTask,
 		/// Not enough balance to pay
 		NotEnoughBalance,
+		/// Exceed maximum tasks owned
+		ExceedMaxTasksOwned,
+
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -215,6 +227,11 @@ use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 			};
 
 			let task_id = T::Hashing::hash_of(&task);
+
+			// Performs this operation first because as it may fail
+			<TasksOwned<T>>::try_mutate(&new_creator, |tasks_vec| {
+				tasks_vec.try_push(task_id)
+			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
 			
 			// Insert task into Hashmap
 			<Tasks<T>>::insert(task_id, task);

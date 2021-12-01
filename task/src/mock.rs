@@ -71,9 +71,15 @@ impl pallet_balances::Config for Test {
 	type WeightInfo = ();
 }
 
+parameter_types! {
+	// One can owned at most 77 tasks
+	pub const MaxTasksOwned: u32 = 77;
+}
+
 impl pallet_task::Config for Test {
 	type Event = Event;
 	type Currency = Balances;
+	type MaxTasksOwned = MaxTasksOwned;
 }
 
 pub(crate) fn new_test_ext() -> sp_io::TestExternalities {
