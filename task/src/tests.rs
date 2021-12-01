@@ -71,6 +71,32 @@ fn assign_task_to_owner(){
 	});
 }
 
+#[test]
+fn start_tasks_assigns_new_owner(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
+
+		// Ensure new task is assigned to new owner (user 1)
+		let hash = Task::tasks_owned(1)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+		assert_eq!(task.owner, 1);
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+
+		// Ensure task is started by new owner (user 10)
+		assert_ok!(Task::start_task(Origin::signed(2), hash));
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+		
+		// TODO: Fix
+		//assert_eq!(Task::tasks_owned(2).len(), 1);
+		// assert_eq!(task.owner, 1);
+	});
+}
+
 
 #[test]
 fn decrease_task_count_when_removing_task(){

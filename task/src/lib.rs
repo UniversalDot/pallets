@@ -157,19 +157,18 @@ pub mod pallet {
 			let signer = ensure_signed(origin)?;
 
 			// Assign task and update storage.
-			Self::assign_task(&signer, task_id)?;
+			Self::assign_task(&signer, &task_id)?;
 
 			// TODO: Investigate why Currency transfer doesn't work 
 			// Transfer budget amount from creator to owner
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let task_owner = task.owner.clone();
-			let budget = task.budget;
-			log::info!("budget {:?}.", budget);
-			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", task_owner);
-			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-
-			T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
+			// let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			// let task_owner = task.owner.clone();
+			// let budget = task.budget;
+			// log::info!("budget {:?}.", budget);
+			// log::info!("signer {:?}.", signer);
+			// log::info!("owner {:?}.", task_owner);
+			// ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
+			// T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -243,9 +242,21 @@ pub mod pallet {
 			Ok(task_id)
 		}
 
-		pub fn assign_task(to: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+		pub fn assign_task(to: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+
+			let prev_owner = task.owner.clone();
+
+
+			// Remove `kitty_id` from the KittyOwned vector of `prev_kitty_owner`
+			<TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
+				if let Some(ind) = owned.iter().position(|&id| id == *task_id) {
+					owned.swap_remove(ind);
+					return Ok(());
+				}
+				Err(())
+			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
 			task.owner = to.clone();
 			task.status = TaskStatus::InProgress;
