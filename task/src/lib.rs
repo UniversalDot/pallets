@@ -203,7 +203,7 @@ pub mod pallet {
 			let signer = ensure_signed(origin)?;
 
 			// Complete task and update storage.
-			Self::delete_task(&signer, task_id)?;
+			Self::delete_task(&signer, &task_id)?;
 
 			// Emit a Task Removed Event.
 			Self::deposit_event(Event::TaskRemoved(signer, task_id));
@@ -276,7 +276,6 @@ pub mod pallet {
 
 
 			// Remove task ownership from current signer 
-			// let prev_owner = task.owner.clone(); 
 			<TasksOwned<T>>::try_mutate(&to, |owned| {
 				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
 					owned.swap_remove(index);
@@ -300,12 +299,21 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn delete_task(owner: &T::AccountId, task_id:T::Hash) -> Result<(), Error<T>> {
+		pub fn delete_task(owner: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
 			Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_creator(&task_id, &owner)?, <Error<T>>::OnlyCreatorClosesTask);
+
+			// Remove from ownership
+			<TasksOwned<T>>::try_mutate(&owner, |owned| {
+				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
+					owned.swap_remove(index);
+					return Ok(());
+				}
+				Err(())
+			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);
