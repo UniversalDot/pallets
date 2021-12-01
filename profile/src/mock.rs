@@ -1,4 +1,4 @@
-use crate as pallet_template;
+use crate as pallet_profile;
 use frame_support::parameter_types;
 use frame_system as system;
 use sp_core::H256;
@@ -20,7 +20,7 @@ frame_support::construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-		TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+		Profile: pallet_profile::{Pallet, Call, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
 	}
 );
@@ -56,7 +56,7 @@ impl system::Config for Test {
 	type Version = ();
 }
 
-impl pallet_template::Config for Test {
+impl pallet_profile::Config for Test {
 	type Event = Event;
 	type Currency =  Balances;
 }
