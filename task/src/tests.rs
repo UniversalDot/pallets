@@ -112,13 +112,49 @@ fn completing_tasks_assigns_new_owner(){
 		// Ensure when task is started user1 has 0 tasks, and user2 has 1
 		assert_eq!(Task::tasks_owned(1).len(), 0);
 		assert_eq!(Task::tasks_owned(2).len(), 1);
-
+		
 		// Ensure task is completed by current owner (user 2)
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
 		// Ensure that the ownership is reversed again
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 		assert_eq!(Task::tasks_owned(2).len(), 0);
+	});
+}
+
+#[test]
+fn only_creator_deletes_task(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
+
+		// Ensure new task is assigned to new owner (user 1)
+		let hash = Task::tasks_owned(1)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+		assert_eq!(task.owner, 1);
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+
+		// Ensure task is started by new owner (user 2)
+		assert_ok!(Task::start_task(Origin::signed(2), hash));
+		
+		// Ensure when task is started user1 has 0 tasks, and user2 has 1
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+		assert_eq!(Task::tasks_owned(2).len(), 1);
+		
+		// Ensure task is completed by current owner (user 2)
+		assert_ok!(Task::complete_task(Origin::signed(2), hash));
+
+		// Ensure that the ownership is reversed again
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+		assert_eq!(Task::tasks_owned(2).len(), 0);
+
+		// Ensure task is completed by task creator (user 1)
+		assert_noop!(Task::remove_task(Origin::signed(2), hash), Error::<Test>::OnlyCreatorClosesTask);
+		assert_ok!(Task::remove_task(Origin::signed(1), hash));
 	});
 }
 
