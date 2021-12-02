@@ -163,13 +163,13 @@ pub mod pallet {
 			// TODO: Investigate why Currency transfer doesn't work 
 			// Transfer budget amount from creator to owner
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let task_owner = task.owner.clone();
+			let task_creator = task.creator.clone();
 			let budget = task.budget;
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", task_owner);
+			log::info!("owner {:?}.", task_creator);
 			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-			T::Currency::transfer(&signer, &task_owner, budget, ExistenceRequirement::KeepAlive)?;
+			T::Currency::transfer(&signer, &task_creator, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
