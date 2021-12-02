@@ -92,6 +92,8 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Reached maximum number of profiles.
 		ProfileCountOverflow,
+		/// No permission to update this profile.
+		NoUpdateAuthority,
 		/// Profiles can only be deleted by the creator
 		NoDeletionAuthority,
 		/// One Account can only create a single profile. 
@@ -190,7 +192,7 @@ pub mod pallet {
 		// Changes existing profile
 		pub fn change_profile(owner: &T::AccountId, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
-			// let mut profile = Self::profiles(owner);
+			Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 			// Get current balance of owner
 			let balance = T::Currency::free_balance(owner);
 

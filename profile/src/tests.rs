@@ -104,3 +104,22 @@ fn user_can_update_profile() {
 		// assert_eq!(Profile::profiles(Origin::signed(1)).len(), 1);
 	});
 }
+
+#[test]
+fn user_can_only_update_own_profile() {
+	new_test_ext().execute_with(|| {
+		// Create vector of interests
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the user can create profile
+		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+
+		// Create new vector of interests
+		let mut vec2 = Vec::new();
+		vec2.push(99);
+
+		// Ensure another user can NOT update others profile.
+		assert_noop!(Profile::update_profile(Origin::signed(2), vec2), Error::<Test>::NoUpdateAuthority);
+	});
+}
