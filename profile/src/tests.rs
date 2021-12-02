@@ -80,3 +80,27 @@ fn user_can_only_delete_own_profile() {
 		assert_eq!(Profile::profile_count(), 1);
 	});
 }
+
+#[test]
+fn user_can_update_profile() {
+	new_test_ext().execute_with(|| {
+		// Create vector of interests
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the user can create profile
+		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+
+		// Create new vector of interests
+		let mut vec2 = Vec::new();
+		vec2.push(99);
+
+		// Ensure user can update profile with new interests
+		assert_ok!(Profile::update_profile(Origin::signed(1), vec2));
+		
+		// Ensure count is NOT reduced when removing profile
+		assert_eq!(Profile::profile_count(), 1);
+		// TODO: Make sure this test is cover appropriately
+		// assert_eq!(Profile::profiles(Origin::signed(1)).len(), 1);
+	});
+}

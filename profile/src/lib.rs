@@ -68,7 +68,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn profiles)]
-	/// Stores a Profiles's unique properties in a StorageMap.
+	/// Stores a Profile unique properties in a StorageMap.
 	pub(super) type Profiles<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Profile<T>>;
 
 	// Pallets use events to inform users when important changes are made.
@@ -81,6 +81,9 @@ pub mod pallet {
 
 		/// Profile was successfully deleted.
 		ProfileDeleted(T::AccountId),
+
+		/// Profile was successfully updated.
+		ProfileUpdated(T::AccountId, T::Hash),
 
 	}
 
@@ -114,9 +117,27 @@ pub mod pallet {
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated(account, profile_id));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
+
+			/// Dispatchable call that ensures user can update existing personal profile in storage.
+			#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+			pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+				// Check that the extrinsic was signed and get the signer.
+				// This function will return an error if the extrinsic is not signed.
+				// https://docs.substrate.io/v3/runtime/origins
+				let account = ensure_signed(origin)?;
+				
+				// Since Each account can have one profile, we call into generate profile again
+				let profile_id = Self::change_profile(&account, interests)?;
+				log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
+	
+				// Emit an event.
+				Self::deposit_event(Event::ProfileUpdated(account, profile_id));
+				
+				Ok(())
+			}
 
 
 		/// Dispatchable call that enables every new actor to delete profile from storage.
@@ -156,15 +177,40 @@ pub mod pallet {
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
 
-			// Change reputation
-			profile.change_reputation();
-
 			// Insert profile into HashMap
 			<Profiles<T>>::insert(owner, profile);
 
 			// Increase profile count
 			let new_count = Self::profile_count().checked_add(1).ok_or(<Error<T>>::ProfileCountOverflow)?;
 			<ProfileCount<T>>::put(new_count);
+
+			Ok(profile_id)
+		}
+
+		// Changes existing profile
+		pub fn change_profile(owner: &T::AccountId, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
+			
+			// let mut profile = Self::profiles(owner);
+			// Get current balance of owner
+			let balance = T::Currency::free_balance(owner);
+
+			// Populate Profile struct
+			let mut profile = Profile::<T> {
+				owner: owner.clone(),
+				interests: new_interests,
+				balance: Some(balance),
+				reputation: 0,
+			};
+
+			// Get hash of profile
+			let profile_id = T::Hashing::hash_of(&profile);
+
+			// Change reputation
+			profile.change_reputation();
+
+			// Insert profile into HashMap
+			// TODO: Use try_mutate instead
+			<Profiles<T>>::insert(owner, profile);
 
 			Ok(profile_id)
 		}
