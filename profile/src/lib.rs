@@ -89,8 +89,8 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Reached maximum number of profiles.
 		ProfileCountOverflow,
-		/// Errors should have helpful documentation associated with them.
-		StorageOverflow,
+		/// Profiles can only be deleted by the creator
+		NoDeletionAuthority,
 		/// One Account can only create a single profile. 
 		ProfileAlreadyCreated,
 	}
@@ -171,6 +171,9 @@ pub mod pallet {
 
 		// Public function that deletes a user profile
 		pub fn delete_profile(owner: &T::AccountId) -> Result<(), Error<T>> {
+			// Ensure that only creator of profile can delete it
+			Self::profiles(owner).ok_or(<Error<T>>::NoDeletionAuthority)?;
+			
 			<Profiles<T>>::remove(owner);
 
 			// Reduce profile count

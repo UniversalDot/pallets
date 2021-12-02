@@ -62,3 +62,21 @@ fn delete_profile_decreases_profile_count() {
 		assert_eq!(Profile::profile_count(), 0);
 	});
 }
+
+#[test]
+fn user_can_only_delete_own_profile() {
+	new_test_ext().execute_with(|| {
+		// Create vector of interests
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the user can create profile
+		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+
+		// Ensure another user can NOT delete others profile
+		assert_noop!(Profile::remove_profile(Origin::signed(2)), Error::<Test>::NoDeletionAuthority);
+		
+		// Ensure count is NOT reduced when removing profile
+		assert_eq!(Profile::profile_count(), 1);
+	});
+}
