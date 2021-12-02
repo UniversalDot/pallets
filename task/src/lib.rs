@@ -34,7 +34,7 @@ pub mod pallet {
 	type AccountOf<T> = <T as frame_system::Config>::AccountId;
 	type BalanceOf<T> =<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-	  // Struct for holding Kitty information.
+	  // Struct for holding Task information.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
@@ -45,7 +45,7 @@ pub mod pallet {
 		pub owner: AccountOf<T>,
 	}
 
-	// Set Gender type in Kitty struct.
+	// Set TaskStatus enum.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
   	#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -77,16 +77,17 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
 	#[pallet::getter(fn task_count)]
+	/// Get total number of Tasks in the system
 	pub(super) type TaskCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn tasks)]
-	// Store Tasks in a  Storage Map where key: hash, value: struct Task
+	/// Store Tasks in a  Storage Map where [key: hash, value: Task]
 	pub(super) type Tasks<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Task<T>>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn tasks_owned)]
-	/// Keeps track of what accounts own what Kitty.
+	/// Keeps track of which Accounts own which Tasks.
 	pub(super) type TasksOwned<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, BoundedVec<T::Hash, T::MaxTasksOwned>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
