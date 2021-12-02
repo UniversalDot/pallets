@@ -56,11 +56,30 @@ fn assign_task_to_owner(){
 
 		assert_ok!(Task::create_task(Origin::signed(10), vec1, 7));
 
-		//TODO: Get taskID
+		// Get task through the hash
 		let hash = Task::tasks_owned(10)[0];
 		let task = Task::tasks(hash).expect("should found the task");
 
 		assert_eq!(task.owner, 10);
+	});
+}
+
+#[test]
+fn verify_inputs_outputs_to_tasks(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		assert_ok!(Task::create_task(Origin::signed(10), vec1, 7));
+
+		// Get task through the hash
+		let hash = Task::tasks_owned(10)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+
+		// Ensure that task properties are assigned correctly
+		assert_eq!(task.owner, 10);
+		assert_eq!(task.budget, 7);
 	});
 }
 
