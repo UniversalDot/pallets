@@ -115,6 +115,23 @@ pub mod pallet {
 			Ok(())
 		}
 
+
+		/// Dispatchable call that enables every new actor to delete profile from storage.
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn remove_profile(origin: OriginFor<T>) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let account = ensure_signed(origin)?;
+
+			Self::delete_profile(&account)?;
+
+			// Emit an event.
+			// Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
 	}
 
 	// ** Helper internal functions ** //
@@ -143,6 +160,12 @@ pub mod pallet {
 			<Profiles<T>>::insert(owner, profile);
 
 			Ok(profile_id)
+		}
+
+		// Public function that deletes a user profile
+		pub fn delete_profile(owner: &T::AccountId) -> Result<(), Error<T>> {
+			<Profiles<T>>::remove(owner);
+			Ok(())
 		}
 	}
 
