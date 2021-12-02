@@ -61,10 +61,10 @@ pub mod pallet {
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
-	#[pallet::getter(fn something)]
+	#[pallet::getter(fn profile_count)]
 	// Learn more about declaring storage items:
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
-	pub type Something<T> = StorageValue<_, u32>;
+	pub(super) type ProfileCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn profiles)]
@@ -87,8 +87,8 @@ pub mod pallet {
 	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-		/// Error names should be descriptive.
-		NoneValue,
+		/// Reached maximum number of profiles.
+		ProfileCountOverflow,
 		/// Errors should have helpful documentation associated with them.
 		StorageOverflow,
 		/// One Account can only create a single profile. 
@@ -162,12 +162,21 @@ pub mod pallet {
 			// Insert profile into HashMap
 			<Profiles<T>>::insert(owner, profile);
 
+			// Increase profile count
+			let new_count = Self::profile_count().checked_add(1).ok_or(<Error<T>>::ProfileCountOverflow)?;
+			<ProfileCount<T>>::put(new_count);
+
 			Ok(profile_id)
 		}
 
 		// Public function that deletes a user profile
 		pub fn delete_profile(owner: &T::AccountId) -> Result<(), Error<T>> {
 			<Profiles<T>>::remove(owner);
+
+			// Reduce profile count
+			let new_count = Self::profile_count().saturating_sub(1);
+			<ProfileCount<T>>::put(new_count);
+			
 			Ok(())
 		}
 	}
