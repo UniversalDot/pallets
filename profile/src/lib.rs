@@ -79,6 +79,9 @@ pub mod pallet {
 		/// Profile was successfully created. 
 		ProfileCreated(T::AccountId, T::Hash),
 
+		/// Profile was successfully deleted.
+		ProfileDeleted(T::AccountId),
+
 	}
 
 	// Errors inform users that something went wrong.
@@ -127,7 +130,7 @@ pub mod pallet {
 			Self::delete_profile(&account)?;
 
 			// Emit an event.
-			// Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			Self::deposit_event(Event::ProfileDeleted(account));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
