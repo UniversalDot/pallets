@@ -48,7 +48,7 @@ fn increase_task_count_when_creating_two_tasks(){
 }
 
 #[test]
-fn assign_task_to_owner(){
+fn assign_task_to_current_owner(){
 	new_test_ext().execute_with( || {
 
 		let mut vec1 = Vec::new();
@@ -60,7 +60,7 @@ fn assign_task_to_owner(){
 		let hash = Task::tasks_owned(10)[0];
 		let task = Task::tasks(hash).expect("should found the task");
 
-		assert_eq!(task.owner, 10);
+		assert_eq!(task.current_owner, 10);
 	});
 }
 
@@ -78,13 +78,13 @@ fn verify_inputs_outputs_to_tasks(){
 		let task = Task::tasks(hash).expect("should found the task");
 
 		// Ensure that task properties are assigned correctly
-		assert_eq!(task.owner, 10);
+		assert_eq!(task.current_owner, 10);
 		assert_eq!(task.budget, 7);
 	});
 }
 
 #[test]
-fn start_tasks_assigns_new_owner(){
+fn start_tasks_assigns_new_current_owner(){
 	new_test_ext().execute_with( || {
 
 		let mut vec1 = Vec::new();
@@ -93,13 +93,13 @@ fn start_tasks_assigns_new_owner(){
 		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
 
-		// Ensure new task is assigned to new owner (user 1)
+		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
 		let task = Task::tasks(hash).expect("should found the task");
-		assert_eq!(task.owner, 1);
+		assert_eq!(task.current_owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 
-		// Ensure task is started by new owner (user 2)
+		// Ensure task is started by new current_owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
 		
 		// Ensure when task is started user1 has 0 tasks, and user2 has 1
@@ -110,7 +110,7 @@ fn start_tasks_assigns_new_owner(){
 }
 
 #[test]
-fn completing_tasks_assigns_new_owner(){
+fn completing_tasks_assigns_new_current_owner(){
 	new_test_ext().execute_with( || {
 
 		let mut vec1 = Vec::new();
@@ -119,20 +119,20 @@ fn completing_tasks_assigns_new_owner(){
 		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
 
-		// Ensure new task is assigned to new owner (user 1)
+		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
 		let task = Task::tasks(hash).expect("should found the task");
-		assert_eq!(task.owner, 1);
+		assert_eq!(task.current_owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 
-		// Ensure task is started by new owner (user 2)
+		// Ensure task is started by new current_owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
 		
 		// Ensure when task is started user1 has 0 tasks, and user2 has 1
 		assert_eq!(Task::tasks_owned(1).len(), 0);
 		assert_eq!(Task::tasks_owned(2).len(), 1);
 		
-		// Ensure task is completed by current owner (user 2)
+		// Ensure task is completed by current current_owner (user 2)
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
 		// Ensure that the ownership is reversed again
@@ -151,20 +151,20 @@ fn only_creator_deletes_task(){
 		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
 
-		// Ensure new task is assigned to new owner (user 1)
+		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
 		let task = Task::tasks(hash).expect("should found the task");
-		assert_eq!(task.owner, 1);
+		assert_eq!(task.current_owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 
-		// Ensure task is started by new owner (user 2)
+		// Ensure task is started by new current_owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
 		
 		// Ensure when task is started user1 has 0 tasks, and user2 has 1
 		assert_eq!(Task::tasks_owned(1).len(), 0);
 		assert_eq!(Task::tasks_owned(2).len(), 1);
 		
-		// Ensure task is completed by current owner (user 2)
+		// Ensure task is completed by current current_owner (user 2)
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
 		// Ensure that the ownership is reversed again
@@ -187,20 +187,20 @@ fn when_task_is_removed_ownership_is_cleared(){
 		// Ensure new task can be created with [signer, requirements vector, budget]
 		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
 
-		// Ensure new task is assigned to new owner (user 1)
+		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
 		let task = Task::tasks(hash).expect("should found the task");
-		assert_eq!(task.owner, 1);
+		assert_eq!(task.current_owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 
-		// Ensure task is started by new owner (user 2)
+		// Ensure task is started by new current_owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
 		
 		// Ensure when task is started user1 has 0 tasks, and user2 has 1
 		assert_eq!(Task::tasks_owned(1).len(), 0);
 		assert_eq!(Task::tasks_owned(2).len(), 1);
 		
-		// Ensure task is completed by current owner (user 2)
+		// Ensure task is completed by current current_owner (user 2)
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
 		// Ensure that the ownership is reversed again

@@ -40,10 +40,10 @@ pub mod pallet {
 	pub struct Task<T: Config> {
 		pub initiator: AccountOf<T>,
 		pub volunteer: AccountOf<T>,
+		pub current_owner: AccountOf<T>,
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
 		pub budget: BalanceOf<T>,
-		pub owner: AccountOf<T>,
 	}
 
 	// Set TaskStatus enum.
@@ -162,13 +162,13 @@ pub mod pallet {
 			Self::assign_task(&signer, &task_id)?;
 
 			// TODO: Investigate why Currency transfer doesn't work 
-			// Transfer budget amount from initiator to owner
+			// Transfer budget amount from initiator to volunteer
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			let task_initiator = task.initiator.clone();
 			let budget = task.budget;
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", task_initiator);
+			log::info!("task_initiator {:?}.", task_initiator);
 			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
 			T::Currency::transfer(&signer, &task_initiator, budget, ExistenceRequirement::KeepAlive)?;
 
@@ -225,7 +225,7 @@ pub mod pallet {
 				requirements: requirements,
 				status: Created,
 				budget: budget,
-				owner: from_initiator.clone(),
+				current_owner: from_initiator.clone(),
 			};
 
 			let task_id = T::Hashing::hash_of(&task);
@@ -249,8 +249,8 @@ pub mod pallet {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
-			// Remove task ownership of previous owner
-			let prev_owner = task.owner.clone(); 
+			// Remove task ownership from previous owner
+			let prev_owner = task.current_owner.clone(); 
 			<TasksOwned<T>>::try_mutate(&prev_owner, |owned| {
 				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
 					owned.swap_remove(index);
@@ -260,11 +260,11 @@ pub mod pallet {
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
 			// Change task properties and insert
-			task.owner = to.clone();
+			task.current_owner = to.clone();
 			task.status = TaskStatus::InProgress;
 			<Tasks<T>>::insert(task_id, task);
 
-			// Assign task to new owner
+			// Assign task to volunteer
 			<TasksOwned<T>>::try_mutate(to, |vec| {
 				vec.try_push(*task_id)
 			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
@@ -287,7 +287,7 @@ pub mod pallet {
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
-			task.owner = to.clone();
+			task.current_owner = to.clone();
 			task.status = TaskStatus::Closed;
 			let task_initiator = task.initiator.clone();
 
@@ -302,15 +302,15 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn delete_task(owner: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
+		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
 			Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
-			ensure!(Self::is_task_initiator(&task_id, &owner)?, <Error<T>>::OnlyInitiatorClosesTask);
+			ensure!(Self::is_task_initiator(&task_id, &task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);
 
 			// Remove from ownership
-			<TasksOwned<T>>::try_mutate(&owner, |owned| {
+			<TasksOwned<T>>::try_mutate(&task_initiator, |owned| {
 				if let Some(index) = owned.iter().position(|&id| id == *task_id) {
 					owned.swap_remove(index);
 					return Ok(());
