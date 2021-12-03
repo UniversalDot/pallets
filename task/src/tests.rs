@@ -110,6 +110,32 @@ fn start_tasks_assigns_new_current_owner(){
 }
 
 #[test]
+fn start_tasks_assigns_task_to_volunteer(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
+
+		// Ensure new task is assigned to new current_owner (user 1)
+		let hash = Task::tasks_owned(1)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+		assert_eq!(task.current_owner, 1);
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+
+		// Ensure task is started by new current_owner (user 2)
+		assert_ok!(Task::start_task(Origin::signed(2), hash));
+		
+		// Ensure when task is started it is assigned to volunteer (user 2)
+		assert_eq!(task.volunteer, 1);
+		assert_eq!(Task::tasks_owned(2).len(), 1);
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+	});
+}
+
+#[test]
 fn completing_tasks_assigns_new_current_owner(){
 	new_test_ext().execute_with( || {
 

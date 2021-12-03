@@ -261,6 +261,7 @@ pub mod pallet {
 
 			// Change task properties and insert
 			task.current_owner = to.clone();
+			task.volunteer = to.clone();
 			task.status = TaskStatus::InProgress;
 			<Tasks<T>>::insert(task_id, task);
 
