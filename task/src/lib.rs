@@ -39,6 +39,7 @@ pub mod pallet {
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
 		pub initiator: AccountOf<T>,
+		pub volunteer: AccountOf<T>,
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
 		pub budget: BalanceOf<T>,
@@ -220,6 +221,7 @@ pub mod pallet {
 			
 			let task = Task::<T> {
 				initiator: from_initiator.clone(),
+				volunteer: from_initiator.clone(),
 				requirements: requirements,
 				status: Created,
 				budget: budget,
