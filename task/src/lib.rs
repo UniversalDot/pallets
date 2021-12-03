@@ -122,7 +122,8 @@ pub mod pallet {
 		NotEnoughBalance,
 		/// Exceed maximum tasks owned
 		ExceedMaxTasksOwned,
-
+		/// You are not allowed to complete this task
+		NoPermissionToComplete,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -278,6 +279,11 @@ pub mod pallet {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
+			// Check if task is in progress before closing
+			ensure!(TaskStatus::InProgress == task.status, <Error<T>>::NoPermissionToComplete);
+
+			// TODO: Check if the volunteer is the one who finished task
+
 
 			// Remove task ownership from current signer 
 			<TasksOwned<T>>::try_mutate(&to, |owned| {
@@ -288,6 +294,7 @@ pub mod pallet {
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
+			// Set current owner to initiator
 			task.current_owner = task.initiator.clone();
 			task.status = TaskStatus::Closed;
 			let task_initiator = task.initiator.clone();

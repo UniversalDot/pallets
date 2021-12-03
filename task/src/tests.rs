@@ -205,6 +205,32 @@ fn only_creator_deletes_task(){
 }
 
 #[test]
+fn only_started_task_can_be_completed(){
+	new_test_ext().execute_with( || {
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7));
+
+		// Ensure new task is assigned to new current_owner (user 1)
+		let hash = Task::tasks_owned(1)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+		assert_eq!(task.current_owner, 1);
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+
+		assert_noop!(Task::complete_task(Origin::signed(2), hash), Error::<Test>::NoPermissionToComplete);
+
+		// Ensure task is started by new current_owner (user 2)
+		assert_ok!(Task::start_task(Origin::signed(2), hash));
+		
+		// Ensure task is completed by current current_owner (user 2)
+		assert_ok!(Task::complete_task(Origin::signed(2), hash));
+	});
+}
+
+#[test]
 fn when_task_is_removed_ownership_is_cleared(){
 	new_test_ext().execute_with( || {
 
