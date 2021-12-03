@@ -172,7 +172,7 @@ fn only_creator_deletes_task(){
 		assert_eq!(Task::tasks_owned(2).len(), 0);
 
 		// Ensure task is removed by task creator (user 1)
-		assert_noop!(Task::remove_task(Origin::signed(2), hash), Error::<Test>::OnlyCreatorClosesTask);
+		assert_noop!(Task::remove_task(Origin::signed(2), hash), Error::<Test>::OnlyInitiatorClosesTask);
 		assert_ok!(Task::remove_task(Origin::signed(1), hash));
 	});
 }

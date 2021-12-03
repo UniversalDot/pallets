@@ -38,7 +38,7 @@ pub mod pallet {
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
-		pub creator: AccountOf<T>,
+		pub initiator: AccountOf<T>,
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
 		pub budget: BalanceOf<T>,
@@ -115,8 +115,8 @@ pub mod pallet {
 		TaskCountOverflow,
 		/// The given task doesn't exists. Try again
 		TaskNotExist,
-		/// Only the creator of task has the rights to remove task
-		OnlyCreatorClosesTask,
+		/// Only the initiator of task has the rights to remove task
+		OnlyInitiatorClosesTask,
 		/// Not enough balance to pay
 		NotEnoughBalance,
 		/// Exceed maximum tasks owned
@@ -161,15 +161,15 @@ pub mod pallet {
 			Self::assign_task(&signer, &task_id)?;
 
 			// TODO: Investigate why Currency transfer doesn't work 
-			// Transfer budget amount from creator to owner
+			// Transfer budget amount from initiator to owner
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let task_creator = task.creator.clone();
+			let task_initiator = task.initiator.clone();
 			let budget = task.budget;
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
-			log::info!("owner {:?}.", task_creator);
+			log::info!("owner {:?}.", task_initiator);
 			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-			T::Currency::transfer(&signer, &task_creator, budget, ExistenceRequirement::KeepAlive)?;
+			T::Currency::transfer(&signer, &task_initiator, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -216,20 +216,20 @@ pub mod pallet {
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(new_creator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(from_initiator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>) -> Result<T::Hash, Error<T>> {
 			
 			let task = Task::<T> {
-				creator: new_creator.clone(),
+				initiator: from_initiator.clone(),
 				requirements: requirements,
 				status: Created,
 				budget: budget,
-				owner: new_creator.clone(),
+				owner: from_initiator.clone(),
 			};
 
 			let task_id = T::Hashing::hash_of(&task);
 
 			// Performs this operation first because as it may fail
-			<TasksOwned<T>>::try_mutate(&new_creator, |tasks_vec| {
+			<TasksOwned<T>>::try_mutate(&from_initiator, |tasks_vec| {
 				tasks_vec.try_push(task_id)
 			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
 			
@@ -287,13 +287,13 @@ pub mod pallet {
 
 			task.owner = to.clone();
 			task.status = TaskStatus::Closed;
-			let task_creator = task.creator.clone();
+			let task_initiator = task.initiator.clone();
 
 			// Insert into update task
 			<Tasks<T>>::insert(task_id, task);
 
-			// Assign task to new owner (original creator)
-			<TasksOwned<T>>::try_mutate(task_creator, |vec| {
+			// Assign task to new owner (original initiator)
+			<TasksOwned<T>>::try_mutate(task_initiator, |vec| {
 				vec.try_push(*task_id)
 			}).map_err(|_| <Error<T>>::ExceedMaxTasksOwned)?;
 
@@ -305,7 +305,7 @@ pub mod pallet {
 			Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
-			ensure!(Self::is_task_creator(&task_id, &owner)?, <Error<T>>::OnlyCreatorClosesTask);
+			ensure!(Self::is_task_initiator(&task_id, &owner)?, <Error<T>>::OnlyInitiatorClosesTask);
 
 			// Remove from ownership
 			<TasksOwned<T>>::try_mutate(&owner, |owned| {
@@ -326,9 +326,9 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn is_task_creator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, Error<T>> {
+		pub fn is_task_initiator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, Error<T>> {
 			match Self::tasks(task_id) {
-				Some(task) => Ok(task.creator == *task_closer),
+				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
 		}
