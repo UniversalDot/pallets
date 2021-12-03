@@ -288,7 +288,7 @@ pub mod pallet {
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
-			task.current_owner = to.clone();
+			task.current_owner = task.initiator.clone();
 			task.status = TaskStatus::Closed;
 			let task_initiator = task.initiator.clone();
 

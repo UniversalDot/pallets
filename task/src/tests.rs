@@ -162,6 +162,7 @@ fn completing_tasks_assigns_new_current_owner(){
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
 		// Ensure that the ownership is reversed again
+		assert_eq!(task.current_owner, 1);
 		assert_eq!(Task::tasks_owned(1).len(), 1);
 		assert_eq!(Task::tasks_owned(2).len(), 0);
 	});
