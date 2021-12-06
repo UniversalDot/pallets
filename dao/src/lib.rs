@@ -18,7 +18,7 @@
 //!  
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
-use sp_std::vec::Vec;
+
 
 #[cfg(test)]
 mod mock;
@@ -33,6 +33,7 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use sp_std::vec::Vec;
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
