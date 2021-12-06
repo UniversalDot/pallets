@@ -12,9 +12,35 @@ fn it_works_for_default_value() {
 }
 
 #[test]
-fn correct_error_for_none_value() {
+fn can_create_vision() {
 	new_test_ext().execute_with(|| {
-		// Ensure the expected error is thrown when no value is present.
+		
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
 		// assert_noop!(Dao::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
+	});
+}
+
+#[test]
+fn can_not_create_vision_that_already_exists() {
+	new_test_ext().execute_with(|| {
+		
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
+
+		// Create a new vector with same content. If the same content its hash is the same.
+		let mut vec2 = Vec::new();
+		vec2.push(7);
+
+		// Ensure the DAO can NOT Create create a vision that already exists
+		assert_noop!(Dao::create_vision(Origin::signed(1), vec2), Error::<Test>::VisionAlreadyExists);
+
+
 	});
 }
