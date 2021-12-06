@@ -48,7 +48,7 @@ pub mod pallet {
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
-	#[pallet::getter(fn vision)]
+	// #[pallet::getter(fn vision)]
 	// Learn more about declaring storage items:
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
