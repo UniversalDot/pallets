@@ -10,6 +10,11 @@
 //! Within the vision, a specified Road-map is create that is broken 
 //! down into tasks. Thus a DAO is a collection of tasks who are undertaken 
 //! by people that believe in the vision of the Founder. 
+//! 
+//! Users support a Vision by signing a vision document. Signing a vision document
+//! enrolls users in DAO where they will be able to create/fulfill tasks in 
+//! support of the overall vision. For completion of tasks, users are rewarded tokens
+//! and increased reputation.
 //!  
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
