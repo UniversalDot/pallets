@@ -18,6 +18,7 @@
 //!  
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
+use sp_std::vec::Vec;
 
 #[cfg(test)]
 mod mock;
