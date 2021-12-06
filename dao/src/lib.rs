@@ -64,6 +64,9 @@ pub mod pallet {
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
+
+		/// Vision successfully create [AccountID, Vec]
+		VisionCreated(T::AccountId, Vec<u8>),
 	}
 
 	// Errors inform users that something went wrong.
@@ -98,7 +101,7 @@ pub mod pallet {
 			// Store the vision with the sender and block number.
 			Vision::<T>::insert(&vision_document, (&sender, current_block));
 			// Emit an event that the claim was created.
-			// Self::deposit_event(Event::VisionCreated(sender, proof));
+			Self::deposit_event(Event::VisionCreated(sender, vision_document));
 			Ok(())
 		}
 
