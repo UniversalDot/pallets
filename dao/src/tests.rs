@@ -59,3 +59,15 @@ fn can_remove_vision() {
 		assert_ok!(Dao::remove_vision(Origin::signed(1), vec));
 	});
 }
+
+#[test]
+fn when_removing_vision_ensure_it_exists() {
+	new_test_ext().execute_with(|| {
+
+		let mut vec2 = Vec::new();
+		vec2.push(8);
+
+		// Ensure the DAO can remove a vision document
+		assert_noop!(Dao::remove_vision(Origin::signed(1), vec2), Error::<Test>::NoSuchVision);
+	});
+}

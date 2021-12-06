@@ -78,6 +78,8 @@ pub mod pallet {
 		StorageOverflow,
 		/// The vision has already been created.
 		VisionAlreadyExists,
+		/// The Vision doesn't exist
+		NoSuchVision
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -112,7 +114,7 @@ pub mod pallet {
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
             // Verify that the specified vision has been created.
-            // ensure!(Vision::<T>::contains_key(&proof), Error::<T>::NoSuchVision);
+            ensure!(Vision::<T>::contains_key(&proof), Error::<T>::NoSuchVision);
             // Get owner of the vision.
             let (owner, _) = Vision::<T>::get(&proof);
             // Verify that sender of the current call is the vision creator
