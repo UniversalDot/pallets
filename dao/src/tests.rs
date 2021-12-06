@@ -20,7 +20,6 @@ fn can_create_vision() {
 
 		// Ensure the DAO can create a vision document
 		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
-		// assert_noop!(Dao::cause_error(Origin::signed(1)), Error::<Test>::NoneValue);
 	});
 }
 
@@ -40,7 +39,23 @@ fn can_not_create_vision_that_already_exists() {
 
 		// Ensure the DAO can NOT Create create a vision that already exists
 		assert_noop!(Dao::create_vision(Origin::signed(1), vec2), Error::<Test>::VisionAlreadyExists);
+	});
+}
 
+#[test]
+fn can_remove_vision() {
+	new_test_ext().execute_with(|| {
+		
+		let mut vec = Vec::new();
+		vec.push(7);
 
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
+
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the DAO can remove a vision document
+		assert_ok!(Dao::remove_vision(Origin::signed(1), vec));
 	});
 }

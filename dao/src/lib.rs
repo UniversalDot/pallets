@@ -105,6 +105,25 @@ pub mod pallet {
 			Ok(())
 		}
 
+		#[pallet::weight(10_000)]
+        pub fn remove_vision(origin: OriginFor<T>, proof: Vec<u8>) -> DispatchResult {
+            // Check that the extrinsic was signed and get the signer.
+            // This function will return an error if the extrinsic is not signed.
+            // https://docs.substrate.io/v3/runtime/origins
+            let sender = ensure_signed(origin)?;
+            // Verify that the specified vision has been created.
+            // ensure!(Vision::<T>::contains_key(&proof), Error::<T>::NoSuchVision);
+            // Get owner of the vision.
+            let (owner, _) = Vision::<T>::get(&proof);
+            // Verify that sender of the current call is the vision creator
+            // ensure!(sender == owner, Error::<T>::NotVisionOwner);
+            // Remove vision from storage.
+            Vision::<T>::remove(&proof);
+            // Emit an event that the vision was erased.
+            // Self::deposit_event(Event::VisionRemoved(sender, proof));
+            Ok(())
+        }
+
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
