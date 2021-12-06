@@ -80,6 +80,26 @@ pub mod pallet {
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
+
+		/// A dispatchable function for creating a vision and publishing it on chain
+		/// The vision is signed by submitter and uses current block.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn create_vision(origin: OriginFor<T>, proof: Vec<u8>) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let sender = ensure_signed(origin)?;
+			// Verify that the specified proof has not already been claimed.
+			// ensure!(!Vision::<T>::contains_key(&proof), Error::<T>::VisionAlreadyExists);
+			// Get the block number from the FRAME System pallet.
+			let current_block = <frame_system::Pallet<T>>::block_number();
+			// Store the proof with the sender and block number.
+			Vision::<T>::insert(&proof, (&sender, current_block));
+			// Emit an event that the claim was created.
+			// Self::deposit_event(Event::VisionCreated(sender, proof));
+			Ok(())
+		}
+
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
