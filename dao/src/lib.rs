@@ -47,10 +47,12 @@ pub mod pallet {
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
-	#[pallet::getter(fn something)]
+	#[pallet::getter(fn vision)]
 	// Learn more about declaring storage items:
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
-	pub type Vision<T> = StorageValue<_, u32>;
+	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
+	pub(super) type Vision<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
+
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -86,7 +88,7 @@ pub mod pallet {
 			let who = ensure_signed(origin)?;
 
 			// Update storage.
-			<Vision<T>>::put(something);
+			// <Vision<T>>::put(something);
 
 			// Emit an event.
 			Self::deposit_event(Event::SomethingStored(something, who));
@@ -94,23 +96,6 @@ pub mod pallet {
 			Ok(())
 		}
 
-		/// An example dispatchable that may throw a custom error.
-		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
-		pub fn cause_error(origin: OriginFor<T>) -> DispatchResult {
-			let _who = ensure_signed(origin)?;
-
-			// Read a value from storage.
-			match <Vision<T>>::get() {
-				// Return an error if the value has not been set.
-				None => Err(Error::<T>::NoneValue)?,
-				Some(old) => {
-					// Increment the value read from storage; will error in the event of overflow.
-					let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-					// Update the value in storage with the incremented result.
-					<Vision<T>>::put(new);
-					Ok(())
-				},
-			}
-		}
+		
 	}
 }
