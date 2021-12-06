@@ -67,7 +67,25 @@ fn when_removing_vision_ensure_it_exists() {
 		let mut vec2 = Vec::new();
 		vec2.push(8);
 
-		// Ensure the DAO can remove a vision document
+		// Ensure error is thrown when no vision exists yet
 		assert_noop!(Dao::remove_vision(Origin::signed(1), vec2), Error::<Test>::NoSuchVision);
+	});
+}
+
+#[test]
+fn only_vision_owner_can_remove_vision() {
+	new_test_ext().execute_with(|| {
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
+
+		let mut vec = Vec::new();
+		vec.push(7);
+
+
+		// Ensure the vision can not be deleted by user who didn't create it. Created with user 1, deleted with 2
+		assert_noop!(Dao::remove_vision(Origin::signed(2), vec), Error::<Test>::NotVisionOwner);
 	});
 }

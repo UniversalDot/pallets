@@ -79,7 +79,9 @@ pub mod pallet {
 		/// The vision has already been created.
 		VisionAlreadyExists,
 		/// The Vision doesn't exist
-		NoSuchVision
+		NoSuchVision,
+		/// You are not the owner of the vision.
+		NotVisionOwner
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -118,7 +120,7 @@ pub mod pallet {
             // Get owner of the vision.
             let (owner, _) = Vision::<T>::get(&proof);
             // Verify that sender of the current call is the vision creator
-            // ensure!(sender == owner, Error::<T>::NotVisionOwner);
+            ensure!(sender == owner, Error::<T>::NotVisionOwner);
             // Remove vision from storage.
             Vision::<T>::remove(&proof);
             // Emit an event that the vision was erased.
