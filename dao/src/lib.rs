@@ -65,8 +65,11 @@ pub mod pallet {
 		/// parameters. [something, who]
 		SomethingStored(u32, T::AccountId),
 
-		/// Vision successfully create [AccountID, Vec]
+		/// Vision successfully created [AccountID, Vec]
 		VisionCreated(T::AccountId, Vec<u8>),
+
+		/// Vision removed [AccountID, Vec]
+		VisionRemoved(T::AccountId, Vec<u8>),
 	}
 
 	// Errors inform users that something went wrong.
@@ -124,7 +127,7 @@ pub mod pallet {
             // Remove vision from storage.
             Vision::<T>::remove(&proof);
             // Emit an event that the vision was erased.
-            // Self::deposit_event(Event::VisionRemoved(sender, proof));
+            Self::deposit_event(Event::VisionRemoved(sender, proof));
             Ok(())
         }
 
