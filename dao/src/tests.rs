@@ -1,15 +1,7 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
-#[test]
-fn it_works_for_default_value() {
-	new_test_ext().execute_with(|| {
-		// Dispatch a signed extrinsic.
-		assert_ok!(Dao::do_something(Origin::signed(1), 42));
-		// Read pallet storage and assert an expected result.
-		// assert_eq!(Dao::something(), Some(42));
-	});
-}
+
 
 #[test]
 fn can_create_vision() {
@@ -87,5 +79,23 @@ fn only_vision_owner_can_remove_vision() {
 
 		// Ensure the vision can not be deleted by user who didn't create it. Created with user 1, deleted with 2
 		assert_noop!(Dao::remove_vision(Origin::signed(2), vec), Error::<Test>::NotVisionOwner);
+	});
+}
+
+#[test]
+fn user_can_sign_onto_vision() {
+	new_test_ext().execute_with(|| {
+
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
+
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure a user can sign onto vision. 
+		assert_ok!(Dao::sign_vision(Origin::signed(1), vec));
 	});
 }
