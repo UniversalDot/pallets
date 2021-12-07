@@ -61,15 +61,14 @@ pub mod pallet {
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
-		/// Event documentation should end with an array that provides descriptive names for event
-		/// parameters. [something, who]
-		SomethingStored(u32, T::AccountId),
-
 		/// Vision successfully created [AccountID, Vec]
 		VisionCreated(T::AccountId, Vec<u8>),
 
 		/// Vision removed [AccountID, Vec]
 		VisionRemoved(T::AccountId, Vec<u8>),
+
+		/// Vision signed [AccountID, Vec]
+		VisionSigned(T::AccountId, Vec<u8>),
 	}
 
 	// Errors inform users that something went wrong.
@@ -113,28 +112,28 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000)]
-        pub fn remove_vision(origin: OriginFor<T>, proof: Vec<u8>) -> DispatchResult {
+        pub fn remove_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
             // Check that the extrinsic was signed and get the signer.
             // This function will return an error if the extrinsic is not signed.
             // https://docs.substrate.io/v3/runtime/origins
             let sender = ensure_signed(origin)?;
             // Verify that the specified vision has been created.
-            ensure!(Vision::<T>::contains_key(&proof), Error::<T>::NoSuchVision);
+            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
             // Get owner of the vision.
-            let (owner, _) = Vision::<T>::get(&proof);
+            let (owner, _) = Vision::<T>::get(&vision_document);
             // Verify that sender of the current call is the vision creator
             ensure!(sender == owner, Error::<T>::NotVisionOwner);
             // Remove vision from storage.
-            Vision::<T>::remove(&proof);
+            Vision::<T>::remove(&vision_document);
             // Emit an event that the vision was erased.
-            Self::deposit_event(Event::VisionRemoved(sender, proof));
+            Self::deposit_event(Event::VisionRemoved(sender, vision_document));
             Ok(())
         }
 
 		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn do_something(origin: OriginFor<T>, something: u32) -> DispatchResult {
+		pub fn sign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
@@ -144,7 +143,7 @@ pub mod pallet {
 			// <Vision<T>>::put(something);
 
 			// Emit an event.
-			Self::deposit_event(Event::SomethingStored(something, who));
+			Self::deposit_event(Event::VisionSigned(who, vision_document));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
