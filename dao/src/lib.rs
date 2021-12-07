@@ -49,12 +49,17 @@ pub mod pallet {
 	// The pallet's runtime storage items.
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
-	// #[pallet::getter(fn vision)]
+	#[pallet::getter(fn vision)]
 	// Learn more about declaring storage items:
 	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
 	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
 	pub(super) type Vision<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
 
+
+	#[pallet::storage]
+	#[pallet::getter(fn vision_signers)]
+	// Store DaoSigners in StorageMap as Vector with value: [AccountID, Hash of Vision]
+	pub(super) type DaoSigners<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::Hash>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
