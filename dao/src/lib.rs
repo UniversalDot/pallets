@@ -49,6 +49,7 @@ pub mod pallet {
 		pub owner: AccountOf<T>,
 		pub vision: Vec<u8>,
 		pub members: Vec<AccountOf<T>>,  // vector of AccountIDs
+		pub tasks: Vec<u8>   //TODO add reference to tasks pallet	
 	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -206,6 +207,7 @@ pub mod pallet {
 				owner: from_initiator.clone(),
 				vision: Vec::new(),
 				members: add_members,
+				tasks: Vec::new(),
 			};
 
 			let dao_id = T::Hashing::hash_of(&new_dao);
