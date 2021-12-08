@@ -33,7 +33,22 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
+	use frame_support::{
+		sp_runtime::traits::Hash};
 	use sp_std::vec::Vec;
+	use scale_info::TypeInfo;
+
+	// Account used in Dao Struct
+	type AccountOf<T> = <T as frame_system::Config>::AccountId;
+
+	// Struct for holding Dao information.
+	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
+	#[scale_info(skip_type_params(T))]
+	pub struct Dao<T: Config> {
+		pub owner: AccountOf<T>,
+		pub vision: Vec<u8>,
+		pub members: u32,
+	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -59,7 +74,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn vision_signers)]
 	// Store DaoSigners in StorageMap as Vector with value: [AccountID, Hash of Vision]
-	pub(super) type DaoSigners<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::Hash>, ValueQuery>;
+	pub(super) type DaoMembers<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::Hash>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -144,8 +159,11 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
+			let hash_vision = T::Hashing::hash_of(&vision_document);
+
+
 			// Update storage.
-			// <Vision<T>>::put(something);
+			// <DaoMembers<T>>::insert(who, hash_vision);
 
 			// Emit an event.
 			Self::deposit_event(Event::VisionSigned(who, vision_document));
