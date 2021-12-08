@@ -99,3 +99,19 @@ fn user_can_sign_onto_vision() {
 		assert_ok!(Dao::sign_vision(Origin::signed(1), vec));
 	});
 }
+
+#[test]
+fn can_create_organizations() {
+	new_test_ext().execute_with(|| {
+
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), org_name,  vec));
+
+	});
+}

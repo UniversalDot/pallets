@@ -48,7 +48,7 @@ pub mod pallet {
 		pub name: Vec<u8>,
 		pub owner: AccountOf<T>,
 		pub vision: Vec<u8>,
-		pub members: u32,
+		pub members: Vec<AccountOf<T>>,  // vector of AccountIDs
 	}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -74,8 +74,8 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn vision_signers)]
-	// Store DaoSigners in StorageMap as Vector with value: [AccountID, Hash of Vision]
-	pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::Hash>, ValueQuery>;
+	// Create organization storage map identified by HashID and contains DAO Struct
+	pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -182,7 +182,7 @@ pub mod pallet {
 
 			let hash_vision = T::Hashing::hash_of(&vision_document);
 
-
+			let dao_id = Self::new_org(&who, org_name, &vision_document);
 			// Update storage.
 			// <DaoMembers<T>>::insert(who, hash_vision);
 
@@ -192,5 +192,33 @@ pub mod pallet {
 			Ok(())
 		}
 		
+	}
+
+	// *** Helper functions *** //
+	impl<T:Config> Pallet<T> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &Vec<u8>) -> Result<T::Hash, Error<T>> {
+			
+			let mut add_members = Vec::new();
+			add_members.push(from_initiator.clone());
+
+			let new_dao = Dao::<T> {
+				name: org_name,
+				owner: from_initiator.clone(),
+				vision: vision.clone(),
+				members: add_members,
+			};
+
+			let dao_id = T::Hashing::hash_of(&new_dao);
+
+			
+			// Insert task into Hashmap
+			<Organizations<T>>::insert(dao_id, new_dao);
+
+			// Increase task count
+			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
+			// <TaskCount<T>>::put(new_count);
+
+			Ok(dao_id)
+		}
 	}
 }
