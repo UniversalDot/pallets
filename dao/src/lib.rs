@@ -204,7 +204,7 @@ pub mod pallet {
 			let new_dao = Dao::<T> {
 				name: org_name,
 				owner: from_initiator.clone(),
-				vision: vision.to_owned(),
+				vision: vision.clone(),
 				members: add_members,
 			};
 
