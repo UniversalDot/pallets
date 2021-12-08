@@ -161,7 +161,7 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			let hash_vision = T::Hashing::hash_of(&vision_document);
+			let _hash_vision = T::Hashing::hash_of(&vision_document);
 
 
 			// Update storage.
@@ -180,9 +180,9 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			let hash_vision = T::Hashing::hash_of(&vision_document);
+			let _hash_vision = T::Hashing::hash_of(&vision_document);
 
-			let dao_id = Self::new_org(&who, org_name, &vision_document);
+			let _dao_id = Self::new_org(&who, org_name, &vision_document);
 			// Update storage.
 			// <DaoMembers<T>>::insert(who, hash_vision);
 
@@ -196,15 +196,14 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &[u8]) -> Result<T::Hash, Error<T>> {
 			
-			let mut add_members = Vec::new();
-			add_members.push(from_initiator.clone());
+			let add_members = vec![from_initiator.clone()];
 
 			let new_dao = Dao::<T> {
 				name: org_name,
 				owner: from_initiator.clone(),
-				vision: vision.clone(),
+				vision: vision.to_owned(),
 				members: add_members,
 			};
 
