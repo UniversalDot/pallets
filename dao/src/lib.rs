@@ -174,20 +174,20 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_organization(origin: OriginFor<T>, org_name: Vec<u8>, vision_document: Vec<u8>) -> DispatchResult {
+		pub fn create_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			let _hash_vision = T::Hashing::hash_of(&vision_document);
+			
 
-			let _dao_id = Self::new_org(&who, org_name, &vision_document);
+			let _dao_id = Self::new_org(&who, org_name);
 			// Update storage.
 			// <DaoMembers<T>>::insert(who, hash_vision);
 
 			// Emit an event.
-			Self::deposit_event(Event::VisionSigned(who, vision_document));
+			// Self::deposit_event(Event::VisionSigned(who, vision_document));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -196,7 +196,7 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			let mut add_members = Vec::new();
 			add_members.push(from_initiator.clone());
@@ -204,7 +204,7 @@ pub mod pallet {
 			let new_dao = Dao::<T> {
 				name: org_name,
 				owner: from_initiator.clone(),
-				vision: vision.clone(),
+				vision: Vec::new(),
 				members: add_members,
 			};
 
