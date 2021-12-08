@@ -91,6 +91,9 @@ pub mod pallet {
 
 		/// Vision signed [AccountID, Vec]
 		VisionSigned(T::AccountId, Vec<u8>),
+
+		/// DAO Organization was created [AccountID, DAO Hash]
+		OrganizationCreated(T::AccountId, T::Hash)
 	}
 
 	// Errors inform users that something went wrong.
@@ -183,12 +186,12 @@ pub mod pallet {
 
 			
 
-			let _dao_id = Self::new_org(&who, org_name);
+			let dao_id = Self::new_org(&who, org_name)?;
 			// Update storage.
 			// <DaoMembers<T>>::insert(who, hash_vision);
 
 			// Emit an event.
-			// Self::deposit_event(Event::VisionSigned(who, vision_document));
+			Self::deposit_event(Event::OrganizationCreated(who, dao_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
