@@ -196,9 +196,10 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &[u8]) -> Result<T::Hash, Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>, vision: &Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
-			let add_members = vec![from_initiator.clone()];
+			let mut add_members = Vec::new();
+			add_members.push(from_initiator.clone());
 
 			let new_dao = Dao::<T> {
 				name: org_name,
