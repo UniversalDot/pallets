@@ -73,7 +73,7 @@ pub mod pallet {
 
 
 	#[pallet::storage]
-	#[pallet::getter(fn vision_signers)]
+	#[pallet::getter(fn organizations)]
 	// Create organization storage map identified by HashID and contains DAO Struct
 	pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
 
