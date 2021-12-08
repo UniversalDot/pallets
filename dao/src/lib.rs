@@ -45,6 +45,7 @@ pub mod pallet {
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Dao<T: Config> {
+		pub name: Vec<u8>,
 		pub owner: AccountOf<T>,
 		pub vision: Vec<u8>,
 		pub members: u32,
