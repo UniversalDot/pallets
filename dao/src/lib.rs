@@ -72,11 +72,16 @@ pub mod pallet {
 	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
 	pub(super) type Vision<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
 
+	
+
+	// #[pallet::storage]
+	// #[pallet::getter(fn organizations)]
+	// // Create organization storage map identified by HashID and contains DAO Struct
+	// pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn organizations)]
-	// Create organization storage map identified by HashID and contains DAO Struct
-	pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
+	pub(super) type Organizations<T: Config> = StorageValue<_, Vec<T::AccountId>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -184,14 +189,31 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			
+			//TODO: Ensure only visionary can crate DAOs
 
+			// call public function to create org
 			let dao_id = Self::new_org(&who, org_name)?;
-			// Update storage.
-			// <DaoMembers<T>>::insert(who, hash_vision);
 
 			// Emit an event.
-			Self::deposit_event(Event::OrganizationCreated(who, dao_id));
+			// Self::deposit_event(Event::OrganizationCreated(who, dao_id));
+			// Return a successful DispatchResultWithPostInfo
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
+
+			//TODO: Ensure only visionary can crate DAOs
+
+			// call public function to create org
+			let dao_id = Self::remove_org(&who, org_name)?;
+
+			// Emit an event.
+			// Self::deposit_event(Event::OrganizationCreated(who, dao_id));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -200,30 +222,58 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
 			
-			let mut add_members = Vec::new();
-			add_members.push(from_initiator.clone());
+			let mut org = <Pallet<T>>::organizations();
+			org.push(from_initiator.clone());
+			// let mut add_members = Vec::new();
+			// add_members.push(from_initiator.clone());
 
-			let new_dao = Dao::<T> {
-				name: org_name,
-				owner: from_initiator.clone(),
-				vision: Vec::new(),
-				members: add_members,
-				tasks: Vec::new(),
-			};
+			// let new_dao = Dao::<T> {
+			// 	name: org_name,
+			// 	owner: from_initiator.clone(),
+			// 	vision: Vec::new(),
+			// 	members: add_members,
+			// 	tasks: Vec::new(),
+			// };
 
-			let dao_id = T::Hashing::hash_of(&new_dao);
+			// let dao_id = T::Hashing::hash_of(&new_dao);
 
-			
 			// Insert task into Hashmap
-			<Organizations<T>>::insert(dao_id, new_dao);
+			<Organizations<T>>::put(org);
 
 			// Increase task count
 			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
 			// <TaskCount<T>>::put(new_count);
 
-			Ok(dao_id)
+			Ok(())
 		}
+
+		pub fn remove_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
+			
+			// let mut add_members = Vec::new();
+			// add_members.push(from_initiator.clone());
+
+			// let new_dao = Dao::<T> {
+			// 	name: org_name,
+			// 	owner: from_initiator.clone(),
+			// 	vision: Vec::new(),
+			// 	members: add_members,
+			// 	tasks: Vec::new(),
+			// };
+
+			// let dao_id = T::Hashing::hash_of(&new_dao);
+
+			// // Insert task into Hashmap
+			// <Organizations<T>>::insert(dao_id, new_dao);
+
+			// Increase task count
+			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
+			// <TaskCount<T>>::put(new_count);
+
+			Ok(())
+		}
+
+
 	}
 }
