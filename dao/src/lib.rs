@@ -226,6 +226,8 @@ pub mod pallet {
 			
 			let mut org = <Pallet<T>>::organizations();
 			org.push(from_initiator.clone());
+
+			// TODO: Implement proper logic
 			// let mut add_members = Vec::new();
 			// add_members.push(from_initiator.clone());
 
@@ -251,25 +253,7 @@ pub mod pallet {
 
 		pub fn remove_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
 			
-			// let mut add_members = Vec::new();
-			// add_members.push(from_initiator.clone());
 
-			// let new_dao = Dao::<T> {
-			// 	name: org_name,
-			// 	owner: from_initiator.clone(),
-			// 	vision: Vec::new(),
-			// 	members: add_members,
-			// 	tasks: Vec::new(),
-			// };
-
-			// let dao_id = T::Hashing::hash_of(&new_dao);
-
-			// // Insert task into Hashmap
-			// <Organizations<T>>::insert(dao_id, new_dao);
-
-			// Increase task count
-			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
-			// <TaskCount<T>>::put(new_count);
 
 			Ok(())
 		}
