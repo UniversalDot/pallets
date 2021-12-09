@@ -113,7 +113,9 @@ pub mod pallet {
 		/// The Vision doesn't exist
 		NoSuchVision,
 		/// You are not the owner of the vision.
-		NotVisionOwner
+		NotVisionOwner,
+		/// No rights to remove. Only creator can remove an organization
+		NotOrganizationCreator,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -252,7 +254,11 @@ pub mod pallet {
 		}
 
 		pub fn remove_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
-			
+			//
+			let org = Self::organizations();
+			ensure!(org.contains(&from_initiator), Error::<T>::NotOrganizationCreator);
+
+			// Remove organizational instance
 			<Organizations<T>>::take();
 
 			Ok(())
