@@ -213,7 +213,12 @@ fn can_add_user_to_organization() {
 		org_name.push(9);
 
 		// TODO: Complete test 
-		// assert_ok!(Dao::add_members(Origin::signed(1), org_name, ));
+		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 4));
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		assert_eq!(Dao::organization(org_name).len(), 2);
 
 	});
 }
