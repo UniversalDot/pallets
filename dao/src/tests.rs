@@ -197,3 +197,23 @@ fn only_creator_can_remove_their_organization() {
 
 	});
 }
+
+#[test]
+fn can_add_user_to_organization() {
+	new_test_ext().execute_with(|| {
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
+
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// TODO: Complete test 
+		// assert_ok!(Dao::add_members(Origin::signed(1), org_name, ));
+
+	});
+}

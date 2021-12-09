@@ -206,6 +206,25 @@ pub mod pallet {
 			Ok(())
 		}
 
+
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn add_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
+
+			//TODO: Ensure only visionary can crate DAOs
+
+			// call public function to create org
+			Self::add_to_organization(&who, &org_name, &account)?;
+
+			// Emit an event.
+			// Self::deposit_event(Event::OrganizationDissolved(who, org_name));
+			
+			Ok(())
+		}
+
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
@@ -233,21 +252,7 @@ pub mod pallet {
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(from_initiator.clone());
 
-			// TODO: Implement proper logic
-			// let mut add_members = Vec::new();
-			// add_members.push(from_initiator.clone());
-
-			// let new_dao = Dao::<T> {
-			// 	name: org_name,
-			// 	owner: from_initiator.clone(),
-			// 	vision: Vec::new(),
-			// 	members: add_members,
-			// 	tasks: Vec::new(),
-			// };
-
-			// let dao_id = T::Hashing::hash_of(&new_dao);
-
-			// Insert task into Hashmap
+			// Insert vector into Hashmap
 			<Organization<T>>::insert(org_name, org);
 
 			// Increase task count
@@ -266,6 +271,14 @@ pub mod pallet {
 			// Remove organizational instance
 			<Organization<T>>::remove(org_name);
 
+			Ok(())
+		}
+
+		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+			let mut org = <Pallet<T>>::organization(&org_name);
+			org.push(account.clone());
+			
+			<Organization<T>>::insert(org_name, org);
 			Ok(())
 		}
 
