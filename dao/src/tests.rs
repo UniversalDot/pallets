@@ -213,7 +213,7 @@ fn can_add_user_to_organization() {
 		org_name.push(9);
 
 		//Ensure users can be added to a DAO
-		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 4));
+		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 2));
 
 		let mut org_name = Vec::new();
 		org_name.push(9);
@@ -239,5 +239,31 @@ fn only_creator_can_add_user_to_organization() {
 
 		// Throw error if another than Creator is trying to add members
 		assert_noop!(Dao::add_members(Origin::signed(2), org_name, 4), Error::<Test>::NotOrganizationCreator);
+	});
+}
+
+
+#[test]
+fn can_only_add_members_if_not_already_in_organization() {
+	new_test_ext().execute_with(|| {
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
+
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Throw error if another than Creator is trying to add members
+		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 2));
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+		
+		// TODO: Fix test and implementation
+		//assert_noop!(Dao::add_members(Origin::signed(1), org_name, 2), Error::<Test>::AlreadyMember );
 	});
 }

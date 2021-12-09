@@ -123,6 +123,8 @@ pub mod pallet {
 		NotVisionOwner,
 		/// No rights to remove. Only creator can remove an organization
 		NotOrganizationCreator,
+		/// User is already a member of this DAO.
+		AlreadyMember
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -217,8 +219,6 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			//TODO: Ensure only visionary can add members
-
 			// call public function to create org
 			Self::add_to_organization(&who, &org_name, &account)?;
 
@@ -280,6 +280,10 @@ pub mod pallet {
 			
 			// check if its DAO original creator
 			Self::is_dao_founder(from_initiator, org_name)?;
+
+			// Check if already a member
+			// let members = Self::organization(&org_name);
+			// ensure!(members.contains(&account.clone()), <Error<T>>::AlreadyMember);
 			
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(account.clone());
