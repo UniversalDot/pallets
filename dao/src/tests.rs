@@ -110,8 +110,11 @@ fn can_create_an_organization() {
 		// Ensure organization can be created
 		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
 
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
 		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organizations().len(), 1);
+		assert_eq!(Dao::organization(org_name).len(), 1);
 	});
 }
 
@@ -131,8 +134,11 @@ fn can_create_multiple_organization() {
 		// Ensure second organization can be created by a different user
 		assert_ok!(Dao::create_organization(Origin::signed(2), org_name));
 
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
 		// Ensure the length of organization is equal to 2
-		assert_eq!(Dao::organizations().len(), 2);
+		assert_eq!(Dao::organization(org_name).len(), 2);
 	});
 }
 
@@ -147,8 +153,11 @@ fn can_remove_an_organization() {
 		// Ensure organization can be created
 		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
 
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
 		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organizations().len(), 1);
+		assert_eq!(Dao::organization(org_name).len(), 1);
 
 		let mut org_name = Vec::new();
 		org_name.push(9);
@@ -156,7 +165,10 @@ fn can_remove_an_organization() {
 		// Ensure organization can be removed
 		assert_ok!(Dao::dissolve_organization(Origin::signed(1), org_name));
 
-		assert_eq!(Dao::organizations().len(), 0);
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		assert_eq!(Dao::organization(org_name).len(), 0);
 
 	});
 }
@@ -171,8 +183,11 @@ fn only_creator_can_remove_their_organization() {
 		// Ensure organization can be created
 		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
 
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
 		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organizations().len(), 1);
+		assert_eq!(Dao::organization(org_name).len(), 1);
 
 		let mut org_name = Vec::new();
 		org_name.push(9);
@@ -180,7 +195,10 @@ fn only_creator_can_remove_their_organization() {
 		// Ensure organization can't be removed by another member. Only creator can remove their own org
 		assert_noop!(Dao::dissolve_organization(Origin::signed(2), org_name), Error::<Test>::NotOrganizationCreator);
 
-		assert_eq!(Dao::organizations().len(), 1);
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		assert_eq!(Dao::organization(org_name).len(), 1);
 
 	});
 }

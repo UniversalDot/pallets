@@ -80,8 +80,9 @@ pub mod pallet {
 	// pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
 
 	#[pallet::storage]
-	#[pallet::getter(fn organizations)]
-	pub(super) type Organizations<T: Config> = StorageValue<_, Vec<T::AccountId>, ValueQuery>;
+	#[pallet::getter(fn organization)]
+	// Create organization storage map with key: name and value: Vec<AccountID>
+	pub(super) type Organization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -212,7 +213,7 @@ pub mod pallet {
 			//TODO: Ensure only visionary can crate DAOs
 
 			// call public function to create org
-			let dao_id = Self::remove_org(&who, org_name)?;
+			let dao_id = Self::remove_org(&who, &org_name)?;
 
 			// Emit an event.
 			// Self::deposit_event(Event::OrganizationCreated(who, dao_id));
@@ -226,7 +227,7 @@ pub mod pallet {
 	impl<T:Config> Pallet<T> {
 		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
 			
-			let mut org = <Pallet<T>>::organizations();
+			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(from_initiator.clone());
 
 			// TODO: Implement proper logic
@@ -244,7 +245,7 @@ pub mod pallet {
 			// let dao_id = T::Hashing::hash_of(&new_dao);
 
 			// Insert task into Hashmap
-			<Organizations<T>>::put(org);
+			<Organization<T>>::insert(org_name, org);
 
 			// Increase task count
 			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
@@ -253,13 +254,14 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn remove_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
-			//
-			let org = Self::organizations();
+		pub fn remove_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
+			// check if initator is a member
+			// TODO: Check if its actual creator
+			let org = Self::organization(&org_name);
 			ensure!(org.contains(&from_initiator), Error::<T>::NotOrganizationCreator);
 
 			// Remove organizational instance
-			<Organizations<T>>::take();
+			<Organization<T>>::remove(org_name);
 
 			Ok(())
 		}
