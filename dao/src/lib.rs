@@ -268,8 +268,7 @@ pub mod pallet {
 		pub fn remove_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
 			
 			// check if its DAO original creator
-			let first_account = Self::organization(&org_name);
-			ensure!((first_account[0] == *from_initiator), Error::<T>::NotOrganizationCreator);
+			Self::is_dao_founder(from_initiator, org_name)?;
 
 			// Remove organizational instance
 			<Organization<T>>::remove(org_name);
@@ -283,6 +282,13 @@ pub mod pallet {
 			
 			<Organization<T>>::insert(org_name, org);
 			Ok(())
+		}
+
+		pub fn is_dao_founder(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<bool, Error<T>> {
+			let first_account = Self::organization(&org_name);
+			if first_account[0] == *from_initiator {
+				Ok(true)
+			} else { Err(Error::<T>::NotOrganizationCreator) }
 		}
 
 
