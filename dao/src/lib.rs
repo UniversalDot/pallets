@@ -277,6 +277,10 @@ pub mod pallet {
 		}
 
 		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+			
+			// check if its DAO original creator
+			Self::is_dao_founder(from_initiator, org_name)?;
+			
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(account.clone());
 			
