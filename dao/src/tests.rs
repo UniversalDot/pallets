@@ -183,11 +183,6 @@ fn only_creator_can_remove_their_organization() {
 		// Ensure organization can be created
 		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
-
-		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organization(org_name).len(), 1);
 
 		let mut org_name = Vec::new();
 		org_name.push(9);

@@ -258,10 +258,10 @@ pub mod pallet {
 		}
 
 		pub fn remove_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
-			// check if initator is a member
-			// TODO: Check if its actual creator
-			let org = Self::organization(&org_name);
-			ensure!(org.contains(&from_initiator), Error::<T>::NotOrganizationCreator);
+			
+			// check if its DAO original creator
+			let first_account = Self::organization(&org_name);
+			ensure!((first_account[0] == *from_initiator), Error::<T>::NotOrganizationCreator);
 
 			// Remove organizational instance
 			<Organization<T>>::remove(org_name);
