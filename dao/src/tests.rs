@@ -135,3 +135,28 @@ fn can_create_multiple_organization() {
 		assert_eq!(Dao::organizations().len(), 2);
 	});
 }
+
+
+#[test]
+fn can_remove_an_organization() {
+	new_test_ext().execute_with(|| {
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
+
+		// Ensure the length of organization is equal to 1
+		assert_eq!(Dao::organizations().len(), 1);
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be removed
+		assert_ok!(Dao::dissolve_organization(Origin::signed(1), org_name));
+
+		assert_eq!(Dao::organizations().len(), 0);
+
+	});
+}

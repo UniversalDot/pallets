@@ -253,7 +253,7 @@ pub mod pallet {
 
 		pub fn remove_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
 			
-
+			<Organizations<T>>::take();
 
 			Ok(())
 		}
