@@ -98,8 +98,8 @@ pub mod pallet {
 		/// Vision signed [AccountID, Vec]
 		VisionSigned(T::AccountId, Vec<u8>),
 
-		/// DAO Organization was created [AccountID, DAO Hash]
-		OrganizationCreated(T::AccountId, T::Hash)
+		/// DAO Organization was created [AccountID, DAO Name]
+		OrganizationCreated(T::AccountId, Vec<u8>)
 	}
 
 	// Errors inform users that something went wrong.
@@ -195,10 +195,10 @@ pub mod pallet {
 			//TODO: Ensure only visionary can crate DAOs
 
 			// call public function to create org
-			let dao_id = Self::new_org(&who, org_name)?;
+			Self::new_org(&who, &org_name)?;
 
 			// Emit an event.
-			// Self::deposit_event(Event::OrganizationCreated(who, dao_id));
+			Self::deposit_event(Event::OrganizationCreated(who, org_name));
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
@@ -225,7 +225,7 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: Vec<u8>) -> Result<(), Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
 			
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(from_initiator.clone());
