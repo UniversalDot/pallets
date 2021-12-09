@@ -103,6 +103,9 @@ pub mod pallet {
 
 		/// DAO Organization was dissolved [AccountID, DAO Name]
 		OrganizationDissolved(T::AccountId, Vec<u8>),
+
+		/// Member has been added to an organization 
+		MemberAdded(T::AccountId, T::AccountId),
 	}
 
 	// Errors inform users that something went wrong.
@@ -214,13 +217,13 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			//TODO: Ensure only visionary can crate DAOs
+			//TODO: Ensure only visionary can add members
 
 			// call public function to create org
 			Self::add_to_organization(&who, &org_name, &account)?;
 
 			// Emit an event.
-			// Self::deposit_event(Event::OrganizationDissolved(who, org_name));
+			Self::deposit_event(Event::MemberAdded(who, account));
 			
 			Ok(())
 		}
