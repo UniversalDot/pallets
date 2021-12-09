@@ -99,7 +99,10 @@ pub mod pallet {
 		VisionSigned(T::AccountId, Vec<u8>),
 
 		/// DAO Organization was created [AccountID, DAO Name]
-		OrganizationCreated(T::AccountId, Vec<u8>)
+		OrganizationCreated(T::AccountId, Vec<u8>),
+
+		/// DAO Organization was dissolved [AccountID, DAO Name]
+		OrganizationDissolved(T::AccountId, Vec<u8>),
 	}
 
 	// Errors inform users that something went wrong.
@@ -181,7 +184,7 @@ pub mod pallet {
 
 			// Emit an event.
 			Self::deposit_event(Event::VisionSigned(who, vision_document));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 
@@ -199,7 +202,7 @@ pub mod pallet {
 
 			// Emit an event.
 			Self::deposit_event(Event::OrganizationCreated(who, org_name));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 
@@ -213,11 +216,11 @@ pub mod pallet {
 			//TODO: Ensure only visionary can crate DAOs
 
 			// call public function to create org
-			let dao_id = Self::remove_org(&who, &org_name)?;
+			Self::remove_org(&who, &org_name)?;
 
 			// Emit an event.
-			// Self::deposit_event(Event::OrganizationCreated(who, dao_id));
-			// Return a successful DispatchResultWithPostInfo
+			Self::deposit_event(Event::OrganizationDissolved(who, org_name));
+			
 			Ok(())
 		}
 		
