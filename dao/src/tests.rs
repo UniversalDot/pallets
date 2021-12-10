@@ -175,6 +175,7 @@ fn can_add_user_to_organization() {
 		//Ensure users can be added to a DAO
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
+		// Ensure the organization has 2 members (creator abd user4)
 		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
 
 	});
@@ -200,6 +201,7 @@ fn only_creator_can_add_user_to_organization() {
 fn can_only_add_members_if_not_already_in_organization() {
 	new_test_ext().execute_with(|| {
 
+		// Create Static Organization name
 		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
@@ -209,7 +211,7 @@ fn can_only_add_members_if_not_already_in_organization() {
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2));
 		
 		// TODO: Fix test and implementation
-		// assert_noop!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2), Error::<Test>::AlreadyMember );
+		assert_noop!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2), Error::<Test>::AlreadyMember );
 	});
 }
 
