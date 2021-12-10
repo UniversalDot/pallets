@@ -229,3 +229,25 @@ fn organization_exists_check_before_adding_user_to_org() {
 		assert_noop!(Dao::add_members(Origin::signed(1), Vec::new(), 4), Error::<Test>::InvalidOrganization);
 	});
 }
+
+#[test]
+fn can_remove_users_from_an_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1),ORG_NAME.to_vec()));
+
+		// Ensure users can be added to a DAO
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
+
+		// Ensure members can be removed
+		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
+
+		// TODO: Ensure length of users in org is 1
+		// assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
+
+	});
+}

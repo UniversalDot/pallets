@@ -229,6 +229,22 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn remove_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
+
+			// call public function to create org
+			Self::remove_member_from_organization(&who, &org_name, &account)?;
+
+			// Emit an event.
+			Self::deposit_event(Event::MemberAdded(who, account));
+			
+			Ok(())
+		}
+
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
@@ -295,6 +311,23 @@ pub mod pallet {
 			
 			Ok(())
 		}
+
+		pub fn remove_member_from_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+			// Check if organization exists
+			let org = <Pallet<T>>::organization(&org_name);
+			ensure!(org.len() != 0 , Error::<T>::InvalidOrganization);
+
+			// check if its DAO original creator
+			Self::is_dao_founder(&from_initiator, &org_name)?;
+
+			// TODO: Pop Member out of organization
+			let mut org = <Pallet<T>>::organization(&org_name);
+			// org.remove(account.clone());
+
+			Ok(())
+		}
+
+
 
 		pub fn is_dao_founder(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<bool, Error<T>> {
 			let first_account = Self::organization(&org_name);
