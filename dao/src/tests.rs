@@ -6,12 +6,11 @@ use frame_support::{assert_noop, assert_ok};
 #[test]
 fn can_create_vision() {
 	new_test_ext().execute_with(|| {
-		
-		let mut vec = Vec::new();
-		vec.push(7);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
+		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
 	});
 }
 
@@ -19,18 +18,14 @@ fn can_create_vision() {
 fn can_not_create_vision_that_already_exists() {
 	new_test_ext().execute_with(|| {
 		
-		let mut vec = Vec::new();
-		vec.push(7);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
-
-		// Create a new vector with same content. If the same content its hash is the same.
-		let mut vec2 = Vec::new();
-		vec2.push(7);
+		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure the DAO can NOT Create create a vision that already exists
-		assert_noop!(Dao::create_vision(Origin::signed(1), vec2), Error::<Test>::VisionAlreadyExists);
+		assert_noop!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()), Error::<Test>::VisionAlreadyExists);
 	});
 }
 
@@ -38,17 +33,14 @@ fn can_not_create_vision_that_already_exists() {
 fn can_remove_vision() {
 	new_test_ext().execute_with(|| {
 		
-		let mut vec = Vec::new();
-		vec.push(7);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
-
-		let mut vec = Vec::new();
-		vec.push(7);
+		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure the DAO can remove a vision document
-		assert_ok!(Dao::remove_vision(Origin::signed(1), vec));
+		assert_ok!(Dao::remove_vision(Origin::signed(1), ORG_NAME.to_vec()));
 	});
 }
 
@@ -56,29 +48,26 @@ fn can_remove_vision() {
 fn when_removing_vision_ensure_it_exists() {
 	new_test_ext().execute_with(|| {
 
-		let mut vec2 = Vec::new();
-		vec2.push(8);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure error is thrown when no vision exists yet
-		assert_noop!(Dao::remove_vision(Origin::signed(1), vec2), Error::<Test>::NoSuchVision);
+		assert_noop!(Dao::remove_vision(Origin::signed(1), ORG_NAME.to_vec()), Error::<Test>::NoSuchVision);
 	});
 }
 
 #[test]
 fn only_vision_owner_can_remove_vision() {
 	new_test_ext().execute_with(|| {
-		let mut vec = Vec::new();
-		vec.push(7);
+		
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
-
-		let mut vec = Vec::new();
-		vec.push(7);
-
+		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure the vision can not be deleted by user who didn't create it. Created with user 1, deleted with 2
-		assert_noop!(Dao::remove_vision(Origin::signed(2), vec), Error::<Test>::NotVisionOwner);
+		assert_noop!(Dao::remove_vision(Origin::signed(2), ORG_NAME.to_vec()), Error::<Test>::NotVisionOwner);
 	});
 }
 
@@ -86,17 +75,14 @@ fn only_vision_owner_can_remove_vision() {
 fn user_can_sign_onto_vision() {
 	new_test_ext().execute_with(|| {
 
-		let mut vec = Vec::new();
-		vec.push(7);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), vec));
-
-		let mut vec = Vec::new();
-		vec.push(7);
+		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure a user can sign onto vision. 
-		assert_ok!(Dao::sign_vision(Origin::signed(1), vec));
+		assert_ok!(Dao::sign_vision(Origin::signed(1), ORG_NAME.to_vec()));
 	});
 }
 
@@ -104,17 +90,14 @@ fn user_can_sign_onto_vision() {
 fn can_create_an_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organization(org_name).len(), 1);
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
 	});
 }
 
@@ -122,23 +105,19 @@ fn can_create_an_organization() {
 fn can_create_multiple_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME1: &'static [u8] = &[7];
+		const ORG_NAME2: &'static [u8] = &[8];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME1.to_vec()));
 
 		// Ensure second organization can be created by a different user
-		assert_ok!(Dao::create_organization(Origin::signed(2), org_name));
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(2), ORG_NAME2.to_vec()));
 
 		// Ensure the length of organization is equal to 2
-		assert_eq!(Dao::organization(org_name).len(), 2);
+		assert_eq!(Dao::organization(ORG_NAME1.to_vec()).len(), 1);
+		assert_eq!(Dao::organization(ORG_NAME2.to_vec()).len(), 1);
 	});
 }
 
@@ -147,29 +126,20 @@ fn can_create_multiple_organization() {
 fn can_remove_an_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure the length of organization is equal to 1
-		assert_eq!(Dao::organization(org_name).len(), 1);
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
 
 		// Ensure organization can be removed
-		assert_ok!(Dao::dissolve_organization(Origin::signed(1), org_name));
+		assert_ok!(Dao::dissolve_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
-
-		assert_eq!(Dao::organization(org_name).len(), 0);
-
+		// Ensure the organization has been removed by checking the length
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 0);
 	});
 }
 
@@ -177,23 +147,17 @@ fn can_remove_an_organization() {
 fn only_creator_can_remove_their_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Ensure organization can't be removed by another member. Only creator can remove their own org
-		assert_noop!(Dao::dissolve_organization(Origin::signed(2), org_name), Error::<Test>::NotOrganizationCreator);
+		assert_noop!(Dao::dissolve_organization(Origin::signed(2), ORG_NAME.to_vec()), Error::<Test>::NotOrganizationCreator);
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
-
-		assert_eq!(Dao::organization(org_name).len(), 1);
+		// Ensure the organization has not been deleted
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
 
 	});
 }
@@ -202,23 +166,16 @@ fn only_creator_can_remove_their_organization() {
 fn can_add_user_to_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		//Ensure users can be added to a DAO
-		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 2));
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
-
-		assert_eq!(Dao::organization(org_name).len(), 2);
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
 
 	});
 }
@@ -227,18 +184,14 @@ fn can_add_user_to_organization() {
 fn only_creator_can_add_user_to_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Throw error if another than Creator is trying to add members
-		assert_noop!(Dao::add_members(Origin::signed(2), org_name, 4), Error::<Test>::NotOrganizationCreator);
+		assert_noop!(Dao::add_members(Origin::signed(2), ORG_NAME.to_vec(), 4), Error::<Test>::NotOrganizationCreator);
 	});
 }
 
@@ -247,24 +200,16 @@ fn only_creator_can_add_user_to_organization() {
 fn can_only_add_members_if_not_already_in_organization() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
-
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
 		// Throw error if another than Creator is trying to add members
-		assert_ok!(Dao::add_members(Origin::signed(1), org_name, 2));
-
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2));
 		
 		// TODO: Fix test and implementation
-		//assert_noop!(Dao::add_members(Origin::signed(1), org_name, 2), Error::<Test>::AlreadyMember );
+		// assert_noop!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2), Error::<Test>::AlreadyMember );
 	});
 }
 
@@ -272,11 +217,11 @@ fn can_only_add_members_if_not_already_in_organization() {
 fn organization_exists_check_before_adding_user_to_org() {
 	new_test_ext().execute_with(|| {
 
-		let mut org_name = Vec::new();
-		org_name.push(9);
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
+		assert_ok!(Dao::create_organization(Origin::signed(1),ORG_NAME.to_vec()));
 
 		// Throw error if org_name is not found
 		assert_noop!(Dao::add_members(Origin::signed(1), Vec::new(), 4), Error::<Test>::InvalidOrganization);
