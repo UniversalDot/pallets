@@ -267,3 +267,18 @@ fn can_only_add_members_if_not_already_in_organization() {
 		//assert_noop!(Dao::add_members(Origin::signed(1), org_name, 2), Error::<Test>::AlreadyMember );
 	});
 }
+
+#[test]
+fn organization_exists_check_before_adding_user_to_org() {
+	new_test_ext().execute_with(|| {
+
+		let mut org_name = Vec::new();
+		org_name.push(9);
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), org_name));
+
+		// Throw error if org_name is not found
+		assert_noop!(Dao::add_members(Origin::signed(1), Vec::new(), 4), Error::<Test>::InvalidOrganization);
+	});
+}

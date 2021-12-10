@@ -122,7 +122,9 @@ pub mod pallet {
 		/// No rights to remove. Only creator can remove an organization
 		NotOrganizationCreator,
 		/// User is already a member of this DAO.
-		AlreadyMember
+		AlreadyMember,
+		/// The organization doesn't exist.
+		InvalidOrganization
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -275,7 +277,10 @@ pub mod pallet {
 		}
 
 		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
-			
+			// Check if organization exists
+			let org = <Pallet<T>>::organization(&org_name);
+			ensure!(org.len() == 1 , Error::<T>::InvalidOrganization);
+
 			// check if its DAO original creator
 			Self::is_dao_founder(&from_initiator, &org_name)?;
 
