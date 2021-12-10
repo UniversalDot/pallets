@@ -72,17 +72,15 @@ pub mod pallet {
 	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
 	pub(super) type Vision<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
 
-	
-
-	// #[pallet::storage]
-	// #[pallet::getter(fn organizations)]
-	// // Create organization storage map identified by HashID and contains DAO Struct
-	// pub(super) type Organizations<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Dao<T>>;
-
 	#[pallet::storage]
 	#[pallet::getter(fn organization)]
 	// Create organization storage map with key: name and value: Vec<AccountID>
 	pub(super) type Organization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn member_of)]
+	/// Keeps track of which Accounts own which Tasks.
+	pub(super) type MemberOf<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::AccountId>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
