@@ -279,11 +279,11 @@ pub mod pallet {
 		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
 			
 			// check if its DAO original creator
-			Self::is_dao_founder(from_initiator, org_name)?;
+			Self::is_dao_founder(&from_initiator, &org_name)?;
 
 			// Check if already a member
 			// let members = Self::organization(&org_name);
-			// ensure!(members.contains(&account.clone()), <Error<T>>::AlreadyMember);
+			// ensure!(members.contains(&account), <Error<T>>::AlreadyMember);
 			
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(account.clone());
