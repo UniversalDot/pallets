@@ -312,7 +312,8 @@ pub mod pallet {
 			// Insert Member into organization
 			let mut org = <Pallet<T>>::organization(&org_name);
 			org.push(account.clone());
-			<Organization<T>>::insert(org_name, org);
+			<Organization<T>>::insert(org_name, &org);
+			<MemberOf<T>>::insert(&account, &org);
 			
 			Ok(())
 		}

@@ -310,3 +310,25 @@ fn can_only_remove_users_that_belong_to_organization() {
 
 	});
 }
+
+#[test]
+fn user_can_view_organization_it_belongs_to() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME1: &'static [u8] = &[7];
+		const ORG_NAME2: &'static [u8] = &[8];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME1.to_vec()));
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME2.to_vec()));
+
+		//Ensure users can be added to a DAO
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME2.to_vec(), 4));
+
+		// Ensure user 4 belongs to two organizations
+		assert_eq!(Dao::member_of(4).len(), 2);
+
+	});
+}
