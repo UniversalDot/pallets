@@ -102,8 +102,11 @@ pub mod pallet {
 		/// DAO Organization was dissolved [AccountID, DAO Name]
 		OrganizationDissolved(T::AccountId, Vec<u8>),
 
-		/// Member has been added to an organization 
+		/// Member has been added to an organization [AccountID, AccountID]
 		MemberAdded(T::AccountId, T::AccountId),
+
+		/// Member removed from an organization [AccountID, AccountID]
+		MemberRemoved(T::AccountId, T::AccountId),
 	}
 
 	// Errors inform users that something went wrong.
@@ -241,7 +244,7 @@ pub mod pallet {
 			Self::remove_member_from_organization(&who, &org_name, &account)?;
 
 			// Emit an event.
-			// Self::deposit_event(Event::MemberAdded(who, account));
+			Self::deposit_event(Event::MemberRemoved(who, account));
 			
 			Ok(())
 		}
