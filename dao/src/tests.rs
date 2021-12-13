@@ -230,6 +230,31 @@ fn organization_exists_check_before_adding_user_to_org() {
 	});
 }
 
+
+#[test]
+fn can_remove_users_from_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1),ORG_NAME.to_vec()));
+
+		// Ensure users can be added to a DAO
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 5));
+
+		// User can be removed from organization
+		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
+
+		
+		// TODO: Validate Ensure length of users in org is 2
+		// assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
+
+	});
+}
+
 #[test]
 fn can_only_remove_users_that_belong_to_organization() {
 	new_test_ext().execute_with(|| {
@@ -243,7 +268,7 @@ fn can_only_remove_users_that_belong_to_organization() {
 		// Ensure users can be added to a DAO
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
-		// Ensure length of users in org is 1
+		// Ensure length of users in org is 2
 		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
 
 		// Ensure error is thrown if user is not in organization
