@@ -124,7 +124,9 @@ pub mod pallet {
 		/// User is already a member of this DAO.
 		AlreadyMember,
 		/// The organization doesn't exist.
-		InvalidOrganization
+		InvalidOrganization,
+		/// The user is not a member of this organization.
+		NotMember,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -239,7 +241,7 @@ pub mod pallet {
 			Self::remove_member_from_organization(&who, &org_name, &account)?;
 
 			// Emit an event.
-			Self::deposit_event(Event::MemberAdded(who, account));
+			// Self::deposit_event(Event::MemberAdded(who, account));
 			
 			Ok(())
 		}
@@ -320,9 +322,13 @@ pub mod pallet {
 			// check if its DAO original creator
 			Self::is_dao_founder(&from_initiator, &org_name)?;
 
-			// TODO: Pop Member out of organization
-			let mut org = <Pallet<T>>::organization(&org_name);
-			// org.remove(account.clone());
+			// Find member and remove from Vector
+			let mut members = <Pallet<T>>::organization(&org_name);
+			let index = members.binary_search(&account).ok().ok_or(<Error<T>>::NotMember)?;
+			members.remove(index);
+			
+
+			
 
 			Ok(())
 		}
