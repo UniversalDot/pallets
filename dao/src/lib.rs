@@ -333,6 +333,18 @@ pub mod pallet {
 			
 			// Update Organization Members
 			<Organization<T>>::insert(org_name, members);
+			// <MemberOf<T>>::get(&account);
+			log::info!("Org {:?}.", org);
+
+
+			// <MemberOf<T>>::try_mutate(&account, |current_org| {
+			// 	if let Some(index) = current_org.iter().position(|&id| id == *org) {
+			// 		current_org.swap_remove(index);
+			// 		return Ok(());
+			// 	}
+			// 	Err(())
+			// }).map_err(|_| <Error<T>>::NotMember)?;
+
 			
 			Ok(())
 		}

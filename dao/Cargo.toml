@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-dao'
-version = '0.0.15'
+version = '0.0.16'
 description = 'Custom pallet for creation decentrilize autonomous organization.'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
@@ -65,7 +65,11 @@ default-features = false
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-11'
 version = '4.0.0-dev'
-    
+
+# dev dependencies
+[dependencies.log]
+default-features = false
+version = '0.4.14'
 
 [features]
 default = ['std']
