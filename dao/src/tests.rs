@@ -249,8 +249,8 @@ fn can_remove_users_from_organization() {
 		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
 		
-		// TODO: Validate Ensure length of users in org is 2
-		// assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
+		//  Validate Ensure length of users in org is 2
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
 
 	});
 }

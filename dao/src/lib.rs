@@ -330,9 +330,9 @@ pub mod pallet {
 			let index = members.binary_search(&account).ok().ok_or(<Error<T>>::NotMember)?;
 			members.remove(index);
 			
-
+			// Update Organization Members
+			<Organization<T>>::insert(org_name, members);
 			
-
 			Ok(())
 		}
 
