@@ -230,6 +230,24 @@ fn organization_exists_check_before_adding_user_to_org() {
 	});
 }
 
+#[test]
+fn only_creator_can_remove_users_from_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1),ORG_NAME.to_vec()));
+
+		// Ensure users can be added to a DAO
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
+
+		// When user 2 who didn't create organization tries to remove user, throw error
+		assert_noop!(Dao::remove_members(Origin::signed(2), ORG_NAME.to_vec(), 4), Error::<Test>::NotOrganizationCreator );
+
+	});
+}
 
 #[test]
 fn organization_exists_check_before_removing_user_from_org() {
