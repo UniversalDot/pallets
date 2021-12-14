@@ -75,7 +75,7 @@ fn only_vision_owner_can_remove_vision() {
 fn user_can_sign_onto_vision() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create Static Vision
 		const VISION: &'static [u8] = &[1];
 
 		// Ensure the DAO can create a vision document
@@ -93,7 +93,7 @@ fn user_can_sign_onto_vision() {
 fn user_can_sign_onto_vision_if_vision_exists() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create Vision
 		const VISION: &'static [u8] = &[1];
 
 		// Ensure the DAO can create a vision document
@@ -101,6 +101,25 @@ fn user_can_sign_onto_vision_if_vision_exists() {
 
 		// Ensure Error is thrown if vision doesn't exist when signing
 		assert_noop!(Dao::sign_vision(Origin::signed(1), Vec::new()), Error::<Test>::NoSuchVision );
+
+	});
+}
+
+#[test]
+fn user_can_sign_onto_vision_only_if_not_signed_previously() {
+	new_test_ext().execute_with(|| {
+
+		// Create Vision Document
+		const VISION: &'static [u8] = &[1];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure Vision can be signed
+		assert_ok!(Dao::sign_vision(Origin::signed(2), VISION.to_vec()));
+
+		// Ensure Error is thrown if vision is already signed
+		assert_noop!(Dao::sign_vision(Origin::signed(2), VISION.to_vec()), Error::<Test>::AlreadySigned );
 
 	});
 }

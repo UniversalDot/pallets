@@ -128,6 +128,8 @@ pub mod pallet {
 		NoSuchVision,
 		/// You are not the owner of the vision.
 		NotVisionOwner,
+		/// This vision has already been signed
+		AlreadySigned,
 		/// No rights to remove. Only creator can remove an organization
 		NotOrganizationCreator,
 		/// User is already a member of this DAO.
@@ -358,9 +360,12 @@ pub mod pallet {
             ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
 
 			// TODO: Perhaps use vision Hash instead of vision document
-			//let hash_vision = T::Hashing::hash_of(&vision_document);
+			// let hash_vision = T::Hashing::hash_of(&vision_document);
 
 			let mut members = <Pallet<T>>::vision_signer(&vision_document);
+
+			// Ensure not signed already
+			ensure!(!members.contains(&from_initiator), <Error<T>>::AlreadySigned);
 			members.push(from_initiator.clone());
 			
 			// Update storage.
