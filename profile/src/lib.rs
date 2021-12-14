@@ -2,9 +2,11 @@
 
 //! # Profile Module
 //!
-//! Each AccountID is able to create profiles that add specific metadata
+//!  Each AccountID is able to create profiles that add specific metadata
 //!  to their account. This metadata is used to enrich AccountID with additional
 //!  properties such as reputation, interests, etc. 
+//! 
+//! 
 /// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
@@ -62,8 +64,7 @@ pub mod pallet {
 	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
 	#[pallet::getter(fn profile_count)]
-	// Learn more about declaring storage items:
-	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
+	// Storage Value that counts the total number of Profiles
 	pub(super) type ProfileCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
 	#[pallet::storage]
@@ -123,31 +124,27 @@ pub mod pallet {
 			Ok(())
 		}
 
-			/// Dispatchable call that ensures user can update existing personal profile in storage.
-			#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-			pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
-				// Check that the extrinsic was signed and get the signer.
-				// This function will return an error if the extrinsic is not signed.
-				// https://docs.substrate.io/v3/runtime/origins
-				let account = ensure_signed(origin)?;
-				
-				// Since Each account can have one profile, we call into generate profile again
-				let profile_id = Self::change_profile(&account, interests)?;
-				log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
-	
-				// Emit an event.
-				Self::deposit_event(Event::ProfileUpdated(account, profile_id));
-				
-				Ok(())
-			}
+		/// Dispatchable call that ensures user can update existing personal profile in storage.
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+
+			let account = ensure_signed(origin)?;
+			
+			// Since Each account can have one profile, we call into generate profile again
+			let profile_id = Self::change_profile(&account, interests)?;
+			log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
+
+			// Emit an event.
+			Self::deposit_event(Event::ProfileUpdated(account, profile_id));
+			
+			Ok(())
+		}
 
 
 		/// Dispatchable call that enables every new actor to delete profile from storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn remove_profile(origin: OriginFor<T>) -> DispatchResult {
-			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
+
 			let account = ensure_signed(origin)?;
 
 			Self::delete_profile(&account)?;
