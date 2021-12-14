@@ -90,6 +90,30 @@ fn user_can_sign_onto_vision() {
 }
 
 #[test]
+fn user_can_unsign_from_vision() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Vision
+		const VISION: &'static [u8] = &[1];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure a user can sign onto vision. 
+		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure the length of VisionSigners has increased
+		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
+
+		// Ensure a user can sign onto vision. 
+		assert_ok!(Dao::unsign_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure the length of VisionSigners has increased
+		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 0);
+	});
+}
+
+#[test]
 fn user_can_sign_onto_vision_if_vision_exists() {
 	new_test_ext().execute_with(|| {
 

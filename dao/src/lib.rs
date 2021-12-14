@@ -194,8 +194,24 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 			
-
 			Self::member_signs_vision(&who, &vision_document)?;
+
+			// Emit an event.
+			Self::deposit_event(Event::VisionSigned(who, vision_document));
+			
+			Ok(())
+		}
+
+				/// An example dispatchable that takes a singles value as a parameter, writes the value to
+		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn unsign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let who = ensure_signed(origin)?;
+			
+			Self::member_unsigns_vision(&who, &vision_document)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::VisionSigned(who, vision_document));
@@ -367,6 +383,27 @@ pub mod pallet {
 			// Ensure not signed already
 			ensure!(!members.contains(&from_initiator), <Error<T>>::AlreadySigned);
 			members.push(from_initiator.clone());
+			
+			// Update storage.
+			<VisionSigner<T>>::insert(&vision_document, members);
+
+			Ok(())
+		}
+
+		pub fn member_unsigns_vision(from_initiator: &T::AccountId, vision_document: &Vec<u8>) -> Result<(), Error<T>> {
+
+			// Verify that the specified vision has been created.
+            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
+
+			// TODO: Perhaps use vision Hash instead of vision document
+			// let hash_vision = T::Hashing::hash_of(&vision_document);
+
+			let mut members = <Pallet<T>>::vision_signer(&vision_document);
+
+			// Ensure not signed already
+			//ensure!(!members.contains(&from_initiator), <Error<T>>::AlreadySigned);
+			let index = members.binary_search(&from_initiator).ok().ok_or(<Error<T>>::NotMember)?;
+			members.remove(index);
 			
 			// Update storage.
 			<VisionSigner<T>>::insert(&vision_document, members);
