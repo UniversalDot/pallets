@@ -131,7 +131,7 @@ pub mod pallet {
 		/// This vision has already been signed
 		AlreadySigned,
 		/// You can't unsign from vision that that you haven't signed.
-		NotSigner,
+		NotSigned,
 		/// No rights to remove. Only creator can remove an organization
 		NotOrganizationCreator,
 		/// User is already a member of this DAO.
@@ -403,7 +403,7 @@ pub mod pallet {
 			let mut members = <Pallet<T>>::vision_signer(&vision_document);
 
 			// Ensure not signed already
-			let index = members.binary_search(&from_initiator).ok().ok_or(<Error<T>>::NotSigner)?;
+			let index = members.binary_search(&from_initiator).ok().ok_or(<Error<T>>::NotSigned)?;
 			members.remove(index);
 			
 			// Update storage.

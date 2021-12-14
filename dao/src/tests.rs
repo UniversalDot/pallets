@@ -165,6 +165,22 @@ fn user_can_sign_onto_vision_only_if_not_signed_previously() {
 }
 
 #[test]
+fn user_can_unsign_from_vision_only_if_signed_previously() {
+	new_test_ext().execute_with(|| {
+
+		// Create Vision Document
+		const VISION: &'static [u8] = &[1];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure Error is thrown if vision has not been signed previously 
+		assert_noop!(Dao::unsign_vision(Origin::signed(2), VISION.to_vec()), Error::<Test>::NotSigned );
+
+	});
+}
+
+#[test]
 fn can_create_an_organization() {
 	new_test_ext().execute_with(|| {
 
