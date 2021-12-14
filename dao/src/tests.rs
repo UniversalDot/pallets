@@ -6,11 +6,11 @@ use frame_support::{assert_noop, assert_ok};
 #[test]
 fn can_create_vision() {
 	new_test_ext().execute_with(|| {
-		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 	});
 }
 
@@ -18,14 +18,14 @@ fn can_create_vision() {
 fn can_not_create_vision_that_already_exists() {
 	new_test_ext().execute_with(|| {
 		
-		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure the DAO can NOT Create create a vision that already exists
-		assert_noop!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()), Error::<Test>::VisionAlreadyExists);
+		assert_noop!(Dao::create_vision(Origin::signed(1), VISION.to_vec()), Error::<Test>::VisionAlreadyExists);
 	});
 }
 
@@ -33,14 +33,14 @@ fn can_not_create_vision_that_already_exists() {
 fn can_remove_vision() {
 	new_test_ext().execute_with(|| {
 		
-		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure the DAO can remove a vision document
-		assert_ok!(Dao::remove_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()));
 	});
 }
 
@@ -48,11 +48,11 @@ fn can_remove_vision() {
 fn when_removing_vision_ensure_it_exists() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
 
 		// Ensure error is thrown when no vision exists yet
-		assert_noop!(Dao::remove_vision(Origin::signed(1), ORG_NAME.to_vec()), Error::<Test>::NoSuchVision);
+		assert_noop!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()), Error::<Test>::NoSuchVision);
 	});
 }
 
@@ -60,14 +60,14 @@ fn when_removing_vision_ensure_it_exists() {
 fn only_vision_owner_can_remove_vision() {
 	new_test_ext().execute_with(|| {
 		
-		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure the vision can not be deleted by user who didn't create it. Created with user 1, deleted with 2
-		assert_noop!(Dao::remove_vision(Origin::signed(2), ORG_NAME.to_vec()), Error::<Test>::NotVisionOwner);
+		assert_noop!(Dao::remove_vision(Origin::signed(2), VISION.to_vec()), Error::<Test>::NotVisionOwner);
 	});
 }
 
@@ -76,13 +76,16 @@ fn user_can_sign_onto_vision() {
 	new_test_ext().execute_with(|| {
 
 		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		const VISION: &'static [u8] = &[1];
 
 		// Ensure the DAO can create a vision document
-		assert_ok!(Dao::create_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure a user can sign onto vision. 
-		assert_ok!(Dao::sign_vision(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure the length of VisionSigners has increased
+		// assert_eq!(Dao::vision_signer(VISION.to_vec()), 1);
 	});
 }
 
