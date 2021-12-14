@@ -100,13 +100,13 @@ fn user_can_unsign_from_vision() {
 		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure a user can sign onto vision. 
-		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
+		assert_ok!(Dao::sign_vision(Origin::signed(2), VISION.to_vec()));
 
 		// Ensure the length of VisionSigners has increased
 		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
 
-		// Ensure a user can sign onto vision. 
-		assert_ok!(Dao::unsign_vision(Origin::signed(1), VISION.to_vec()));
+		// Ensure a user can unsign onto vision. 
+		assert_ok!(Dao::unsign_vision(Origin::signed(2), VISION.to_vec()));
 
 		// Ensure the length of VisionSigners has increased
 		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 0);
@@ -139,7 +139,7 @@ fn user_can_unsign_from_vision_if_vision_exists() {
 		// Ensure the DAO can create a vision document
 		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
-		// Ensure Error is thrown if vision doesn't exist when signing
+		// Ensure Error is thrown if vision doesn't exist when unsigning
 		assert_noop!(Dao::unsign_vision(Origin::signed(1), Vec::new()), Error::<Test>::NoSuchVision );
 
 	});
