@@ -79,13 +79,13 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn member_of)]
-	/// TODO: Evaluate if needed
+	/// Storage item that indicates which DAO's a user belongs to [AccountID, Vec]
 	pub(super) type MemberOf<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::AccountId>, ValueQuery>;
 
 
 	#[pallet::storage]
 	#[pallet::getter(fn vision_signer)]
-	/// VisionSigner storageMap... [Hash of Vision, Vec[Account]]
+	/// Storage Map to indicate which user agree with a proposed Vision [Vision, Vec[Account]]
 	pub(super) type VisionSigner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
