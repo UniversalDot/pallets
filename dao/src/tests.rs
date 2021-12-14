@@ -85,7 +85,7 @@ fn user_can_sign_onto_vision() {
 		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure the length of VisionSigners has increased
-		// assert_eq!(Dao::vision_signer(VISION.to_vec()), 1);
+		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
 	});
 }
 

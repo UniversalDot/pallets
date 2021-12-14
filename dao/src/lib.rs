@@ -86,7 +86,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn vision_signer)]
 	/// VisionSigner storageMap... [Hash of Vision, Vec[Account]]
-	pub(super) type VisionSigner<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Vec<T::AccountId>, ValueQuery>;
+	pub(super) type VisionSigner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 	// Pallets use events to inform users when important changes are made.
 	// https://docs.substrate.io/v3/runtime/events
@@ -192,11 +192,7 @@ pub mod pallet {
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
-			let _hash_vision = T::Hashing::hash_of(&vision_document);
-
-
-			// Update storage.
-			// <DaoMembers<T>>::insert(who, hash_vision);
+			Self::member_signs_vision(&who, &vision_document);
 
 			// Emit an event.
 			Self::deposit_event(Event::VisionSigned(who, vision_document));
@@ -342,7 +338,7 @@ pub mod pallet {
 			// <MemberOf<T>>::get(&account);
 			log::info!("Org {:?}.", org);
 
-
+			//TODO: Remove organization from MemberOf
 			// <MemberOf<T>>::try_mutate(&account, |current_org| {
 			// 	if let Some(index) = current_org.iter().position(|&id| id == *org) {
 			// 		current_org.swap_remove(index);
@@ -352,6 +348,21 @@ pub mod pallet {
 			// }).map_err(|_| <Error<T>>::NotMember)?;
 
 			
+			Ok(())
+		}
+
+		pub fn member_signs_vision(from_initiator: &T::AccountId, vision_document: &Vec<u8>) -> Result<(), Error<T>> {
+
+			//Verify the vision exists
+
+			//let hash_vision = T::Hashing::hash_of(&vision_document);
+
+			let mut members = <Pallet<T>>::vision_signer(&vision_document);
+			members.push(from_initiator.clone());
+			
+			// Update storage.
+			<VisionSigner<T>>::insert(&vision_document, members);
+
 			Ok(())
 		}
 
