@@ -191,10 +191,9 @@ pub mod pallet {
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
-			// Verify that the specified vision has been created.
-            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
+			
 
-			Self::member_signs_vision(&who, &vision_document);
+			Self::member_signs_vision(&who, &vision_document)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::VisionSigned(who, vision_document));
@@ -355,8 +354,10 @@ pub mod pallet {
 
 		pub fn member_signs_vision(from_initiator: &T::AccountId, vision_document: &Vec<u8>) -> Result<(), Error<T>> {
 
-			//Verify the vision exists
+			// Verify that the specified vision has been created.
+            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
 
+			// TODO: Perhaps use vision Hash instead of vision document
 			//let hash_vision = T::Hashing::hash_of(&vision_document);
 
 			let mut members = <Pallet<T>>::vision_signer(&vision_document);
