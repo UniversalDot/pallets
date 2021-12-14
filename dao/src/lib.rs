@@ -191,6 +191,8 @@ pub mod pallet {
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
+			// Verify that the specified vision has been created.
+            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
 
 			Self::member_signs_vision(&who, &vision_document);
 

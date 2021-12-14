@@ -90,6 +90,22 @@ fn user_can_sign_onto_vision() {
 }
 
 #[test]
+fn user_can_sign_onto_vision_if_vision_exists() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const VISION: &'static [u8] = &[1];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		// Ensure Error is thrown if vision doesn't exist when signing
+		assert_noop!(Dao::sign_vision(Origin::signed(1), Vec::new()), Error::<Test>::NoSuchVision );
+
+	});
+}
+
+#[test]
 fn can_create_an_organization() {
 	new_test_ext().execute_with(|| {
 
