@@ -446,7 +446,7 @@ fn user_can_be_removed_from_organization_it_belongs_to_member_of() {
 		// User can be removed from organization
 		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
 
-		// Ensure user 4 belongs to 1 organizations
+		// TODO: Ensure user 4 belongs to 1 organizations
 		// assert_eq!(Dao::member_of(4).len(), 1);	
 
 	});
