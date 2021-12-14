@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-dao'
-version = '0.0.16'
+version = '0.0.17'
 description = 'Custom pallet for creation decentrilize autonomous organization.'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
