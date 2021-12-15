@@ -78,13 +78,13 @@ pub mod pallet {
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		/// Profile was successfully created. 
-		ProfileCreated(T::AccountId, T::Hash),
+		ProfileCreated { who: T::AccountId },
 
 		/// Profile was successfully deleted.
-		ProfileDeleted(T::AccountId),
+		ProfileDeleted { who: T::AccountId},
 
 		/// Profile was successfully updated.
-		ProfileUpdated(T::AccountId, T::Hash),
+		ProfileUpdated { who: T::AccountId, hash: T::Hash },
 
 	}
 
@@ -119,7 +119,7 @@ pub mod pallet {
 			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Emit an event.
-			Self::deposit_event(Event::ProfileCreated(account, profile_id));
+			Self::deposit_event(Event::ProfileCreated{ who:account });
 			
 			Ok(())
 		}
@@ -135,7 +135,7 @@ pub mod pallet {
 			log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Emit an event.
-			Self::deposit_event(Event::ProfileUpdated(account, profile_id));
+			Self::deposit_event(Event::ProfileUpdated{ who: account, hash: profile_id });
 			
 			Ok(())
 		}
@@ -150,7 +150,7 @@ pub mod pallet {
 			Self::delete_profile(&account)?;
 
 			// Emit an event.
-			Self::deposit_event(Event::ProfileDeleted(account));
+			Self::deposit_event(Event::ProfileDeleted{ who : account});
 			// Return a successful DispatchResultWithPostInfo
 			Ok(())
 		}
