@@ -166,7 +166,7 @@ pub mod pallet {
 			let balance = T::Currency::free_balance(owner);
 
 			// Populate Profile struct
-			let mut profile = Profile::<T> {
+			let profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: interests_vec,
 				balance: Some(balance),

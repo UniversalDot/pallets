@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-profile'
-version = '0.0.49'
+version = '0.0.50'
 description = 'FRAME pallet for creating profiles'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'

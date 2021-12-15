@@ -18,7 +18,7 @@ fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
 
 // This creates an `Profile` object.
 // All data is pre-populated with some arbitrary bytes.
-fn create_profile_info<T: Config>(num_fields: u32) -> Profile<T> {
+fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 	// let data = Data::Raw(vec![0; 32].try_into().unwrap());
 	let mut interests = Vec::new();
 	interests.push(77);
