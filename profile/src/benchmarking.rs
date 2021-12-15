@@ -24,7 +24,6 @@ fn create_profile_info<T: Config>(num_fields: u32) -> Profile<T> {
 	interests.push(77);
 
 	let caller: T::AccountId = whitelisted_caller();
-
 	let balance = T::Currency::free_balance(&caller);
 
 	let info = Profile {
@@ -39,7 +38,7 @@ fn create_profile_info<T: Config>(num_fields: u32) -> Profile<T> {
 
 
 benchmarks! {
-	benchmark_name {
+	profile_creation {
 		/* setup initial state */
 		let s in 1 .. 100;
 		let profile = create_profile_info::<T>(1);
@@ -54,7 +53,8 @@ benchmarks! {
 	
 	verify {
 		/* verifying final state */
-		assert_eq!(ProfileCount::<T>::get(), s);
+		let caller: T::AccountId = whitelisted_caller();
+		assert_last_event::<T>(Event::<T>::ProfileCreated { who: caller }.into());
 	}
 }
 
