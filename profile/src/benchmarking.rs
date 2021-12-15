@@ -56,6 +56,15 @@ benchmarks! {
 		let caller: T::AccountId = whitelisted_caller();
 		assert_last_event::<T>(Event::<T>::ProfileCreated { who: caller }.into());
 	}
+
+	benchmark_name {
+		/* setup initial state */
+	  }: {
+		/* the code to be benchmarked */
+	  }
+	  verify {
+		/* verifying final state */
+	  }
 }
 
 impl_benchmark_test_suite!(Template, crate::mock::new_test_ext(), crate::mock::Test,);
