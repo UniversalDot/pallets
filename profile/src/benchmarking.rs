@@ -15,9 +15,7 @@ fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
 	frame_system::Pallet::<T>::assert_last_event(generic_event.into());
 }
 
-
 // This creates an `Profile` object.
-// All data is pre-populated with some arbitrary bytes.
 fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 	// let data = Data::Raw(vec![0; 32].try_into().unwrap());
 	let mut interests = Vec::new();
@@ -55,6 +53,17 @@ benchmarks! {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
 		assert_last_event::<T>(Event::<T>::ProfileCreated { who: caller }.into());
+	}
+
+	sort_vector {
+		let x in 0 .. 10000;
+		let mut m = Vec::<u32>::new();
+		for i in (0..x).rev() {
+			m.push(i);
+		}
+	}: {
+		// The benchmark execution phase could also be a closure with custom code
+		m.sort();
 	}
 
 	benchmark_name {
