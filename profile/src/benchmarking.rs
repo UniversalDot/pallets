@@ -10,6 +10,10 @@ use frame_system::RawOrigin;
 use frame_support::{
 	traits::{Currency}};
 
+// Helper function to assert event thrown during verification
+fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
+	frame_system::Pallet::<T>::assert_last_event(generic_event.into());
+}
 
 
 // This creates an `Profile` object.
@@ -38,11 +42,14 @@ benchmarks! {
 	benchmark_name {
 		/* setup initial state */
 		let s in 1 .. 100;
-		let mut profile = Vec::new();
-		profile.push(7);
+		let profile = create_profile_info::<T>(1);
+		let mut interests = Vec::new();
+		interests.push(7);
+
+		//let initial_info = create_profile_info::<T>(1);
 		let caller: T::AccountId = whitelisted_caller();
 
-	}: create_profile(RawOrigin::Signed(caller), profile)
+	}: create_profile(RawOrigin::Signed(caller), interests)
 		/* the code to be benchmarked above*/
 	
 	verify {
