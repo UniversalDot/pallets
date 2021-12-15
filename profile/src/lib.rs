@@ -65,7 +65,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn profile_count)]
 	// Storage Value that counts the total number of Profiles
-	pub(super) type ProfileCount<T: Config> = StorageValue<_, u64, ValueQuery>;
+	pub(super) type ProfileCount<T: Config> = StorageValue<_, u32, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn profiles)]
