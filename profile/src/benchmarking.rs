@@ -7,13 +7,21 @@ use crate::Pallet as Template;
 use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin;
 
+
 benchmarks! {
-	do_something {
-		let s in 0 .. 100;
+	benchmark_name {
+		/* setup initial state */
+		let s in 1 .. 100;
+		let mut profile = Vec::new();
+		profile.push(7);
 		let caller: T::AccountId = whitelisted_caller();
-	}: _(RawOrigin::Signed(caller), s)
+
+	}: create_profile(RawOrigin::Signed(caller), profile)
+		/* the code to be benchmarked above*/
+	
 	verify {
-		assert_eq!(Something::<T>::get(), Some(s));
+		/* verifying final state */
+		assert_eq!(ProfileCount::<T>::get(), s);
 	}
 }
 
