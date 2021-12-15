@@ -31,6 +31,24 @@ fn create_profile_increases_profile_count() {
 }
 
 #[test]
+fn only_one_profile_per_account_allowed() {
+	new_test_ext().execute_with(|| {
+		// Create vector of interests
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		// Ensure the user can create profile
+		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+
+		// Create vector of interests
+		let mut vec = Vec::new();
+		vec.push(7);
+
+		assert_noop!(Profile::create_profile(Origin::signed(1), vec), Error::<Test>::ProfileAlreadyCreated );
+	});
+}
+
+#[test]
 fn delete_profile_works() {
 	new_test_ext().execute_with(|| {
 		// Create vector of interests

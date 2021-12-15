@@ -161,7 +161,9 @@ pub mod pallet {
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
 		pub fn generate_profile(owner: &T::AccountId, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
-			
+			// Check if profile already exists for owner
+			ensure!(!Profiles::<T>::contains_key(&owner), Error::<T>::ProfileAlreadyCreated);
+
 			// Get current balance of owner
 			let balance = T::Currency::free_balance(owner);
 
