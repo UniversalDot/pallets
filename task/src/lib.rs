@@ -163,6 +163,7 @@ pub mod pallet {
 			Self::assign_task(&signer, &task_id)?;
 
 			// TODO: Investigate why Currency transfer doesn't work 
+			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
 			// Transfer budget amount from initiator to volunteer
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			let task_initiator = task.initiator.clone();
