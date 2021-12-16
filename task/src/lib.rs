@@ -44,6 +44,7 @@ pub mod pallet {
 		pub requirements: Vec<u8>,
 		pub status: TaskStatus,
 		pub budget: BalanceOf<T>,
+		pub deadline: u64,
 	}
 
 	// Set TaskStatus enum.
@@ -133,14 +134,14 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>) -> DispatchResultWithPostInfo {
+		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>, deadline: u64) -> DispatchResultWithPostInfo {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
 			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
 			// Update storage.
-			let task_id = Self::new_task(&signer, requirements, budget)?;
+			let task_id = Self::new_task(&signer, requirements, budget, deadline)?;
 			
 			// TODO: Check if user has balance to create task
 			// T::Currency::reserve(&signer, budget).map_err(|_| "locker can't afford to lock the amount requested")?;
@@ -219,7 +220,7 @@ pub mod pallet {
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(from_initiator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(from_initiator: &T::AccountId, requirements: Vec<u8>, budget: BalanceOf<T>, deadline: u64) -> Result<T::Hash, Error<T>> {
 			
 			let task = Task::<T> {
 				initiator: from_initiator.clone(),
@@ -228,6 +229,7 @@ pub mod pallet {
 				status: Created,
 				budget: budget,
 				current_owner: from_initiator.clone(),
+				deadline: deadline.clone(),
 			};
 
 			let task_id = T::Hashing::hash_of(&task);
