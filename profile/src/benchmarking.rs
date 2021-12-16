@@ -38,8 +38,9 @@ fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 benchmarks! {
 	profile_creation {
 		/* setup initial state */
-		let s in 1 .. 100;
-		let profile = create_profile_info::<T>(1);
+		let x in 1 .. 100;
+		let int_u8 = u8::from_str_radix("A", 16);
+		let profile = create_profile_info::<T>(x);
 		let mut interests = Vec::new();
 		interests.push(7);
 
