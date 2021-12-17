@@ -75,7 +75,7 @@ pub mod pallet {
         ) -> DispatchResultWithPostInfo {
             let _ = ensure_signed(origin)?;
 
-            ensure!(val_to_add <= T::MaxAddend::get(), "value must be <= maximum add amount constant");
+            ensure!(val_to_add <= T::MaxAddend::get(), Error::<T>::Overflow);
 
             // previous value got
            	let c_val = SingleValue::<T>::get();
