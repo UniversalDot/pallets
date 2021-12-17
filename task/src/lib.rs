@@ -153,6 +153,7 @@ pub mod pallet {
 		}
 
 		/// An dispatchable call that starts a task by assigning to new account.
+		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
@@ -168,7 +169,7 @@ pub mod pallet {
 			// Transfer budget amount from initiator to volunteer
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			let task_initiator = task.initiator.clone();
-			let budget = task.budget;
+			let budget = task.budget.clone();
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", signer);
 			log::info!("task_initiator {:?}.", task_initiator);
@@ -199,7 +200,6 @@ pub mod pallet {
 		}
 
 		/// An dispatchable call that starts a task by assigning to new account.
-		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
