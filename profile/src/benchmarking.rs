@@ -19,7 +19,7 @@ fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
 fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 	// let data = Data::Raw(vec![0; 32].try_into().unwrap());
 	let mut interests = Vec::new();
-	interests.push(77);
+	interests.push(u8::MAX);
 
 	let caller: T::AccountId = whitelisted_caller();
 	let balance = T::Currency::free_balance(&caller);
@@ -28,7 +28,7 @@ fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 		owner: caller,
 		interests: interests,
 		balance: Some(balance),
-		reputation: 1111111,
+		reputation: u32::MAX,
 	};
 
 	return info
@@ -42,7 +42,7 @@ benchmarks! {
 		let caller: T::AccountId = whitelisted_caller();
 
 		// Create 10_000 profiles
-		let x in 1 .. 10000;
+		let x in 1 .. 100;
 		let profile = create_profile_info::<T>(x);
 		
 		// Create vector of interests
