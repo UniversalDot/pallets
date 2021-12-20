@@ -38,7 +38,8 @@ fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 benchmarks! {
 	profile_creation {
 		/* setup initial state */
-
+		
+		let caller: T::AccountId = whitelisted_caller();
 
 		// Create 10_000 profiles
 		let x in 1 .. 10000;
@@ -46,11 +47,7 @@ benchmarks! {
 		
 		// Create vector of interests
 		let mut interests = Vec::new();
-		interests.push(7);
-
-
-		//let initial_info = create_profile_info::<T>(1);
-		let caller: T::AccountId = whitelisted_caller();
+		interests.push(u8::MAX);
 
 	}: create_profile(RawOrigin::Signed(caller), interests)
 		/* the code to be benchmarked above*/
