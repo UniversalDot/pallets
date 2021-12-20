@@ -81,10 +81,10 @@ pub mod pallet {
 		ProfileCreated { who: T::AccountId },
 
 		/// Profile was successfully deleted.
-		ProfileDeleted { who: T::AccountId},
+		ProfileDeleted { who: T::AccountId },
 
 		/// Profile was successfully updated.
-		ProfileUpdated { who: T::AccountId, hash: T::Hash },
+		ProfileUpdated { who: T::AccountId },
 
 	}
 
@@ -135,7 +135,7 @@ pub mod pallet {
 			log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
 
 			// Emit an event.
-			Self::deposit_event(Event::ProfileUpdated{ who: account, hash: profile_id });
+			Self::deposit_event(Event::ProfileUpdated{ who: account });
 			
 			Ok(())
 		}
