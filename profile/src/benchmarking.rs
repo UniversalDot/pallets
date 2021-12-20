@@ -38,11 +38,16 @@ fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 benchmarks! {
 	profile_creation {
 		/* setup initial state */
-		let x in 1 .. 100;
-		let int_u8 = u8::from_str_radix("A", 16);
+
+
+		// Create 10_000 profiles
+		let x in 1 .. 10000;
 		let profile = create_profile_info::<T>(x);
+		
+		// Create vector of interests
 		let mut interests = Vec::new();
 		interests.push(7);
+
 
 		//let initial_info = create_profile_info::<T>(1);
 		let caller: T::AccountId = whitelisted_caller();
@@ -75,6 +80,23 @@ benchmarks! {
 	  verify {
 		/* verifying final state */
 	  }
+
+	//   profile_update {
+	// 	/* setup initial state */
+	// 	let caller: T::AccountId = whitelisted_caller();
+	// 	// create_profile(RawOrigin::Signed(caller), interests);
+
+	// 	// Create vector of interests
+	// 	let mut interests = Vec::new();
+	// 	interests.push(7);
+
+	// 	Template::create_profile(RawOrigin::Signed(caller), interests);
+	//   }: update_profile(RawOrigin::Signed(caller), interests)
+	//   verify {
+	// 	/* verifying final state */
+	// 	let caller: T::AccountId = whitelisted_caller();
+	// 	assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
+	//   }
 }
 
 impl_benchmark_test_suite!(Template, crate::mock::new_test_ext(), crate::mock::Test,);
