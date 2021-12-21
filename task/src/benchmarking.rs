@@ -45,12 +45,21 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 benchmarks! {
 	benchmark_name {
 		/* setup initial state */
-	  }: {
+	}: {
 		/* the code to be benchmarked */
-	  }
-	  verify {
+	}
+	verify {
 		/* verifying final state */
-	  }
+	}
+
+	create_task {
+		/* setup initial state */
+	}: {
+		/* the code to be benchmarked */
+	}
+	verify {
+		/* verifying final state */
+	}
 }
 
 impl_benchmark_test_suite!(PalletTask, crate::mock::new_test_ext(), crate::mock::Test,);
