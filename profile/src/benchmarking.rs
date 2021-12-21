@@ -79,24 +79,25 @@ benchmarks! {
 		/* verifying final state */
 	  }
 
-	//   profile_update {
-	// 	/* setup initial state */
-	// 	let caller: T::AccountId = whitelisted_caller();
-	// 	// create_profile(RawOrigin::Signed(caller), interests);
+	  profile_update {
+		/* setup initial state */
+		let create_account_caller: T::AccountId = whitelisted_caller();
+		let update_account_caller: T::AccountId = whitelisted_caller();
 
-	// 	// Create vector of interests
-	// 	let mut interests = Vec::new();
-	// 	interests.push(7);
+		// Create vector of interests
+		let s in 1 .. u8::MAX.into(); // max bytes for interests
+		let interests = vec![0u8, s as u8];
+		let interests_update = vec![0u8, s as u8];
 
-	// 	//PalletProfile::<T>::Profile::create_profile_info::<T>(1);
-
-	// 	// PalletProfile::<T>::create_profile(RawOrigin::Signed(caller), interests);
-	//   }: update_profile(RawOrigin::Signed(caller), interests)
-	//   verify {
-	// 	/* verifying final state */
-	// 	// let caller: T::AccountId = whitelisted_caller();
-	// 	//assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
-	//   }
+		// before we check update profile, profile must be created
+		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
+		
+	  }: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
+	  verify {
+		/* verifying final state */
+		let caller: T::AccountId = whitelisted_caller();
+		assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
+	  }
 }
 
 impl_benchmark_test_suite!(PalletProfile, crate::mock::new_test_ext(), crate::mock::Test,);
