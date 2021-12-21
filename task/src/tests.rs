@@ -1,7 +1,7 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
-pub const DEADLINE:u64 = 77; 
+pub const DEADLINE:u32 = 77; 
 
 #[test]
 fn create_new_task(){
