@@ -72,14 +72,14 @@ benchmarks! {
 
 	benchmark_name {
 		/* setup initial state */
-	  }: {
+	}: {
 		/* the code to be benchmarked */
-	  }
-	  verify {
+	}
+	verify {
 		/* verifying final state */
-	  }
+	}
 
-	  profile_update {
+	profile_update {
 		/* setup initial state */
 		let create_account_caller: T::AccountId = whitelisted_caller();
 		let update_account_caller: T::AccountId = whitelisted_caller();
@@ -92,12 +92,12 @@ benchmarks! {
 		// before we check update profile, profile must be created
 		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
 		
-	  }: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
-	  verify {
+	}: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
+	verify {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
 		assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
-	  }
+	}
 }
 
 impl_benchmark_test_suite!(PalletProfile, crate::mock::new_test_ext(), crate::mock::Test,);
