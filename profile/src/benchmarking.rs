@@ -41,13 +41,14 @@ benchmarks! {
 		
 		let caller: T::AccountId = whitelisted_caller();
 
-		// Create 10_000 profiles
-		let x in 1 .. 100;
-		let profile = create_profile_info::<T>(x);
+		let x in 1 .. 100;  // # of profiles
+		let s in 1 .. u8::MAX.into(); // max bytes for interests
+		
+		// Create profile
+		let profile = create_profile_info::<T>(1);
 		
 		// Create vector of interests
-		let mut interests = Vec::new();
-		interests.push(u8::MAX);
+		let interests = vec![0u8, s as u8];
 
 	}: create_profile(RawOrigin::Signed(caller), interests)
 		/* the code to be benchmarked above*/
@@ -87,12 +88,14 @@ benchmarks! {
 	// 	let mut interests = Vec::new();
 	// 	interests.push(7);
 
-	// 	Template::create_profile(RawOrigin::Signed(caller), interests);
+	// 	//PalletProfile::<T>::Profile::create_profile_info::<T>(1);
+
+	// 	// PalletProfile::<T>::create_profile(RawOrigin::Signed(caller), interests);
 	//   }: update_profile(RawOrigin::Signed(caller), interests)
 	//   verify {
 	// 	/* verifying final state */
-	// 	let caller: T::AccountId = whitelisted_caller();
-	// 	assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
+	// 	// let caller: T::AccountId = whitelisted_caller();
+	// 	//assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
 	//   }
 }
 
