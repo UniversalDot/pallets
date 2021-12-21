@@ -89,7 +89,7 @@ benchmarks! {
 		let interests = vec![0u8, s as u8];
 		let interests_update = vec![0u8, s as u8];
 
-		// before we check update profile, profile must be created
+		// before we update profile, profile must be created
 		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
 		
 	}: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
@@ -97,6 +97,27 @@ benchmarks! {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
 		assert_last_event::<T>(Event::<T>::ProfileUpdated { who: caller }.into());
+	}
+
+	profile_remove {
+		/* setup initial state */
+		let create_account_caller: T::AccountId = whitelisted_caller();
+		let delete_account_caller: T::AccountId = whitelisted_caller();
+
+		// Create vector of interests
+		let s in 1 .. u8::MAX.into(); // max bytes for interests
+		let interests = vec![0u8, s as u8];
+
+		// before we delete profile, profile must be created
+		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
+	}: 
+	/* the code to be benchmarked */
+	remove_profile(RawOrigin::Signed(delete_account_caller))
+		
+	verify {
+		/* verifying final state */
+		let caller: T::AccountId = whitelisted_caller();
+		assert_last_event::<T>(Event::<T>::ProfileDeleted { who: caller }.into());
 	}
 }
 
