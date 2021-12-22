@@ -61,9 +61,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-/// Edit this file to define custom logic or remove it if it is not needed.
-/// Learn more about FRAME and the core library of Substrate FRAME pallets:
-/// <https://docs.substrate.io/v3/runtime/frame>
+
 pub use pallet::*;
 
 #[cfg(test)]
@@ -77,8 +75,7 @@ mod benchmarking;
 
 #[frame_support::pallet]
 pub mod pallet {
-	//TODO: Better import
-	use crate::TaskStatus::Created;
+	use crate::TaskStatus::Created; //TODO: Better import
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
 	use frame_support::{
@@ -191,7 +188,7 @@ pub mod pallet {
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/// An dispatchable call that creates tasks.
+		/// Function call that creates tasks.  [ origin, requirements, budget, deadline]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>, deadline: u32) -> DispatchResultWithPostInfo {
 			
@@ -210,7 +207,7 @@ pub mod pallet {
 			Ok(().into())
 		}
 
-		/// An dispatchable call that starts a task by assigning to new account.
+		/// Function call that starts a task by assigning new task owner. [origin, task_id]
 		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
@@ -235,11 +232,11 @@ pub mod pallet {
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 
-		/// An dispatchable call that starts a task by assigning to new account.
+		/// Function that completes a task [origin, task_id]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(2,1))]
 		pub fn complete_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			
@@ -251,11 +248,11 @@ pub mod pallet {
 
 			// Emit a Task Completed Event.
 			Self::deposit_event(Event::TaskCompleted(signer, task_id));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 
-		/// An dispatchable call that starts a task by assigning to new account.
+		/// Function to remove task. [origin, task_id]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			
@@ -267,7 +264,7 @@ pub mod pallet {
 
 			// Emit a Task Removed Event.
 			Self::deposit_event(Event::TaskRemoved(signer, task_id));
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 	}
@@ -277,6 +274,7 @@ pub mod pallet {
 
 		pub fn new_task(from_initiator: &T::AccountId, requirements: &Vec<u8>, budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
 			
+			// Init Task Object
 			let task = Task::<T> {
 				initiator: from_initiator.clone(),
 				volunteer: from_initiator.clone(),
@@ -287,6 +285,7 @@ pub mod pallet {
 				deadline: deadline.clone(),
 			};
 
+			// Create hash of task
 			let task_id = T::Hashing::hash_of(&task);
 
 			// Performs this operation first because as it may fail
@@ -334,6 +333,7 @@ pub mod pallet {
 
 
 		pub fn mark_finished(to: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
+			
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
@@ -394,13 +394,12 @@ pub mod pallet {
 			Ok(())
 		}
 
+		// Function to check if the current signer is the task_initiator
 		pub fn is_task_initiator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, Error<T>> {
 			match Self::tasks(task_id) {
 				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
 		}
-
 	}
-
 }
