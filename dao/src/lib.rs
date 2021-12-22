@@ -1,6 +1,27 @@
-#![cfg_attr(not(feature = "std"), no_std)]
+// This file is part of Substrate.
 
-//! # DAO Module
+// Copyright (C) 2022 UNIVERSALDOT FOUNDATION.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+//! # DAO Pallet
+//!
+//! - [`Config`]
+//! - [`Pallet`]
+//!
+//! ## Overview
 //!
 //! Organizes People with a common Vision to work on projects.
 //! This module works as an extension to the Task module since 
@@ -11,12 +32,41 @@
 //! down into tasks. Thus a DAO is a collection of tasks who are undertaken 
 //! by people that believe in the vision of the Founder. 
 //! 
-//! Users support a Vision by signing a vision document. Signing a vision document
-//! enrolls users in DAO where they will be able to create/fulfill tasks in 
-//! support of the overall vision. For completion of tasks, users are rewarded tokens
-//! and increased reputation.
-//!  
-/// <https://docs.substrate.io/v3/runtime/frame>
+//! Users support a Vision by signing a vision document. Signing a vision document enables
+//! users to be added to a DAO where they will be able to create/fulfill tasks in 
+//! support of the overall vision. 
+//! 
+//! For completion of tasks, users are rewarded tokens and increased reputation.
+//!
+//! ## Interface
+//!
+//! ### Public Functions
+//!
+//! - `create_vision` - Function used to create vision of the future. 
+//! 
+//! - `remove_vision` - Function used to remove existing vision.
+//! 
+//! - `sign_vision` - Function used to sign user to a vision. Signing a vision
+//! indicates interest that the user are interested in creating said vision.
+//! 
+//! - `unsign_vision` - Function used to unsign user from a vision. Unsigning a vision
+//! indicates that a user is no longer interested in creating said vision.
+//! 
+//! - `create_organization` - Function used to create a DAO organization. 
+//! 
+//! - `add_members` - Function user for a visionary to add members to his organization. 
+//! 
+//! - `remove_members` - Function user for a visionary to remove members from his organization. 
+//! 
+//! - `dissolve_organization` - Function user for a visionary to dissolve his organization. 
+//!
+//! ## Related Modules
+//!
+
+
+#![cfg_attr(not(feature = "std"), no_std)]
+
+
 pub use pallet::*;
 
 
@@ -63,18 +113,15 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
-	// The pallet's runtime storage items.
-	// https://docs.substrate.io/v3/runtime/storage
+
 	#[pallet::storage]
 	#[pallet::getter(fn vision)]
-	// Learn more about declaring storage items:
-	// https://docs.substrate.io/v3/runtime/storage#declaring-storage-items
-	// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
+	/// Store Vision document in StorageMap as Vector with value: AccountID, BlockNumber
 	pub(super) type Vision<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn organization)]
-	// Create organization storage map with key: name and value: Vec<AccountID>
+	/// Create organization storage map with key: name and value: Vec<AccountID>
 	pub(super) type Organization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 	#[pallet::storage]
@@ -88,8 +135,7 @@ pub mod pallet {
 	/// Storage Map to indicate which user agree with a proposed Vision [Vision, Vec[Account]]
 	pub(super) type VisionSigner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
-	// Pallets use events to inform users when important changes are made.
-	// https://docs.substrate.io/v3/runtime/events
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -152,37 +198,46 @@ pub mod pallet {
 		/// The vision is signed by submitter and uses current block.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn create_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let sender = ensure_signed(origin)?;
+
 			// Verify that the specified vision has not already been created.
 			ensure!(!Vision::<T>::contains_key(&vision_document), Error::<T>::VisionAlreadyExists);
+
 			// Get the block number from the FRAME System pallet.
 			let current_block = <frame_system::Pallet<T>>::block_number();
+
 			// Store the vision with the sender and block number.
 			Vision::<T>::insert(&vision_document, (&sender, current_block));
+
 			// Emit an event that the claim was created.
 			Self::deposit_event(Event::VisionCreated(sender, vision_document));
+
 			Ok(())
 		}
 
 		#[pallet::weight(10_000)]
         pub fn remove_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
-            // Check that the extrinsic was signed and get the signer.
-            // This function will return an error if the extrinsic is not signed.
-            // https://docs.substrate.io/v3/runtime/origins
+            
+			// Check that the extrinsic was signed and get the signer.
             let sender = ensure_signed(origin)?;
+
             // Verify that the specified vision has been created.
             ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
+
             // Get owner of the vision.
             let (owner, _) = Vision::<T>::get(&vision_document);
+
             // Verify that sender of the current call is the vision creator
             ensure!(sender == owner, Error::<T>::NotVisionOwner);
+
             // Remove vision from storage.
             Vision::<T>::remove(&vision_document);
+
             // Emit an event that the vision was erased.
             Self::deposit_event(Event::VisionRemoved(sender, vision_document));
+
             Ok(())
         }
 
@@ -191,9 +246,8 @@ pub mod pallet {
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn sign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 			
 			Self::member_signs_vision(&who, &vision_document)?;
@@ -204,13 +258,12 @@ pub mod pallet {
 			Ok(())
 		}
 
-				/// An example dispatchable that takes a singles value as a parameter, writes the value to
+		/// An example dispatchable that takes a singles value as a parameter, writes the value to
 		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn unsign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 			
 			Self::member_unsigns_vision(&who, &vision_document)?;
@@ -223,9 +276,8 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
 			//TODO: Ensure only visionary can crate DAOs
@@ -242,9 +294,8 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn add_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
 			// call public function to create org
@@ -258,9 +309,8 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn remove_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
 			// call public function to create org
@@ -274,9 +324,8 @@ pub mod pallet {
 
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let who = ensure_signed(origin)?;
 
 			//TODO: Ensure only visionary can crate DAOs
@@ -415,7 +464,5 @@ pub mod pallet {
 				Ok(true)
 			} else { Err(Error::<T>::NotOrganizationCreator) }
 		}
-
-
 	}
 }
