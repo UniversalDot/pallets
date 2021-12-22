@@ -142,13 +142,12 @@ pub mod pallet {
 		/// Dispatchable call that enables every new actor to create personal profile in storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let account = ensure_signed(origin)?;
 
-			let profile_id = Self::generate_profile(&account, interests)?;
-			log::info!("A profile is created with ID: {:?}.", profile_id); // TODO Remove loging
+			// Call helper function to generate Profile Struct
+			let _profile_id = Self::generate_profile(&account, interests)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated{ who:account });
@@ -160,6 +159,7 @@ pub mod pallet {
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
 
+			// Check that the extrinsic was signed and get the signer.
 			let account = ensure_signed(origin)?;
 			
 			// Since Each account can have one profile, we call into generate profile again
@@ -176,14 +176,16 @@ pub mod pallet {
 		/// Dispatchable call that enables every new actor to delete profile from storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn remove_profile(origin: OriginFor<T>) -> DispatchResult {
-
+			
+			// Check that the extrinsic was signed and get the signer.
 			let account = ensure_signed(origin)?;
 
+			// Call helper function to delete profile
 			Self::delete_profile(&account)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileDeleted{ who : account});
-			// Return a successful DispatchResultWithPostInfo
+			
 			Ok(())
 		}
 
@@ -223,7 +225,9 @@ pub mod pallet {
 		// Changes existing profile
 		pub fn change_profile(owner: &T::AccountId, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
+			// Ensure that only owner can update profile
 			Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
+			
 			// Get current balance of owner
 			let balance = T::Currency::free_balance(owner);
 
@@ -245,14 +249,17 @@ pub mod pallet {
 			// TODO: Use try_mutate instead
 			<Profiles<T>>::insert(owner, profile);
 
+			// Return hash of profileID
 			Ok(profile_id)
 		}
 
 		// Public function that deletes a user profile
 		pub fn delete_profile(owner: &T::AccountId) -> Result<(), Error<T>> {
+			
 			// Ensure that only creator of profile can delete it
 			Self::profiles(owner).ok_or(<Error<T>>::NoDeletionAuthority)?;
 			
+			// Remove profile from storage
 			<Profiles<T>>::remove(owner);
 
 			// Reduce profile count
