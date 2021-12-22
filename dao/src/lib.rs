@@ -113,6 +113,10 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
+	#[pallet::storage]
+	#[pallet::getter(fn vision_count)]
+	/// VisionCount: Get total number of submitted Visions in the system
+	pub(super) type VisionCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn vision)]
@@ -174,6 +178,8 @@ pub mod pallet {
 		NoSuchVision,
 		/// You are not the owner of the vision.
 		NotVisionOwner,
+		/// Max limit for Visions Reached
+		VisionCountOverflow,
 		/// This vision has already been signed
 		AlreadySigned,
 		/// You can't unsign from vision that that you haven't signed.
@@ -210,6 +216,10 @@ pub mod pallet {
 			// Store the vision with the sender and block number.
 			Vision::<T>::insert(&vision_document, (&sender, current_block));
 
+			//Increase Vision Count storage
+			let new_count = Self::vision_count().checked_add(1).ok_or(<Error<T>>::VisionCountOverflow)?;
+			<VisionCount<T>>::put(new_count);
+
 			// Emit an event that the claim was created.
 			Self::deposit_event(Event::VisionCreated(sender, vision_document));
 
@@ -234,6 +244,10 @@ pub mod pallet {
 
             // Remove vision from storage.
             Vision::<T>::remove(&vision_document);
+
+			// Reduce vision count
+			let new_count = Self::vision_count().saturating_sub(1);
+			<VisionCount<T>>::put(new_count);
 
             // Emit an event that the vision was erased.
             Self::deposit_event(Event::VisionRemoved(sender, vision_document));

@@ -15,6 +15,20 @@ fn can_create_vision() {
 }
 
 #[test]
+fn creating_vision_increases_vision_count() {
+	new_test_ext().execute_with(|| {
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		//Ensure vision count is 1
+		assert_eq!(Dao::vision_count(), 1);
+	});
+}
+
+#[test]
 fn can_not_create_vision_that_already_exists() {
 	new_test_ext().execute_with(|| {
 		
@@ -41,6 +55,26 @@ fn can_remove_vision() {
 
 		// Ensure the DAO can remove a vision document
 		assert_ok!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()));
+	});
+}
+
+#[test]
+fn removing_vision_decreases_vision_count() {
+	new_test_ext().execute_with(|| {
+		// Create Vision Document
+		const VISION: &'static [u8] = &[7];
+
+		// Ensure the DAO can create a vision document
+		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
+
+		//Ensure vision count is 1
+		assert_eq!(Dao::vision_count(), 1);
+
+		// Ensure the DAO can remove a vision document
+		assert_ok!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()));
+
+		//Ensure vision count is 0
+		assert_eq!(Dao::vision_count(), 0);
 	});
 }
 
