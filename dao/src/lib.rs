@@ -194,8 +194,7 @@ pub mod pallet {
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 
-		/// A dispatchable function for creating a vision and publishing it on chain
-		/// The vision is signed by submitter and uses current block.
+		/// Function for creating a vision and publishing it on chain [origin, vision]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn create_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
 			
@@ -217,6 +216,7 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for removing a vision document [origin, vision]
 		#[pallet::weight(10_000)]
         pub fn remove_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
             
@@ -242,8 +242,7 @@ pub mod pallet {
         }
 
 
-		/// An example dispatchable that takes a singles value as a parameter, writes the value to
-		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
+		/// Function for signing a vision document [origin, vision]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn sign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
 			
@@ -258,8 +257,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		/// An example dispatchable that takes a singles value as a parameter, writes the value to
-		/// storage and emits an event. This function must be dispatched by a signed extrinsic.
+		/// Function for unsigning a vision document [origin, vision]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn unsign_vision(origin: OriginFor<T>, vision_document: Vec<u8>) -> DispatchResult {
 			
@@ -274,6 +272,7 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for creating an organization [origin, name of org]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
 			
@@ -291,7 +290,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-
+		/// Function for adding member to an organization [origin, name_org, AccountID]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn add_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
 			
@@ -307,6 +306,7 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for removing member from an organization [origin, name_org, AccountID]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn remove_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
 			
@@ -322,13 +322,12 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for dissolving an organization [origin, name_org]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
 			
 			// Check that the extrinsic was signed and get the signer.
 			let who = ensure_signed(origin)?;
-
-			//TODO: Ensure only visionary can crate DAOs
 
 			// call public function to create org
 			Self::remove_org(&who, &org_name)?;
