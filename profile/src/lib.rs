@@ -1,13 +1,48 @@
+// This file is part of Substrate.
+
+// Copyright (C) 2022 UNIVERSALDOT FOUNDATION.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+//! # Profile Pallet
+//!
+//! - [`Config`]
+//! - [`Pallet`]
+//!
+//! ## Overview
+//!
+//! The Profile Pallet creates a user profile per AccountID.
+//! The Profile is used to enrich the AccountID information with user specific
+//! metadata such as personal interests, reputation, etc. 
+//!
+//! ## Interface
+//!
+//! ### Public Functions
+//!
+//! - `create_profile` - Function used to create a new user profile.
+//! 
+//! - `update_profile` - Function used to update an already existing user profile.
+//! 
+//! - `remove_profile` - Function used to delete an existing user profile.
+//!
+//! ## Related Modules
+//!
+
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
-//! # Profile Module
-//!
-//!  Each AccountID is able to create profiles that add specific metadata
-//!  to their account. This metadata is used to enrich AccountID with additional
-//!  properties such as reputation, interests, etc. 
-//! 
-//! 
-/// <https://docs.substrate.io/v3/runtime/frame>
 pub use pallet::*;
 
 #[cfg(test)]
@@ -60,11 +95,9 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
-	// The pallet's runtime storage items.
-	// https://docs.substrate.io/v3/runtime/storage
 	#[pallet::storage]
 	#[pallet::getter(fn profile_count)]
-	// Storage Value that counts the total number of Profiles
+	/// Storage Value that counts the total number of Profiles
 	pub(super) type ProfileCount<T: Config> = StorageValue<_, u32, ValueQuery>;
 
 	#[pallet::storage]
@@ -72,8 +105,7 @@ pub mod pallet {
 	/// Stores a Profile unique properties in a StorageMap.
 	pub(super) type Profiles<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Profile<T>>;
 
-	// Pallets use events to inform users when important changes are made.
-	// https://docs.substrate.io/v3/runtime/events
+	
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
