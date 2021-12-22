@@ -1,3 +1,64 @@
+// This file is part of Substrate.
+
+// Copyright (C) 2022 UNIVERSALDOT FOUNDATION.
+// SPDX-License-Identifier: Apache-2.0
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// 	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+//! # Task Pallet
+//!
+//! - [`Config`]
+//! - [`Pallet`]
+//!
+//! ## Overview
+//!
+//! The Task Pallet creates a way of users to interact with one another.
+//! 
+//! There are two types of Users who can interact with tasks. We call them
+//! Initiators and Volunteers. 
+//! 
+//! Initiators are people who have the permission to Create and Remove Tasks.
+//! Volunteers are people who have the permission to Start and Complete Tasks.
+//! 
+//! Anybody can be become an Initiator or Volunteer. In other words, 
+//! one doesn't need a permission to become Initiator or Volunteer. 
+//! 
+//! When Tasks are created, there is some associated metadata that shall be defined.
+//! This includes the following:
+//! - Task Requirements (Defining the Task Requirements)
+//! - Task Budget (The cost of completion for the Task)
+//! - Task Deadline (The specified time until which the task should be completed)
+//! 
+//! Furthermore, budget funds are locked in escrow when task is created. 
+//! Funds are removed from escrow when task is removed. 
+//!
+//! ## Interface
+//!
+//! ### Public Functions
+//!
+//! - `create_task` - Function used to create a new task. 
+//! 
+//! - `start_task` - Function used to start already existing task.
+//! 
+//! - `complete_task` - Function used to complete a task.
+//! 
+//! - `remove_task` - Function used to remove task.
+//!
+//! ## Related Modules
+//!
+
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 /// Edit this file to define custom logic or remove it if it is not needed.
@@ -34,7 +95,7 @@ pub mod pallet {
 	type AccountOf<T> = <T as frame_system::Config>::AccountId;
 	type BalanceOf<T> =<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-	  // Struct for holding Task information.
+	// Struct for holding Task information.
 	#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo)]
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
@@ -75,16 +136,15 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	pub struct Pallet<T>(_);
 
-	// The pallet's runtime storage items.
-	// https://docs.substrate.io/v3/runtime/storage
+
 	#[pallet::storage]
 	#[pallet::getter(fn task_count)]
-	/// Get total number of Tasks in the system
+	/// TaskCount: Get total number of Tasks in the system
 	pub(super) type TaskCount<T: Config> = StorageValue<_, u64, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn tasks)]
-	/// Store Tasks in a  Storage Map where [key: hash, value: Task]
+	/// Tasks: Store Tasks in a  Storage Map where [key: hash, value: Task]
 	pub(super) type Tasks<T: Config> = StorageMap<_, Twox64Concat, T::Hash, Task<T>>;
 
 	#[pallet::storage]
@@ -92,8 +152,7 @@ pub mod pallet {
 	/// Keeps track of which Accounts own which Tasks.
 	pub(super) type TasksOwned<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, BoundedVec<T::Hash, T::MaxTasksOwned>, ValueQuery>;
 
-	// Pallets use events to inform users when important changes are made.
-	// https://docs.substrate.io/v3/runtime/events
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -135,9 +194,8 @@ pub mod pallet {
 		/// An dispatchable call that creates tasks.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn create_task(origin: OriginFor<T>, requirements: Vec<u8>, budget: BalanceOf<T>, deadline: u32) -> DispatchResultWithPostInfo {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
 			// Update storage.
@@ -156,9 +214,8 @@ pub mod pallet {
 		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
 			// Assign task and update storage.
@@ -185,9 +242,8 @@ pub mod pallet {
 		/// An dispatchable call that starts a task by assigning to new account.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(2,1))]
 		pub fn complete_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
 			// Complete task and update storage.
@@ -202,9 +258,8 @@ pub mod pallet {
 		/// An dispatchable call that starts a task by assigning to new account.
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
+			
 			// Check that the extrinsic was signed and get the signer.
-			// This function will return an error if the extrinsic is not signed.
-			// https://docs.substrate.io/v3/runtime/origins
 			let signer = ensure_signed(origin)?;
 
 			// Complete task and update storage.
