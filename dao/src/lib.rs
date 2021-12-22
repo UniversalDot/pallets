@@ -356,18 +356,13 @@ pub mod pallet {
 			
 			// Update Organization Members
 			<Organization<T>>::insert(org_name, members);
-			// <MemberOf<T>>::get(&account);
-			log::info!("Org {:?}.", org);
 
-			//TODO: Remove organization from MemberOf
-			// <MemberOf<T>>::try_mutate(&account, |current_org| {
-			// 	if let Some(index) = current_org.iter().position(|&id| id == *org) {
-			// 		current_org.swap_remove(index);
-			// 		return Ok(());
-			// 	}
-			// 	Err(())
-			// }).map_err(|_| <Error<T>>::NotMember)?;
-
+			// Find current organizations and remove user as MemberOf
+			let mut current_organizations = <Pallet<T>>::member_of(&account);
+			let index = current_organizations.binary_search(&org[0]).ok().ok_or(<Error<T>>::NotMember)?;
+			current_organizations.swap_remove(index);
+			
+			<MemberOf<T>>::insert(&account, &current_organizations);
 			
 			Ok(())
 		}

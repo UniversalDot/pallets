@@ -439,15 +439,21 @@ fn user_can_be_removed_from_organization_it_belongs_to_member_of() {
 		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME1.to_vec()));
 		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME2.to_vec()));
 
-		//Ensure users can be added to a DAO
+		// Ensure user 4 is member of 0 organizations
+		assert_eq!(Dao::member_of(4).len(), 0);
+
+		// Ensure user 4 can be added to a DAO
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME2.to_vec(), 4));
+
+		// Ensure the user 4 is member of 2 organizations
+		assert_eq!(Dao::member_of(4).len(), 2);
 
 		// User can be removed from organization
 		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
 
-		// TODO: Ensure user 4 belongs to 1 organizations
-		// assert_eq!(Dao::member_of(4).len(), 1);	
+		// Ensure user 4 belongs to 1 organizations
+		assert_eq!(Dao::member_of(4).len(), 1);	
 
 	});
 }
