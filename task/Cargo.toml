@@ -81,6 +81,10 @@ git = 'https://github.com/paritytech/substrate.git'
 default-features = false
 tag = 'monthly-2021-11'
 
+[dependencies.pallet-profile]
+default-features = false
+git = 'https://github.com/UniversalDot/pallets.git'
+version = '0.0.52'
 
 [features]
 default = ['std']
@@ -89,6 +93,7 @@ std = [
     'codec/std',
     'scale-info/std',
     'pallet-balances/std',
+    'pallet-profile/std',
     'frame-support/std',
     'frame-system/std',
     'frame-benchmarking/std',

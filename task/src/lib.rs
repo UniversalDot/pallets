@@ -84,6 +84,7 @@ pub mod pallet {
 		transactional};
 	use scale_info::TypeInfo;
 	use sp_std::vec::Vec;
+	use pallet_profile;
 
 	#[cfg(feature = "std")]
 	use frame_support::serde::{Deserialize, Serialize};
