@@ -58,8 +58,9 @@ benchmarks! {
 	create_task {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
-
-		// let task = create_task_info::<T>(1);
+		
+		let task = create_task_info::<T>(1);
+		let task_hash = T::Hashing::hash_of(&task);
 
 		let s in 1 .. u8::MAX.into(); // max bytes for requirements
 		let x in 1 .. 2000; 
@@ -77,9 +78,30 @@ benchmarks! {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
 		// TODO: fix task hash error
-		//assert_last_event::<T>(Event::<T>::TaskCreated(caller, task_hash).into());
+		// assert_last_event::<T>(Event::<T>::TaskCreated(caller, hash).into());
 		assert_eq!(PalletTask::<T>::task_count(), 1);
 	}
+
+	// start_task {
+	// 	/* setup initial state */
+	// 	let caller: T::AccountId = whitelisted_caller();
+
+	// 	let task = create_task_info::<T>(1);
+	// 	let hash_task = T::Hashing::hash_of(&task);
+
+	// 	let s in 1 .. u8::MAX.into(); // max bytes for requirements
+	// 	let x in 1 .. 2000; 
+
+	// 	let requirements = vec![0u8, s as u8];
+	// 	let budget = T::Currency::total_balance(&caller);
+
+	// }: start_task(RawOrigin::Signed(caller), hash_task)
+	// 	/* the code to be benchmarked */
+	
+	// verify {
+	// 	/* verifying final state */
+	// 	assert_eq!(PalletTask::<T>::task_count(), 1);
+	// }
 }
 
 impl_benchmark_test_suite!(PalletTask, crate::mock::new_test_ext(), crate::mock::Test,);
