@@ -268,6 +268,12 @@ pub mod pallet {
 			
 			Ok(())
 		}
+
+		pub fn increase_reputation(owner: &T::AccountId) -> Result<(), Error<T>> {
+			
+
+			Ok(())
+		}
 	}
 
 	// Change the reputation on a Profile
