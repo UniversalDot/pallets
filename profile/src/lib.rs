@@ -131,6 +131,8 @@ pub mod pallet {
 		NoDeletionAuthority,
 		/// One Account can only create a single profile. 
 		ProfileAlreadyCreated,
+		/// This Account has not yet created a profile.
+		NoProfileCreated,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -272,6 +274,13 @@ pub mod pallet {
 
 			// Increase reputation
 			profile.increase_reputation();
+
+			Ok(())
+		}
+
+		pub fn has_profile(owner: &T::AccountId) -> Result<(), Error<T>>  {
+
+			Self::profiles(owner).ok_or(<Error<T>>::NoProfileCreated)?;
 
 			Ok(())
 		}
