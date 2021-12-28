@@ -48,6 +48,35 @@ fn increase_task_count_when_creating_two_tasks(){
 }
 
 #[test]
+fn cant_own_more_tax_than_max_tasks(){
+	new_test_ext().execute_with( || {
+
+		// TODO: use MaxTasksOwned instead of hardcoded values;
+
+		// Create 77 tasks  ExceedMaxTasksOwned
+		for n in 0..77 {
+			
+			let mut vec1 = Vec::new();
+			vec1.push(n);
+			
+			// Ensure new task can be created with [signer, requirements vector, budget, deadline]
+			assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		}	
+
+		// Assert that count is incremented to 2 after task creation
+		assert_eq!(Task::task_count(), 77);
+
+		let mut vec2 = Vec::new();
+		vec2.push(7);
+
+		// Assert that when creating the 77 Task, Error is thrown
+		assert_noop!(Task::create_task(Origin::signed(1), vec2, 7, DEADLINE), Error::<Test>::ExceedMaxTasksOwned);
+
+	});
+
+}
+
+#[test]
 fn assign_task_to_current_owner(){
 	new_test_ext().execute_with( || {
 
