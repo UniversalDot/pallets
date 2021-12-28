@@ -84,7 +84,8 @@ benchmarks! {
 
 	// start_task {
 	// 	/* setup initial state */
-	// 	let caller: T::AccountId = whitelisted_caller();
+	// 	let caller_create: T::AccountId = whitelisted_caller();
+	// 	let caller_start: T::AccountId = whitelisted_caller();
 
 	// 	let task = create_task_info::<T>(1);
 	// 	let hash_task = T::Hashing::hash_of(&task);
@@ -93,14 +94,16 @@ benchmarks! {
 	// 	let x in 1 .. 2000; 
 
 	// 	let requirements = vec![0u8, s as u8];
-	// 	let budget = T::Currency::total_balance(&caller);
+	// 	let budget = T::Currency::total_balance(&caller_create);
 
-	// }: start_task(RawOrigin::Signed(caller), hash_task)
+	// 	// PalletTask::<T>::create_task(RawOrigin::Signed(caller_create).into(), requirements, budget, x.into());
+
+	// }: start_task(RawOrigin::Signed(caller_start), hash_task)
 	// 	/* the code to be benchmarked */
 	
 	// verify {
 	// 	/* verifying final state */
-	// 	assert_eq!(PalletTask::<T>::task_count(), 1);
+	// 	// assert_eq!(PalletTask::<T>::task_count(), 1);
 	// }
 }
 
