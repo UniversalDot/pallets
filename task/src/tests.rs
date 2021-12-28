@@ -6,6 +6,10 @@ pub const DEADLINE:u32 = 77;
 #[test]
 fn create_new_task(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		
 		let mut vec = Vec::new();
 		vec.push(2);
 		
@@ -17,6 +21,10 @@ fn create_new_task(){
 #[test]
 fn increase_task_count_when_creating_task(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+
 		let mut vec = Vec::new();
 		vec.push(2);
 		
@@ -31,6 +39,9 @@ fn increase_task_count_when_creating_task(){
 #[test]
 fn increase_task_count_when_creating_two_tasks(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -52,6 +63,9 @@ fn cant_own_more_tax_than_max_tasks(){
 	new_test_ext().execute_with( || {
 
 		// TODO: use MaxTasksOwned instead of hardcoded values;
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
 
 		// Create 77 tasks  ExceedMaxTasksOwned
 		for n in 0..77 {
@@ -80,6 +94,9 @@ fn cant_own_more_tax_than_max_tasks(){
 fn assign_task_to_current_owner(){
 	new_test_ext().execute_with( || {
 
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(10), Vec::new()));
+
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
@@ -96,6 +113,9 @@ fn assign_task_to_current_owner(){
 #[test]
 fn verify_inputs_outputs_to_tasks(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(10), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -115,6 +135,10 @@ fn verify_inputs_outputs_to_tasks(){
 #[test]
 fn start_tasks_assigns_new_current_owner(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -142,6 +166,9 @@ fn start_tasks_assigns_new_current_owner(){
 fn start_tasks_assigns_task_to_volunteer(){
 	new_test_ext().execute_with( || {
 
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
@@ -167,6 +194,9 @@ fn start_tasks_assigns_task_to_volunteer(){
 #[test]
 fn completing_tasks_assigns_new_current_owner(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -200,6 +230,10 @@ fn completing_tasks_assigns_new_current_owner(){
 #[test]
 fn only_creator_deletes_task(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -237,6 +271,10 @@ fn only_creator_deletes_task(){
 fn only_started_task_can_be_completed(){
 	new_test_ext().execute_with( || {
 
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
+
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
@@ -262,6 +300,10 @@ fn only_started_task_can_be_completed(){
 #[test]
 fn when_task_is_removed_ownership_is_cleared(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
 
 		let mut vec1 = Vec::new();
 		vec1.push(2);
@@ -302,6 +344,9 @@ fn when_task_is_removed_ownership_is_cleared(){
 #[test]
 fn decrease_task_count_when_removing_task(){
 	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
 		
 		let mut vec = Vec::new();
 		vec.push(2);
@@ -318,3 +363,33 @@ fn decrease_task_count_when_removing_task(){
 		assert_eq!(Task::task_count(), 0);
 	});
 }
+
+
+// Integration tests 
+ 
+
+// #[test]
+// fn increase_profile_reputation_when_task_completed(){
+// 	new_test_ext().execute_with( || {
+		
+// 		let mut vec = Vec::new();
+// 		vec.push(7);
+
+// 		// Ensure the user can create profile
+// 		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+
+// 		let mut vec = Vec::new();
+// 		vec.push(2);
+		
+// 		// Ensure new task can be created with [signer, requirements vector, budget]
+// 		assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+
+// 		// Get hash of task owned
+// 		let hash = Task::tasks_owned(1)[0];
+// 		let _task = Task::tasks(hash).expect("should found the task");
+
+// 		// Removing task decreases count
+// 		assert_ok!(Task::remove_task(Origin::signed(1), hash));
+// 		assert_eq!(Task::task_count(), 0);
+// 	});
+// }
