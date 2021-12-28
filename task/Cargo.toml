@@ -84,7 +84,7 @@ tag = 'monthly-2021-11'
 [dependencies.pallet-profile]
 default-features = false
 git = 'https://github.com/UniversalDot/pallets.git'
-version = '0.0.53'
+version = '0.0.54'
 
 [features]
 default = ['std']
