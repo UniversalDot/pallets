@@ -1,3 +1,4 @@
+
 use crate as pallet_task;
 use frame_support::parameter_types;
 use frame_system as system;
@@ -7,6 +8,7 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	BuildStorage,
 };
+
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -21,6 +23,7 @@ frame_support::construct_runtime!(
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
 		Task: pallet_task::{Pallet, Call, Storage, Event<T>},
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>},
+		Profile: pallet_profile::{Pallet, Call, Storage, Event<T>},
 	}
 );
 
@@ -59,6 +62,12 @@ impl system::Config for Test {
 parameter_types! {
 	pub const ExistentialDeposit: u64 = 1;
 }
+
+impl pallet_profile::Config for Test {
+	type Event = Event;
+	type Currency =  Balances;
+}
+
 impl pallet_balances::Config for Test {
 	type ReserveIdentifier = [u8; 8];
 	type MaxLocks = ();

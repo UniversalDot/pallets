@@ -84,7 +84,6 @@ pub mod pallet {
 		transactional};
 	use scale_info::TypeInfo;
 	use sp_std::vec::Vec;
-	use pallet_profile;
 
 	#[cfg(feature = "std")]
 	use frame_support::serde::{Deserialize, Serialize};
@@ -118,7 +117,7 @@ pub mod pallet {
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_profile::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
@@ -222,14 +221,14 @@ pub mod pallet {
 			// TODO: Investigate why Currency transfer doesn't work 
 			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
 			// Transfer budget amount from initiator to volunteer
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			let task_initiator = task.initiator.clone();
-			let budget = task.budget.clone();
-			log::info!("budget {:?}.", budget);
-			log::info!("signer {:?}.", signer);
-			log::info!("task_initiator {:?}.", task_initiator);
-			ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-			T::Currency::transfer(&signer, &task_initiator, budget, ExistenceRequirement::KeepAlive)?;
+			// let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			// let task_initiator = task.initiator.clone();
+			// let budget = task.budget.clone();
+			// log::info!("budget {:?}.", budget);
+			// log::info!("signer {:?}.", signer);
+			// log::info!("task_initiator {:?}.", task_initiator);
+			// ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
+			// T::Currency::transfer(&signer, &task_initiator, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -391,6 +390,9 @@ pub mod pallet {
 			// Reduce task count
 			let new_count = Self::task_count().saturating_sub(1);
 			<TaskCount<T>>::put(new_count);
+
+			// Add reputation to Profiles after successful completion
+			// pallet_profile::Pallet::<T>::add_reputation(task_initiator);
 			
 			Ok(())
 		}
@@ -401,6 +403,10 @@ pub mod pallet {
 				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
+		}
+
+		pub fn reputation(){
+
 		}
 	}
 }
