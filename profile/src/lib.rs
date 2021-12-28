@@ -278,11 +278,11 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn has_profile(owner: &T::AccountId) -> Result<(), Error<T>>  {
+		pub fn has_profile(owner: &T::AccountId) -> Result<bool, Error<T>>  {
 
 			Self::profiles(owner).ok_or(<Error<T>>::NoProfileCreated)?;
 
-			Ok(())
+			Ok(true)
 		}
 	}
 
