@@ -232,7 +232,7 @@ pub mod pallet {
 			let balance = T::Currency::free_balance(owner);
 
 			// Populate Profile struct
-			let mut profile = Profile::<T> {
+			let profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: new_interests,
 				balance: Some(balance),
@@ -241,9 +241,6 @@ pub mod pallet {
 
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
-
-			// Change reputation
-			profile.change_reputation();
 
 			// Insert profile into HashMap
 			// TODO: Use try_mutate instead
@@ -269,8 +266,12 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn increase_reputation(owner: &T::AccountId) -> Result<(), Error<T>> {
-			
+		pub fn add_reputation(owner: &T::AccountId) -> Result<(), Error<T>> {
+			// Get current profile
+			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
+
+			// Increase reputation
+			profile.increase_reputation();
 
 			Ok(())
 		}
@@ -279,8 +280,12 @@ pub mod pallet {
 	// Change the reputation on a Profile
 	// TODO: Create better reputation function 
 	impl<T:Config> Profile<T> {
-		pub fn change_reputation(&mut self) {
+		pub fn increase_reputation(&mut self) {
 			self.reputation += 1;
+		}
+
+		pub fn decrease_reputation(&mut self) {
+			self.reputation -= 1;
 		}
 
 		pub fn change_interests(&mut self, new_interests: Vec<u8>) {
