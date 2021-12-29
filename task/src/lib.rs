@@ -181,6 +181,8 @@ pub mod pallet {
 		ExceedMaxTasksOwned,
 		/// You are not allowed to complete this task
 		NoPermissionToComplete,
+		/// This account has no Profile yet. 
+		NoProfile,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -273,6 +275,9 @@ pub mod pallet {
 	impl<T:Config> Pallet<T> {
 
 		pub fn new_task(from_initiator: &T::AccountId, requirements: &Vec<u8>, budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
+
+			// Ensure user has a profile before creating a task
+			ensure!(pallet_profile::Pallet::<T>::has_profile(from_initiator).unwrap(), <Error<T>>::NoProfile);
 			
 			// Init Task Object
 			let task = Task::<T> {
@@ -370,7 +375,7 @@ pub mod pallet {
 
 		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
-			Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_initiator(&task_id, &task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);
@@ -392,7 +397,8 @@ pub mod pallet {
 			<TaskCount<T>>::put(new_count);
 
 			// Add reputation to Profiles after successful completion
-			// pallet_profile::Pallet::<T>::add_reputation(task_initiator);
+			pallet_profile::Pallet::<T>::add_reputation(&task.initiator).expect("can add reputation");
+			pallet_profile::Pallet::<T>::add_reputation(&task.volunteer).expect("can add reputation");
 			
 			Ok(())
 		}
@@ -403,10 +409,6 @@ pub mod pallet {
 				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
-		}
-
-		pub fn reputation(){
-
 		}
 	}
 }
