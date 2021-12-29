@@ -365,7 +365,7 @@ fn decrease_task_count_when_removing_task(){
 }
 
 
-// Integration tests 
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  Integration tests  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
  
 
 #[test]
@@ -386,54 +386,49 @@ fn increase_profile_reputation_when_task_completed(){
 		let hash = Task::tasks_owned(1)[0];
 		let task = Task::tasks(hash).expect("should found the task");
 		assert_eq!(task.current_owner, 1);
-		assert_eq!(Task::tasks_owned(1).len(), 1);
 
 		// Ensure task is started by new current_owner (user 2)
 		assert_ok!(Task::start_task(Origin::signed(2), hash));
-		
-		// Ensure when task is started user1 has 0 tasks, and user2 has 1
-		assert_eq!(Task::tasks_owned(1).len(), 0);
-		assert_eq!(Task::tasks_owned(2).len(), 1);
-		
+
 		// Ensure task is completed by current current_owner (user 2)
 		assert_ok!(Task::complete_task(Origin::signed(2), hash));
-
-		// Ensure that the ownership is reversed again
-		assert_eq!(Task::tasks_owned(1).len(), 1);
-		assert_eq!(Task::tasks_owned(2).len(), 0);
 
 		// Ensure task is removed by task creator (user 1)
 		assert_ok!(Task::remove_task(Origin::signed(1), hash));
 
-		// Ensure ownership of task is cleared
-		assert_eq!(Task::tasks_owned(1).len(), 0);
-		assert_eq!(Task::tasks_owned(2).len(), 0);
+		let profile1 = Profile::profiles(1).expect("should find the profile");
+		let profile2 = Profile::profiles(2).expect("should find the profile");
 
-		// let profile = Profile::profiles(1).expect("should find the profile");
-		let profile = Profile::profiles(1).expect("should find the profile");
-		assert_eq!(profile.reputation, 1);
+		// Ensure that the reputation has been added to both profiles
+		assert_eq!(profile1.reputation, 1);
+		assert_eq!(profile2.reputation, 1);
 
-		// // Profile is necessary for task creation
-		// assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
-		// assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
+	});
+}
 
-		// let mut vec = Vec::new();
-		// vec.push(2);
+#[test]
+fn only_add_reputation_when_task_has_been_completed(){
+	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+
+		let mut vec = Vec::new();
+		vec.push(2);
 		
-		// // Ensure new task can be created with [signer, requirements vector, budget]
-		// assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
 
-		// // Get hash of task owned
-		// let hash = Task::tasks_owned(1)[0];
-		// let _task = Task::tasks(hash).expect("should found the task");
+		// Get hash of task owned
+		let hash = Task::tasks_owned(1)[0];
+		let _task = Task::tasks(hash).expect("should found the task");
 
-		// // Removing task decreases count
-		// assert_ok!(Task::remove_task(Origin::signed(1), hash));
-		// assert_eq!(Task::task_count(), 0);
+		// Removing task decreases count
+		assert_ok!(Task::remove_task(Origin::signed(1), hash));
+		assert_eq!(Task::task_count(), 0);
 
-		// //TODO: Fix test.. not updating reputation currently
-		// let profile = Profile::profiles(1).expect("should find the profile");
-		// assert_eq!(profile.reputation, 1);
-
+		// Reputation should remain 0 since the task was removed without being completed
+		let profile = Profile::profiles(1).expect("should find the profile");
+		assert_eq!(profile.reputation, 0);
 	});
 }
