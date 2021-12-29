@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-task'
-version = '0.0.34'
+version = '0.0.35'
 description = 'FRAME pallet for creating tasks'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
@@ -84,7 +84,7 @@ tag = 'monthly-2021-11'
 [dependencies.pallet-profile]
 default-features = false
 git = 'https://github.com/UniversalDot/pallets.git'
-version = '0.0.61'
+version = '0.0.62'
 
 [features]
 default = ['std']
