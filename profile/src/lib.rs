@@ -272,6 +272,8 @@ pub mod pallet {
 			// Get current profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 
+			//let reputation = profile.reputation.clone();
+			profile.reputation += 1;
 			// Increase reputation
 			profile.increase_reputation();
 
