@@ -208,7 +208,7 @@ pub mod pallet {
 				owner: owner.clone(),
 				interests: interests_vec,
 				balance: Some(balance),
-				reputation: 1,
+				reputation: 0,
 			};
 
 			// Get hash of profile
@@ -274,9 +274,12 @@ pub mod pallet {
 			// Get current profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 
-			profile.reputation = profile.reputation.clone() + 1;
+			
 			// Increase reputation
 			profile.increase_reputation();
+			log::info!("A reputation: {:?}", profile.reputation); // TODO Remove loging
+			log::info!("Interests: {:?}", profile.interests); // TODO Remove loging
+			<Profiles<T>>::insert(owner, profile);
 
 			Ok(())
 		}
