@@ -389,16 +389,15 @@ pub mod pallet {
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
 
+			// Reward reputation points to profiles who created/completed a task
+			Self::handle_reputation(&task_id).expect("Add reputation works");
+
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);
 
 			// Reduce task count
 			let new_count = Self::task_count().saturating_sub(1);
 			<TaskCount<T>>::put(new_count);
-
-			// Add reputation to Profiles after successful completion
-			pallet_profile::Pallet::<T>::add_reputation(&task.initiator).expect("can add reputation");
-			pallet_profile::Pallet::<T>::add_reputation(&task.volunteer).expect("can add reputation");
 			
 			Ok(())
 		}
@@ -409,6 +408,21 @@ pub mod pallet {
 				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
+		}
+
+		// Handles reputation update for profiles
+		pub fn handle_reputation(task_id: &T::Hash) -> Result<(), Error<T>> {
+
+			// Check if task exists
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+
+			// Ensure that reputation is added only when task is in status Closed
+			if task.status == TaskStatus::Closed {
+				pallet_profile::Pallet::<T>::add_reputation(&task.initiator).expect("can add reputation");
+				pallet_profile::Pallet::<T>::add_reputation(&task.volunteer).expect("can add reputation");
+			}
+
+			Ok(())
 		}
 	}
 }
