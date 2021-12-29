@@ -368,28 +368,72 @@ fn decrease_task_count_when_removing_task(){
 // Integration tests 
  
 
-// #[test]
-// fn increase_profile_reputation_when_task_completed(){
-// 	new_test_ext().execute_with( || {
+#[test]
+fn increase_profile_reputation_when_task_completed(){
+	new_test_ext().execute_with( || {
+
+		// Profile is necessary for task creation
+		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
+
+		let mut vec1 = Vec::new();
+		vec1.push(2);
+
+		// Ensure new task can be created with [signer, requirements vector, budget]
+		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+
+		// Ensure new task is assigned to new current_owner (user 1)
+		let hash = Task::tasks_owned(1)[0];
+		let task = Task::tasks(hash).expect("should found the task");
+		assert_eq!(task.current_owner, 1);
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+
+		// Ensure task is started by new current_owner (user 2)
+		assert_ok!(Task::start_task(Origin::signed(2), hash));
 		
-// 		let mut vec = Vec::new();
-// 		vec.push(7);
-
-// 		// Ensure the user can create profile
-// 		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
-
-// 		let mut vec = Vec::new();
-// 		vec.push(2);
+		// Ensure when task is started user1 has 0 tasks, and user2 has 1
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+		assert_eq!(Task::tasks_owned(2).len(), 1);
 		
-// 		// Ensure new task can be created with [signer, requirements vector, budget]
-// 		assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+		// Ensure task is completed by current current_owner (user 2)
+		assert_ok!(Task::complete_task(Origin::signed(2), hash));
 
-// 		// Get hash of task owned
-// 		let hash = Task::tasks_owned(1)[0];
-// 		let _task = Task::tasks(hash).expect("should found the task");
+		// Ensure that the ownership is reversed again
+		assert_eq!(Task::tasks_owned(1).len(), 1);
+		assert_eq!(Task::tasks_owned(2).len(), 0);
 
-// 		// Removing task decreases count
-// 		assert_ok!(Task::remove_task(Origin::signed(1), hash));
-// 		assert_eq!(Task::task_count(), 0);
-// 	});
-// }
+		// Ensure task is removed by task creator (user 1)
+		assert_ok!(Task::remove_task(Origin::signed(1), hash));
+
+		// Ensure ownership of task is cleared
+		assert_eq!(Task::tasks_owned(1).len(), 0);
+		assert_eq!(Task::tasks_owned(2).len(), 0);
+
+		// let profile = Profile::profiles(1).expect("should find the profile");
+		let profile = Profile::profiles(1).expect("should find the profile");
+		assert_eq!(profile.reputation, 1);
+
+		// // Profile is necessary for task creation
+		// assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
+		// assert_ok!(Profile::create_profile(Origin::signed(2), Vec::new()));
+
+		// let mut vec = Vec::new();
+		// vec.push(2);
+		
+		// // Ensure new task can be created with [signer, requirements vector, budget]
+		// assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+
+		// // Get hash of task owned
+		// let hash = Task::tasks_owned(1)[0];
+		// let _task = Task::tasks(hash).expect("should found the task");
+
+		// // Removing task decreases count
+		// assert_ok!(Task::remove_task(Origin::signed(1), hash));
+		// assert_eq!(Task::task_count(), 0);
+
+		// //TODO: Fix test.. not updating reputation currently
+		// let profile = Profile::profiles(1).expect("should find the profile");
+		// assert_eq!(profile.reputation, 1);
+
+	});
+}
