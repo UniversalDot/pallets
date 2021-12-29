@@ -234,14 +234,12 @@ pub mod pallet {
 			let balance = T::Currency::free_balance(owner);
 
 			// Populate Profile struct
-			let mut profile = Profile::<T> {
+			let profile = Profile::<T> {
 				owner: owner.clone(),
 				interests: new_interests,
 				balance: Some(balance),
 				reputation: 0,
 			};
-
-			profile.increase_reputation();
 
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
@@ -274,11 +272,8 @@ pub mod pallet {
 			// Get current profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 
-			
 			// Increase reputation
 			profile.increase_reputation();
-			log::info!("A reputation: {:?}", profile.reputation); // TODO Remove loging
-			log::info!("Interests: {:?}", profile.interests); // TODO Remove loging
 			<Profiles<T>>::insert(owner, profile);
 
 			Ok(())
