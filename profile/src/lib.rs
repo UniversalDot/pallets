@@ -208,7 +208,7 @@ pub mod pallet {
 				owner: owner.clone(),
 				interests: interests_vec,
 				balance: Some(balance),
-				reputation: 0,
+				reputation: 1,
 			};
 
 			// Get hash of profile
