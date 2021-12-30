@@ -26,7 +26,7 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 	let initiator: T::AccountId = whitelisted_caller();
 	let volunteer: T::AccountId = whitelisted_caller();
 	let owner: T::AccountId = whitelisted_caller();
-	let balance = T::Currency::total_balance(&initiator);
+	let balance = <T as pallet::Config>::Currency::total_balance(&initiator);
 	let deadline = u32::MAX;
 	let status: TaskStatus = TaskStatus::InProgress;
 
@@ -66,7 +66,7 @@ benchmarks! {
 		let x in 1 .. 2000; 
 
 		let requirements = vec![0u8, s as u8];
-		let budget = T::Currency::total_balance(&caller);
+		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
 
 		//let task_hash = PalletTask::<T>::new_task(&caller, &requirements, &budget, &x)?;
 
