@@ -50,7 +50,7 @@ fn create_profile<T: Config>(){
 
 	let caller: T::AccountId = whitelisted_caller();
 	let _profile = PalletProfile::<T>::create_profile(RawOrigin::Signed(caller).into(), Vec::new());
-	
+
 }
 
 
@@ -97,29 +97,30 @@ benchmarks! {
 		assert_eq!(PalletTask::<T>::task_count(), 1);
 	}
 
-	// start_task {
-	// 	/* setup initial state */
-	// 	let caller_create: T::AccountId = whitelisted_caller();
-	// 	let caller_start: T::AccountId = whitelisted_caller();
+	start_task {
+		/* setup initial state */
+		let caller_create: T::AccountId = whitelisted_caller();
+		let caller_start: T::AccountId = whitelisted_caller();
 
-	// 	let task = create_task_info::<T>(1);
-	// 	let hash_task = T::Hashing::hash_of(&task);
+		let task = create_task_info::<T>(1);
+		let hash_task = T::Hashing::hash_of(&task);
 
-	// 	let s in 1 .. u8::MAX.into(); // max bytes for requirements
-	// 	let x in 1 .. 2000; 
+		let s in 1 .. u8::MAX.into(); // max bytes for requirements
+		let x in 1 .. 2000; 
 
-	// 	let requirements = vec![0u8, s as u8];
-	// 	let budget = T::Currency::total_balance(&caller_create);
+		let requirements = vec![0u8, s as u8];
+		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
 
-	// 	// PalletTask::<T>::create_task(RawOrigin::Signed(caller_create).into(), requirements, budget, x.into());
-
-	// }: start_task(RawOrigin::Signed(caller_start), hash_task)
-	// 	/* the code to be benchmarked */
+		
+		//PalletTask::<T>::create_task(RawOrigin::Signed(caller_create).into(), requirements, budget, x.into());
+		// TODO: FIX taskNot Exist Error
+	}: start_task(RawOrigin::Signed(caller_start), hash_task)
+		/* the code to be benchmarked */
 	
-	// verify {
-	// 	/* verifying final state */
-	// 	// assert_eq!(PalletTask::<T>::task_count(), 1);
-	// }
+	verify {
+		/* verifying final state */
+		// assert_eq!(PalletTask::<T>::task_count(), 1);
+	}
 }
 
 impl_benchmark_test_suite!(PalletTask, crate::mock::new_test_ext(), crate::mock::Test,);
