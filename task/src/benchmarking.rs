@@ -10,6 +10,7 @@ use frame_support::traits::{Currency};
 use frame_support::sp_runtime::traits::Hash;
 use std::convert::TryInto;
 use sp_std::ptr::hash;
+use pallet_profile::Pallet as PalletProfile;
 
 // Helper function to assert event thrown during verification
 fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
@@ -44,6 +45,14 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 	return info
 }
 
+// Helper function to create a profile
+fn create_profile<T: Config>(){
+
+	let caller: T::AccountId = whitelisted_caller();
+	let _profile = PalletProfile::<T>::create_profile(RawOrigin::Signed(caller).into(), Vec::new());
+	
+}
+
 
 benchmarks! {
 	benchmark_name {
@@ -58,12 +67,18 @@ benchmarks! {
 	create_task {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
+
+		// Create profile before creating a task
+		create_profile::<T>();
 		
 		let task = create_task_info::<T>(1);
 		let task_hash = T::Hashing::hash_of(&task);
 
-		let s in 1 .. u8::MAX.into(); // max bytes for requirements
-		let x in 1 .. 2000; 
+		let s = 255; // max bytes for requirements
+		let x = 2000; 
+		// let s in 1 .. u8::MAX.into(); // max bytes for requirements
+		// let x in 1 .. 2000;
+
 
 		let requirements = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
@@ -72,7 +87,7 @@ benchmarks! {
 
 	}: 
 	/* the code to be benchmarked */
-	create_task(RawOrigin::Signed(caller), requirements, budget, x.into())
+	create_task(RawOrigin::Signed(caller), requirements, budget, x)
 	
 	verify {
 		/* verifying final state */
