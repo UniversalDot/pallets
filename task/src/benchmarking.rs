@@ -83,8 +83,6 @@ benchmarks! {
 		let requirements = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
 
-		//let task_hash = PalletTask::<T>::new_task(&caller, &requirements, &budget, &x)?;
-
 	}: 
 	/* the code to be benchmarked */
 	create_task(RawOrigin::Signed(caller), requirements, budget, x)
@@ -92,9 +90,9 @@ benchmarks! {
 	verify {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
-		// TODO: fix task hash error
-		// assert_last_event::<T>(Event::<T>::TaskCreated(caller, hash).into());
-		assert_eq!(PalletTask::<T>::task_count(), 1);
+		let hash = PalletTask::<T>::tasks_owned(&caller)[0];
+
+		assert_last_event::<T>(Event::<T>::TaskCreated(caller, hash).into());
 	}
 
 	start_task {
