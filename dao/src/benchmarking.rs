@@ -83,6 +83,24 @@ benchmarks! {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::VisionSigned (caller, vision ).into());
 	  }
+
+	  unsign_vision {
+		/* setup initial state */
+		let caller: T::AccountId = whitelisted_caller();
+
+		let s in 1 .. u8::MAX.into();
+		let vision = vec![0u8, s as u8];
+
+		// Create vision before removing
+		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+		PalletDao::<T>::sign_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+
+
+	  }: unsign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
+	  verify {
+		/* verifying final state */
+		assert_last_event::<T>(Event::<T>::VisionUnsigned (caller, vision ).into());
+	  }
 }
 
 impl_benchmark_test_suite!(PalletDao, crate::mock::new_test_ext(), crate::mock::Test,);
