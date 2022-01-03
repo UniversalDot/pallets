@@ -152,6 +152,9 @@ pub mod pallet {
 		/// Vision signed [AccountID, Vec]
 		VisionSigned(T::AccountId, Vec<u8>),
 
+		/// Vision signed [AccountID, Vec]
+		VisionUnsigned(T::AccountId, Vec<u8>),
+
 		/// DAO Organization was created [AccountID, DAO Name]
 		OrganizationCreated(T::AccountId, Vec<u8>),
 
@@ -281,7 +284,7 @@ pub mod pallet {
 			Self::member_unsigns_vision(&who, &vision_document)?;
 
 			// Emit an event.
-			Self::deposit_event(Event::VisionSigned(who, vision_document));
+			Self::deposit_event(Event::VisionUnsigned(who, vision_document));
 			
 			Ok(())
 		}
