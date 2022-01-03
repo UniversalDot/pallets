@@ -113,15 +113,9 @@ benchmarks! {
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		let result = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
-		// let hash_task = result.unwrap();
-
+		PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
-
-		let events = frame_system::Pallet::<T>::events();
-		// let hash_task = events.unwrap();
 		
-		// TODO: FIX taskNot Exist Error
 	}: start_task(RawOrigin::Signed(caller_start), hash_task)
 		/* the code to be benchmarked */
 	
