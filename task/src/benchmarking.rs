@@ -68,21 +68,15 @@ benchmarks! {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
-		// Create profile before creating a task
-		create_profile::<T>();
-		
-		let task = create_task_info::<T>(1);
-		let task_hash = T::Hashing::hash_of(&task);
-
-		let s = 255; // max bytes for requirements
-		let x = 2000; 
-		// let s in 1 .. u8::MAX.into(); // max bytes for requirements
-		// let x in 1 .. 2000;
-
+		let s in 1 .. u8::MAX.into(); // max bytes for requirements
+		let x in 1 .. 2000;
 
 		let requirements = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
 
+		// Create profile before creating a task
+		create_profile::<T>();
+		
 	}: 
 	/* the code to be benchmarked */
 	create_task(RawOrigin::Signed(caller.clone()), requirements, budget, x)
@@ -117,6 +111,15 @@ benchmarks! {
 	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::TaskAssigned(caller_start, hash_task).into());
+	}
+
+	complete_task {
+		/* setup initial state */
+	}: {
+		/* the code to be benchmarked */
+	}
+	verify {
+		/* verifying final state */
 	}
 }
 
