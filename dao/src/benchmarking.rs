@@ -20,7 +20,7 @@
 use super::*;
 
 #[allow(unused)]
-use crate::Pallet as Template;
+use crate::Pallet as PalletDao;
 use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin;
 
@@ -33,6 +33,15 @@ benchmarks! {
 	  verify {
 		/* verifying final state */
 	  }
+
+	  create_vision {
+		/* setup initial state */
+	  }: {
+		/* the code to be benchmarked */
+	  }
+	  verify {
+		/* verifying final state */
+	  }
 }
 
-impl_benchmark_test_suite!(Template, crate::mock::new_test_ext(), crate::mock::Test,);
+impl_benchmark_test_suite!(PalletDao, crate::mock::new_test_ext(), crate::mock::Test,);
