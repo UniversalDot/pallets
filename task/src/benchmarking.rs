@@ -102,8 +102,8 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_start: T::AccountId = whitelisted_caller();
 
-		let task = create_task_info::<T>(1);
-		let hash_task = T::Hashing::hash_of(&task);
+		// let task = create_task_info::<T>(1);
+		// let hash_task = T::Hashing::hash_of(&task);
 
 		let s in 1 .. u8::MAX.into(); // max bytes for requirements
 		let x in 1 .. 2000; 
@@ -111,15 +111,23 @@ benchmarks! {
 		let requirements = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
 
+		// Create profile before creating a task
+		create_profile::<T>();		
+		let result = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		// let hash_task = result.unwrap();
+
+		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
+
+		let events = frame_system::Pallet::<T>::events();
+		// let hash_task = events.unwrap();
 		
-		//PalletTask::<T>::create_task(RawOrigin::Signed(caller_create).into(), requirements, budget, x.into());
 		// TODO: FIX taskNot Exist Error
 	}: start_task(RawOrigin::Signed(caller_start), hash_task)
 		/* the code to be benchmarked */
 	
 	verify {
 		/* verifying final state */
-		// assert_eq!(PalletTask::<T>::task_count(), 1);
+		assert_eq!(PalletTask::<T>::task_count(), 1);
 	}
 }
 
