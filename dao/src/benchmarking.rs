@@ -24,6 +24,11 @@ use crate::Pallet as PalletDao;
 use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin;
 
+// Helper function to assert event thrown during verification
+fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
+	frame_system::Pallet::<T>::assert_last_event(generic_event.into());
+}
+
 benchmarks! {
 	benchmark_name {
 		/* setup initial state */
@@ -36,11 +41,15 @@ benchmarks! {
 
 	  create_vision {
 		/* setup initial state */
-	  }: {
-		/* the code to be benchmarked */
-	  }
+		let caller: T::AccountId = whitelisted_caller();
+
+		let s in 1 .. u8::MAX.into();
+		let vision = vec![0u8, s as u8];
+
+	  }: create_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
 	  verify {
 		/* verifying final state */
+		assert_last_event::<T>(Event::<T>::VisionCreated (caller, vision ).into());
 	  }
 }
 
