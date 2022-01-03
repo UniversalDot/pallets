@@ -85,7 +85,7 @@ benchmarks! {
 
 	}: 
 	/* the code to be benchmarked */
-	create_task(RawOrigin::Signed(caller), requirements, budget, x)
+	create_task(RawOrigin::Signed(caller.clone()), requirements, budget, x)
 	
 	verify {
 		/* verifying final state */
@@ -100,9 +100,6 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_start: T::AccountId = whitelisted_caller();
 
-		// let task = create_task_info::<T>(1);
-		// let hash_task = T::Hashing::hash_of(&task);
-
 		let s in 1 .. u8::MAX.into(); // max bytes for requirements
 		let x in 1 .. 2000; 
 
@@ -114,12 +111,12 @@ benchmarks! {
 		PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
 		
-	}: start_task(RawOrigin::Signed(caller_start), hash_task)
+	}: start_task(RawOrigin::Signed(caller_start.clone()), hash_task)
 		/* the code to be benchmarked */
 	
 	verify {
 		/* verifying final state */
-		assert_eq!(PalletTask::<T>::task_count(), 1);
+		assert_last_event::<T>(Event::<T>::TaskAssigned(caller_start, hash_task).into());
 	}
 }
 
