@@ -32,27 +32,27 @@ fn assert_last_event<T: Config>(generic_event: <T as Config>::Event) {
 benchmarks! {
 	benchmark_name {
 		/* setup initial state */
-	  }: {
+	}: {
 		/* the code to be benchmarked */
-	  }
-	  verify {
+	}
+	verify {
 		/* verifying final state */
-	  }
+	}
 
-	  create_vision {
+	create_vision {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
 		let s in 1 .. u8::MAX.into();
 		let vision = vec![0u8, s as u8];
 
-	  }: create_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
-	  verify {
+	}: create_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
+	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::VisionCreated (caller, vision ).into());
-	  }
+	}
 
-	  remove_vision {
+	remove_vision {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
@@ -62,13 +62,13 @@ benchmarks! {
 		// Create vision before removing
 		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
-	  }: remove_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
-	  verify {
+	}: remove_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
+	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::VisionRemoved (caller, vision ).into());
-	  }
+	}
 
-	  sign_vision {
+	sign_vision {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
@@ -78,13 +78,13 @@ benchmarks! {
 		// Create vision before removing
 		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
-	  }: sign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
-	  verify {
+	}: sign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
+	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::VisionSigned (caller, vision ).into());
-	  }
+	}
 
-	  unsign_vision {
+	unsign_vision {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
@@ -96,11 +96,11 @@ benchmarks! {
 		PalletDao::<T>::sign_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
 
-	  }: unsign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
-	  verify {
+	}: unsign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
+	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::VisionUnsigned (caller, vision ).into());
-	  }
+	}
 
 	//   add_members {
 	// 	/* setup initial state */
