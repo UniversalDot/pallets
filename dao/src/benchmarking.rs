@@ -175,12 +175,13 @@ benchmarks! {
 	// 	PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
 	// 	PalletDao::<T>::add_members(RawOrigin::Signed(caller.clone()).into(), name.clone(), account.clone());
 		
+		
 	// 	//TODO: Fix NotMember error
 	// }: remove_members(RawOrigin::Signed(caller.clone()), name.clone(), account.clone())
 	// 	/* the code to be benchmarked */
 	// verify {
 	// 	/* verifying final state */
-	// 	//assert_eq!()
+	// 	assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 0);
 	// 	assert_last_event::<T>(Event::<T>::MemberRemoved (caller, account ).into());
 	// }
 }
