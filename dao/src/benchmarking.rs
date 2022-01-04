@@ -102,6 +102,22 @@ benchmarks! {
 		assert_last_event::<T>(Event::<T>::VisionUnsigned (caller, vision ).into());
 	}
 
+	create_organization {
+		/* setup initial state */
+		let caller: T::AccountId = whitelisted_caller();
+
+		let s in 1 .. u8::MAX.into();
+		let name = vec![0u8, s as u8];
+
+
+	}: create_organization(RawOrigin::Signed(caller.clone()), name.clone())
+		/* the code to be benchmarked */
+	
+	verify {
+		/* verifying final state */
+		assert_last_event::<T>(Event::<T>::OrganizationCreated( caller, name).into())
+	}
+
 	//   add_members {
 	// 	/* setup initial state */
 	// 	let caller: T::AccountId = whitelisted_caller();
