@@ -53,6 +53,16 @@ fn create_profile_info<T: Config>(_num_fields: u32) -> Profile<T> {
 
 
 benchmarks! {
+	// ** Template for testing extrinsic functions ** //
+ 	benchmark_name {
+		/* setup initial state */
+	}: {
+		/* the code to be benchmarked */
+	}
+	verify {
+		/* verifying final state */
+	}
+
 	profile_creation {
 		/* setup initial state */
 		
@@ -68,32 +78,11 @@ benchmarks! {
 		let interests = vec![0u8, s as u8];
 
 	}: create_profile(RawOrigin::Signed(caller), interests)
-		/* the code to be benchmarked above*/
 	
 	verify {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
 		assert_last_event::<T>(Event::<T>::ProfileCreated { who: caller }.into());
-	}
-
-	sort_vector {
-		let x in 0 .. 10000;
-		let mut m = Vec::<u32>::new();
-		for i in (0..x).rev() {
-			m.push(i);
-		}
-	}: {
-		// The benchmark execution phase could also be a closure with custom code
-		m.sort();
-	}
-
-	benchmark_name {
-		/* setup initial state */
-	}: {
-		/* the code to be benchmarked */
-	}
-	verify {
-		/* verifying final state */
 	}
 
 	profile_update {
@@ -110,6 +99,7 @@ benchmarks! {
 		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
 		
 	}: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
+	
 	verify {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
@@ -127,10 +117,8 @@ benchmarks! {
 
 		// before we delete profile, profile must be created
 		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
-	}: 
-	/* the code to be benchmarked */
-	remove_profile(RawOrigin::Signed(delete_account_caller))
-		
+	}: remove_profile(RawOrigin::Signed(delete_account_caller))
+	
 	verify {
 		/* verifying final state */
 		let caller: T::AccountId = whitelisted_caller();
