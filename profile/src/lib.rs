@@ -165,8 +165,7 @@ pub mod pallet {
 			let account = ensure_signed(origin)?;
 			
 			// Since Each account can have one profile, we call into generate profile again
-			let profile_id = Self::change_profile(&account, interests)?;
-			log::info!("A profile is updated with ID: {:?}.", profile_id); // TODO Remove loging
+			let _profile_id = Self::change_profile(&account, interests)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileUpdated{ who: account });
@@ -228,24 +227,25 @@ pub mod pallet {
 		pub fn change_profile(owner: &T::AccountId, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Ensure that only owner can update profile
-			Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
+			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 			
 			// Get current balance of owner
-			let balance = T::Currency::free_balance(owner);
+			//let balance = T::Currency::free_balance(owner);
+
+			profile.change_interests(new_interests);
 
 			// Populate Profile struct
-			let profile = Profile::<T> {
-				owner: owner.clone(),
-				interests: new_interests,
-				balance: Some(balance),
-				reputation: 0,
-			};
+			// let profile = Profile::<T> {
+			// 	owner: owner.clone(),
+			// 	interests: new_interests,
+			// 	balance: Some(balance),
+			// 	reputation: user_profile.reputation.clone(),
+			// };
 
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
 
 			// Insert profile into HashMap
-			// TODO: Use try_mutate instead
 			<Profiles<T>>::insert(owner, profile);
 
 			// Return hash of profileID
@@ -287,8 +287,7 @@ pub mod pallet {
 		}
 	}
 
-	// Change the reputation on a Profile
-	// TODO: Create better reputation function 
+	// Change the reputation on a Profile (TODO MVP2: Improve reputation functions)
 	impl<T:Config> Profile<T> {
 		pub fn increase_reputation(&mut self) {
 			self.reputation += 1;
