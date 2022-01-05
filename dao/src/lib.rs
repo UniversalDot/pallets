@@ -131,7 +131,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn member_of)]
 	/// Storage item that indicates which DAO's a user belongs to [AccountID, Vec]
-	pub(super) type MemberOf<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<T::AccountId>, ValueQuery>;
+	pub(super) type MemberOf<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, Vec<u8>, ValueQuery>;
 
 
 	#[pallet::storage]
@@ -387,21 +387,23 @@ pub mod pallet {
 
 		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let org = <Pallet<T>>::organization(&org_name);
-			ensure!(org.len() != 0 , Error::<T>::InvalidOrganization);
+			let mut members = Self::organization(&org_name);
+			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator
 			Self::is_dao_founder(&from_initiator, &org_name)?;
 
 			// Check if already a member
-			let members = Self::organization(&org_name);
 			ensure!(!members.contains(&account), <Error<T>>::AlreadyMember);
 			
-			// Insert Member into organization
-			let mut org = <Pallet<T>>::organization(&org_name);
-			org.push(account.clone());
-			<Organization<T>>::insert(org_name, &org);
-			<MemberOf<T>>::insert(&account, &org);
+			// Insert account into organization
+			members.push(account.clone());
+			<Organization<T>>::insert(org_name, &members);
+			
+			// Insert organizations into MemberOf
+			let mut organizations = Self::member_of(&account);
+			organizations.push(org_name[0]);
+			<MemberOf<T>>::insert(&account, organizations);
 			
 			Ok(())
 		}
@@ -421,8 +423,8 @@ pub mod pallet {
 			
 			// Find current organizations and remove user as MemberOf
 			let mut current_organizations = <Pallet<T>>::member_of(&account);
-			let index1 = current_organizations.binary_search(&org[1]).ok().ok_or(<Error<T>>::InvalidOrganization)?;
-			current_organizations.swap_remove(index1);
+			let index1 = current_organizations.binary_search(&org_name[0]).ok().ok_or(<Error<T>>::InvalidOrganization)?;
+			current_organizations.remove(index1);
 
 			// Update Organization Members
 			<Organization<T>>::insert(org_name, members);
