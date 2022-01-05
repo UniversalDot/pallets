@@ -419,14 +419,13 @@ pub mod pallet {
 			let index = members.binary_search(&account).ok().ok_or(<Error<T>>::NotMember)?;
 			members.remove(index);
 			
-			// Update Organization Members
-			<Organization<T>>::insert(org_name, members);
-
 			// Find current organizations and remove user as MemberOf
 			let mut current_organizations = <Pallet<T>>::member_of(&account);
-			let index = current_organizations.binary_search(&org[0]).ok().ok_or(<Error<T>>::NotMember)?;
-			current_organizations.swap_remove(index);
-			
+			let index1 = current_organizations.binary_search(&org[1]).ok().ok_or(<Error<T>>::InvalidOrganization)?;
+			current_organizations.swap_remove(index1);
+
+			// Update Organization Members
+			<Organization<T>>::insert(org_name, members);
 			<MemberOf<T>>::insert(&account, &current_organizations);
 			
 			Ok(())
