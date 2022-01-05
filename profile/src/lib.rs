@@ -196,6 +196,7 @@ pub mod pallet {
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
 		pub fn generate_profile(owner: &T::AccountId, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
+			
 			// Check if profile already exists for owner
 			ensure!(!Profiles::<T>::contains_key(&owner), Error::<T>::ProfileAlreadyCreated);
 
@@ -229,18 +230,8 @@ pub mod pallet {
 			// Ensure that only owner can update profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 			
-			// Get current balance of owner
-			//let balance = T::Currency::free_balance(owner);
-
+			// Change interests of owner
 			profile.change_interests(new_interests);
-
-			// Populate Profile struct
-			// let profile = Profile::<T> {
-			// 	owner: owner.clone(),
-			// 	interests: new_interests,
-			// 	balance: Some(balance),
-			// 	reputation: user_profile.reputation.clone(),
-			// };
 
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
@@ -268,19 +259,25 @@ pub mod pallet {
 			Ok(())
 		}
 
+		// Public function that adds reputation to a profile
 		pub fn add_reputation(owner: &T::AccountId) -> Result<(), Error<T>> {
+			
 			// Get current profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 
 			// Increase reputation
 			profile.increase_reputation();
+
+			// Insert into storage a new profile
 			<Profiles<T>>::insert(owner, profile);
 
 			Ok(())
 		}
 
+		// Public function that check if user has a profile
 		pub fn has_profile(owner: &T::AccountId) -> Result<bool, Error<T>>  {
 
+			// Check if an account has a profile
 			Self::profiles(owner).ok_or(<Error<T>>::NoProfileCreated)?;
 
 			Ok(true)
