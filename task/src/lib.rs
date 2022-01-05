@@ -375,7 +375,7 @@ pub mod pallet {
 
 		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
-			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let _task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_initiator(&task_id, &task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);

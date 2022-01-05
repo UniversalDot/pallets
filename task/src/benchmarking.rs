@@ -24,9 +24,6 @@ use crate::Pallet as PalletTask;
 use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin;
 use frame_support::traits::{Currency};
-use frame_support::sp_runtime::traits::Hash;
-use std::convert::TryInto;
-use sp_std::ptr::hash;
 use pallet_profile::Pallet as PalletProfile;
 
 // Helper function to assert event thrown during verification
@@ -93,6 +90,7 @@ benchmarks! {
 
 		// Create profile before creating a task
 		create_profile::<T>();
+		create_task_info::<T>(1);
 		
 	}: 
 	/* the code to be benchmarked */
@@ -119,7 +117,7 @@ benchmarks! {
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
 		
 	}: start_task(RawOrigin::Signed(caller_start.clone()), hash_task)
@@ -143,9 +141,9 @@ benchmarks! {
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
-		PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
+		let _ = PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
 
 	}: complete_task(RawOrigin::Signed(caller_complete.clone()), hash_task)
 		/* the code to be benchmarked */
@@ -168,9 +166,9 @@ benchmarks! {
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
-		PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
+		let _ = PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
 
 	}: remove_task(RawOrigin::Signed(caller_complete.clone()), hash_task)
 		/* the code to be benchmarked */
