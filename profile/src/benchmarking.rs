@@ -96,7 +96,7 @@ benchmarks! {
 		let interests_update = vec![0u8, s as u8];
 
 		// before we update profile, profile must be created
-		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
+		let _ = PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
 		
 	}: update_profile(RawOrigin::Signed(update_account_caller), interests_update)
 	
@@ -116,7 +116,8 @@ benchmarks! {
 		let interests = vec![0u8, s as u8];
 
 		// before we delete profile, profile must be created
-		PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
+		let _ = PalletProfile::<T>::create_profile(RawOrigin::Signed(create_account_caller).into(), interests);
+
 	}: remove_profile(RawOrigin::Signed(delete_account_caller))
 	
 	verify {
