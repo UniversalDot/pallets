@@ -491,3 +491,35 @@ fn user_can_be_removed_from_organization_it_belongs_to_member_of() {
 
 	});
 }
+
+#[test]
+fn user_can_not_be_removed_from_organization_that_does_not_exist() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME1: &'static [u8] = &[7];
+		const ORG_NAME2: &'static [u8] = &[8];
+		const ORG_NAME3: &'static [u8] = &[1];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME1.to_vec()));
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME2.to_vec()));
+
+		// Ensure user 4 is member of 0 organizations
+		assert_eq!(Dao::member_of(4).len(), 0);
+
+		// Ensure user 4 can be added to a DAO
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
+		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME2.to_vec(), 4));
+
+		// Ensure the user 4 is member of 2 organizations
+		assert_eq!(Dao::member_of(4).len(), 2);
+
+		// Throws error when attempting to remove user from uncreated organization
+		assert_noop!(Dao::remove_members(Origin::signed(1), ORG_NAME3.to_vec(), 4), Error::<Test>::InvalidOrganization );
+
+		// Ensure user 4 belongs to 1 organizations
+		assert_eq!(Dao::member_of(4).len(), 2);	
+
+	});
+}
