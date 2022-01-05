@@ -166,24 +166,20 @@ benchmarks! {
 		let s in 1 .. u8::MAX.into();
 		let name = vec![0u8, s as u8];
 		
-		
 		// Create account for member
 		let u:u32 = 7;
 		let account: T::AccountId = account("member", u, SEED);
 		
-
 		// Create organization before adding members to it
 		PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
 		PalletDao::<T>::add_members(RawOrigin::Signed(caller.clone()).into(), name.clone(), account.clone());
 		assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 2);
 		
-		
-		//TODO: Fix NotMember error
 	}: remove_members(RawOrigin::Signed(caller.clone()), name.clone(), account.clone() )
 		/* the code to be benchmarked */
 	verify {
 		/* verifying final state */
-		//assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 1);
+		assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 1);
 		assert_last_event::<T>(Event::<T>::MemberRemoved (caller, account ).into());
 	}
 }
