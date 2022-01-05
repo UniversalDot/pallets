@@ -62,7 +62,7 @@ benchmarks! {
 		let vision = vec![0u8, s as u8];
 
 		// Create vision before removing
-		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+		let _ = PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
 	}: remove_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
 	verify {
@@ -78,7 +78,7 @@ benchmarks! {
 		let vision = vec![0u8, s as u8];
 
 		// Create vision before removing
-		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+		let _ = PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
 	}: sign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
 	verify {
@@ -94,8 +94,8 @@ benchmarks! {
 		let vision = vec![0u8, s as u8];
 
 		// Create vision before removing
-		PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
-		PalletDao::<T>::sign_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+		let _ = PalletDao::<T>::create_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
+		let _ = PalletDao::<T>::sign_vision(RawOrigin::Signed(caller.clone()).into(), vision.clone());
 
 
 	}: unsign_vision(RawOrigin::Signed(caller.clone()), vision.clone()) 
@@ -128,7 +128,7 @@ benchmarks! {
 		let name = vec![0u8, s as u8];
 
 		// Create organization before dissolving it
-		PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
+		let _ = PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
 
 	}: dissolve_organization(RawOrigin::Signed(caller.clone()), name.clone())
 		/* the code to be benchmarked */
@@ -149,7 +149,7 @@ benchmarks! {
 		let account: T::AccountId = account("member", s, SEED);
 
 		// Create organization before adding members to it
-		PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
+		let _ = PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
 
 
 	}: add_members(RawOrigin::Signed(caller.clone()), name.clone(), account.clone())
@@ -171,8 +171,8 @@ benchmarks! {
 		let account: T::AccountId = account("member", u, SEED);
 		
 		// Create organization before adding members to it
-		PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
-		PalletDao::<T>::add_members(RawOrigin::Signed(caller.clone()).into(), name.clone(), account.clone());
+		let _ = PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
+		let _ = PalletDao::<T>::add_members(RawOrigin::Signed(caller.clone()).into(), name.clone(), account.clone());
 		assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 2);
 		
 	}: remove_members(RawOrigin::Signed(caller.clone()), name.clone(), account.clone() )
