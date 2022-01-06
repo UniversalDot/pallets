@@ -210,7 +210,6 @@ pub mod pallet {
 		}
 
 		/// Function call that starts a task by assigning new task owner. [origin, task_id]
-		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn start_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			
@@ -219,18 +218,6 @@ pub mod pallet {
 
 			// Assign task and update storage.
 			Self::assign_task(&signer, &task_id)?;
-
-			// TODO: Investigate why Currency transfer doesn't work 
-			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
-			// Transfer budget amount from initiator to volunteer
-			// let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
-			// let task_initiator = task.initiator.clone();
-			// let budget = task.budget.clone();
-			// log::info!("budget {:?}.", budget);
-			// log::info!("signer {:?}.", signer);
-			// log::info!("task_initiator {:?}.", task_initiator);
-			// ensure!(T::Currency::free_balance(&signer) >= budget, <Error<T>>::NotEnoughBalance);
-			// T::Currency::transfer(&signer, &task_initiator, budget, ExistenceRequirement::KeepAlive)?;
 
 			// Emit a Task Assigned Event.
 			Self::deposit_event(Event::TaskAssigned(signer, task_id));
@@ -255,6 +242,7 @@ pub mod pallet {
 		}
 
 		/// Function to remove task. [origin, task_id]
+		#[transactional]
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn remove_task(origin: OriginFor<T>, task_id: T::Hash) -> DispatchResult {
 			
@@ -375,7 +363,7 @@ pub mod pallet {
 
 		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
 			// Check if task exists
-			let _task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
+			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
 			ensure!(Self::is_task_initiator(&task_id, &task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);
@@ -388,6 +376,11 @@ pub mod pallet {
 				}
 				Err(())
 			}).map_err(|_| <Error<T>>::TaskNotExist)?;
+
+			// Transfer balance to volunteer
+			let volunteer = task.volunteer.clone();
+			let budget = task.budget.clone();
+			Self::transfer_balance(task_initiator.clone(), volunteer, budget)?;
 
 			// Reward reputation points to profiles who created/completed a task
 			Self::handle_reputation(&task_id).expect("Add reputation works");
@@ -408,6 +401,21 @@ pub mod pallet {
 				Some(task) => Ok(task.initiator == *task_closer),
 				None => Err(<Error<T>>::TaskNotExist)
 			}
+		}
+
+		// Function to transfer balance from one account to another
+		pub fn transfer_balance(task_initiator: T::AccountId, task_volunteer: T::AccountId, budget: BalanceOf<T>) -> Result<(), Error<T>> {
+			// TODO: Investigate why Currency transfer doesn't work 
+			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
+
+			//let task_initiator = task.initiator.clone();
+			log::info!("budget {:?}.", budget);
+			log::info!("signer {:?}.", task_initiator);
+			log::info!("task_initiator {:?}.", task_initiator);
+			ensure!(<T as self::Config>::Currency::free_balance(&task_initiator) >= budget, <Error<T>>::NotEnoughBalance);
+			let _ = <T as self::Config>::Currency::transfer(&task_initiator, &task_volunteer, budget, ExistenceRequirement::KeepAlive);
+
+			Ok(())
 		}
 
 		// Handles reputation update for profiles
