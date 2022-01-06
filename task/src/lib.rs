@@ -404,6 +404,7 @@ pub mod pallet {
 		}
 
 		// Function to transfer balance from one account to another
+		#[transactional]
 		pub fn transfer_balance(task_initiator: T::AccountId, task_volunteer: T::AccountId, budget: BalanceOf<T>) -> Result<(), Error<T>> {
 			// TODO: Investigate why Currency transfer doesn't work 
 			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
