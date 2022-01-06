@@ -367,12 +367,6 @@ fn decrease_task_count_when_removing_task(){
 #[test]
 fn transfer_ballance_works(){
 	new_test_ext().execute_with( || {
-
-		// Profile is necessary for task creation
-		assert_ok!(Profile::create_profile(Origin::signed(1), Vec::new()));
-		
-		let mut vec = Vec::new();
-		vec.push(2);
 		
 		// Transfer balance works using Mock
 		assert_ok!(Task::transfer_balance(1, 2, 7));
