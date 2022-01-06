@@ -369,7 +369,7 @@ fn transfer_ballance_works(){
 	new_test_ext().execute_with( || {
 		
 		// Transfer balance works using Mock
-		assert_ok!(Task::transfer_balance(1, 2, 7));
+		assert_ok!(Task::transfer_balance(&1, &2, 7));
 	});
 }
 

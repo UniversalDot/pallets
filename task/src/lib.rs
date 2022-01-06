@@ -380,7 +380,7 @@ pub mod pallet {
 			// Transfer balance to volunteer
 			let volunteer = task.volunteer.clone();
 			let budget = task.budget.clone();
-			Self::transfer_balance(task_initiator.clone(), volunteer, budget)?;
+			Self::transfer_balance(&task_initiator, &volunteer, budget)?;
 
 			// Reward reputation points to profiles who created/completed a task
 			Self::handle_reputation(&task_id).expect("Add reputation works");
@@ -405,7 +405,7 @@ pub mod pallet {
 
 		// Function to transfer balance from one account to another
 		#[transactional]
-		pub fn transfer_balance(task_initiator: T::AccountId, task_volunteer: T::AccountId, budget: BalanceOf<T>) -> Result<(), Error<T>> {
+		pub fn transfer_balance(task_initiator: &T::AccountId, task_volunteer: &T::AccountId, budget: BalanceOf<T>) -> Result<(), Error<T>> {
 			// TODO: Investigate why Currency transfer doesn't work 
 			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
 
