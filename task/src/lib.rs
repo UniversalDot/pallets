@@ -414,7 +414,8 @@ pub mod pallet {
 			log::info!("signer {:?}.", task_initiator);
 			log::info!("task_volunteer {:?}.", task_volunteer);
 			ensure!(<T as self::Config>::Currency::free_balance(&task_initiator) >= budget, <Error<T>>::NotEnoughBalance);
-			let _ = <T as self::Config>::Currency::transfer(&task_initiator, &task_volunteer, budget, ExistenceRequirement::KeepAlive);
+			let result = <T as self::Config>::Currency::transfer(&task_initiator, &task_volunteer, budget, ExistenceRequirement::KeepAlive);
+			log::info!("Result Output {:?}.", result);
 
 			Ok(())
 		}

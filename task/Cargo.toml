@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-task'
-version = '0.0.37'
+version = '0.0.38'
 description = 'FRAME pallet for creating tasks'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
