@@ -76,6 +76,17 @@ default-features = false
 git = 'https://github.com/UniversalDot/pallets.git'
 version = '0.0.39'
 
+[dependencies.pallet-profile]
+default-features = false
+git = 'https://github.com/UniversalDot/pallets.git'
+version = '0.0.65'
+
+[dependencies.pallet-balances]
+version = '4.0.0-dev'
+git = 'https://github.com/paritytech/substrate.git'
+default-features = false
+tag = 'monthly-2021-11'
+
 [features]
 default = ['std']
 runtime-benchmarks = ['frame-benchmarking']
