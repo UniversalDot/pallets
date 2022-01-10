@@ -523,3 +523,25 @@ fn user_can_not_be_removed_from_organization_that_does_not_exist() {
 
 	});
 }
+
+// < -------- Integration Tests -------------> 
+
+#[test]
+fn can_add_tasks_to_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+		let hash = sp_core::H256::zero();
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Ensure tasks can be added to a DAO
+		assert_ok!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+
+		// Ensure the organization has 1 task
+		assert_eq!(Dao::organization_tasks(ORG_NAME.to_vec()).len(), 1);
+
+	});
+}
