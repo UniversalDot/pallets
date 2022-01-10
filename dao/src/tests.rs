@@ -545,3 +545,24 @@ fn can_add_tasks_to_organization() {
 
 	});
 }
+
+#[test]
+fn can_add_task_to_organization_only_once() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+		let hash = sp_core::H256::zero();
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Add task twice
+		assert_ok!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+		assert_noop!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash), Error::<Test>::TaskAlreadyExists);
+
+		// Ensure Error is thrown
+		assert_eq!(Dao::organization_tasks(ORG_NAME.to_vec()).len(), 1);
+
+	});
+}

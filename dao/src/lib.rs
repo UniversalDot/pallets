@@ -200,6 +200,8 @@ pub mod pallet {
 		InvalidOrganization,
 		/// The user is not a member of this organization.
 		NotMember,
+		/// Task has been already added to organization.
+		TaskAlreadyExists,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -439,7 +441,7 @@ pub mod pallet {
 
 			// Check if already contains the task
 			let mut tasks = Self::organization_tasks(&org_name);
-			ensure!(!tasks.contains(&task), <Error<T>>::AlreadyMember);
+			ensure!(!tasks.contains(&task), <Error<T>>::TaskAlreadyExists);
 			
 			// Insert task into organization
 			tasks.push(task.clone());
