@@ -104,7 +104,7 @@ pub mod pallet {
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_task::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 	}
@@ -127,6 +127,11 @@ pub mod pallet {
 	#[pallet::getter(fn organization)]
 	/// Create organization storage map with key: name and value: Vec<AccountID>
 	pub(super) type Organization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn organization_tasks)]
+	/// Create organization storage map with key: name and value: Vec<Hash of task>
+	pub(super) type OrganizationTasks<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::Hash>, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn member_of)]
@@ -323,6 +328,22 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for adding tasks to an organization [origin, name_org, task_hash]
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn add_tasks(origin: OriginFor<T>, org_name: Vec<u8>, task: T::Hash) -> DispatchResult {
+			
+			// Check that the extrinsic was signed and get the signer.
+			let who = ensure_signed(origin)?;
+
+			// call public function to create org
+			Self::add_task_to_organization(&who, &org_name, &task)?;
+
+			// Emit an event.
+			//Self::deposit_event(Event::MemberAdded(who, task));
+			
+			Ok(())
+		}
+
 		/// Function for removing member from an organization [origin, name_org, AccountID]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn remove_members(origin: OriginFor<T>, org_name: Vec<u8>, account: T::AccountId) -> DispatchResult {
@@ -404,6 +425,26 @@ pub mod pallet {
 			let mut organizations = Self::member_of(&account);
 			organizations.push(org_name[0]);
 			<MemberOf<T>>::insert(&account, organizations);
+			
+			Ok(())
+		}
+
+		pub fn add_task_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, task: &T::Hash ) -> Result<(), Error<T>> {
+			// Check if organization exists
+			let mut members = Self::organization(&org_name);
+			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
+
+			// check if its DAO original creator
+			Self::is_dao_founder(&from_initiator, &org_name)?;
+
+			// Check if already contains the task
+			let mut tasks = Self::organization_tasks(&org_name);
+			ensure!(!tasks.contains(&task), <Error<T>>::AlreadyMember);
+			
+			// Insert task into organization
+			tasks.push(task.clone());
+			<OrganizationTasks<T>>::insert(org_name, &tasks);
+
 			
 			Ok(())
 		}
