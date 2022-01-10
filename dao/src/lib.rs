@@ -433,7 +433,7 @@ pub mod pallet {
 
 		pub fn add_task_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, task: &T::Hash ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let mut members = Self::organization(&org_name);
+			let members = Self::organization(&org_name);
 			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator

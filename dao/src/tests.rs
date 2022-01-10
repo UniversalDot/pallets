@@ -559,9 +559,11 @@ fn can_add_task_to_organization_only_once() {
 
 		// Add task twice
 		assert_ok!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
-		assert_noop!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash), Error::<Test>::TaskAlreadyExists);
 
 		// Ensure Error is thrown
+		assert_noop!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash), Error::<Test>::TaskAlreadyExists);
+
+		// Check only 1 task was added
 		assert_eq!(Dao::organization_tasks(ORG_NAME.to_vec()).len(), 1);
 
 	});
@@ -580,5 +582,17 @@ fn only_creator_can_add_task_to_organization() {
 
 		// Throw error if another than Creator is trying to add members
 		assert_noop!(Dao::add_tasks(Origin::signed(2), ORG_NAME.to_vec(), hash), Error::<Test>::NotOrganizationCreator);
+	});
+}
+
+#[test]
+fn can_not_add_tasks_to_organization_that_does_not_exist() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		let hash = sp_core::H256::zero();
+
+		// Throw error if organization is not found
+		assert_noop!(Dao::add_tasks(Origin::signed(2), Vec::new(), hash), Error::<Test>::InvalidOrganization);
 	});
 }
