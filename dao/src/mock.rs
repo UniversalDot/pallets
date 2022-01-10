@@ -18,7 +18,10 @@ frame_support::construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
+		Balances: pallet_balances::{Pallet, Call, Storage, Event<T>},
 		Dao: pallet_dao::{Pallet, Call, Storage, Event<T>},
+		Task: pallet_task::{Pallet, Call, Storage, Event<T>},
+		Profile: pallet_profile::{Pallet, Call, Storage, Event<T>},
 	}
 );
 
@@ -45,7 +48,7 @@ impl system::Config for Test {
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
 	type PalletInfo = PalletInfo;
-	type AccountData = ();
+	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -55,6 +58,38 @@ impl system::Config for Test {
 
 impl pallet_dao::Config for Test {
 	type Event = Event;
+}
+
+parameter_types! {
+	// One can owned at most 77 tasks
+	pub const MaxTasksOwned: u32 = 77;
+}
+
+impl pallet_task::Config for Test {
+	type Event = Event;
+	type Currency = Balances;
+	type MaxTasksOwned = MaxTasksOwned;
+}
+
+impl pallet_profile::Config for Test {
+	type Event = Event;
+	type Currency =  Balances;
+}
+
+parameter_types! {
+	pub const ExistentialDeposit: u64 = 1;
+}
+
+impl pallet_balances::Config for Test {
+	type ReserveIdentifier = [u8; 8];
+	type MaxLocks = ();
+	type MaxReserves = ();
+	type Balance = u64;
+	type Event = Event;
+	type DustRemoval = ();
+	type ExistentialDeposit = ExistentialDeposit;
+	type AccountStore = System;
+	type WeightInfo = ();
 }
 
 // Build genesis storage according to the mock runtime.
