@@ -129,6 +129,11 @@ pub mod pallet {
 	pub(super) type Organization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 	#[pallet::storage]
+	#[pallet::getter(fn organization_count)]
+	/// OrganizationCount: Get total number of organizations in the system
+	pub(super) type OrganizationCount<T: Config> = StorageValue<_, u64, ValueQuery>;
+
+	#[pallet::storage]
 	#[pallet::getter(fn organization_tasks)]
 	/// Create organization storage map with key: name and value: Vec<Hash of task>
 	pub(super) type OrganizationTasks<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::Hash>, ValueQuery>;
@@ -189,8 +194,10 @@ pub mod pallet {
 		NoSuchVision,
 		/// You are not the owner of the vision.
 		NotVisionOwner,
-		/// Max limit for Visions Reached
+		/// Max limit for Visions reached
 		VisionCountOverflow,
+		/// Max limit for Organizations reached
+		OrganizationCountOverflow,
 		/// This vision has already been signed
 		AlreadySigned,
 		/// You can't unsign from vision that that you haven't signed.
@@ -393,9 +400,9 @@ pub mod pallet {
 			// Insert vector into Hashmap
 			<Organization<T>>::insert(org_name, org);
 
-			// Increase task count
-			// let new_count = Self::task_count().checked_add(1).ok_or(<Error<T>>::TaskCountOverflow)?;
-			// <TaskCount<T>>::put(new_count);
+			// Increase organization count
+			let new_count = Self::organization_count().checked_add(1).ok_or(<Error<T>>::OrganizationCountOverflow)?;
+			<OrganizationCount<T>>::put(new_count);
 
 			Ok(())
 		}
@@ -407,6 +414,10 @@ pub mod pallet {
 
 			// Remove organizational instance
 			<Organization<T>>::remove(org_name);
+
+			// Reduce organization count
+			let new_count = Self::organization_count().saturating_sub(1);
+			<OrganizationCount<T>>::put(new_count);
 
 			Ok(())
 		}
