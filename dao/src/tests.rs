@@ -665,3 +665,26 @@ fn can_remove_task_from_organization() {
 
 	});
 }
+
+#[test]
+fn can_remove_task_from_organization_only_once() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+		let hash = sp_core::H256::zero();
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Add task to organization
+		assert_ok!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+
+		// Remove task from organization
+		assert_ok!(Dao::remove_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+
+		// Ensure once the task has been removed, error is thrown
+		assert_noop!(Dao::remove_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash), Error::<Test>::TaskNotExist);
+
+	});
+}
