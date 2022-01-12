@@ -230,6 +230,20 @@ fn can_create_an_organization() {
 }
 
 #[test]
+fn creating_organization_increases_organization_count() {
+	new_test_ext().execute_with(|| {
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Ensure organization count is 1
+		assert_eq!(Dao::organization_count(), 1);
+	});
+}
+
+#[test]
 fn can_create_multiple_organization() {
 	new_test_ext().execute_with(|| {
 
@@ -243,9 +257,12 @@ fn can_create_multiple_organization() {
 		// Ensure second organization can be created by a different user
 		assert_ok!(Dao::create_organization(Origin::signed(2), ORG_NAME2.to_vec()));
 
-		// Ensure the length of organization is equal to 2
+		// Ensure each organization was created successfully
 		assert_eq!(Dao::organization(ORG_NAME1.to_vec()).len(), 1);
 		assert_eq!(Dao::organization(ORG_NAME2.to_vec()).len(), 1);
+		
+		// Ensure organization count is 2
+		assert_eq!(Dao::organization_count(), 2);
 	});
 }
 
@@ -268,6 +285,31 @@ fn can_remove_an_organization() {
 
 		// Ensure the organization has been removed by checking the length
 		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 0);
+	});
+}
+
+#[test]
+fn removing_organization_decreases_organization_count() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Ensure the length of organization is equal to 1, and count is 1
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
+		assert_eq!(Dao::organization_count(), 1);
+
+		// Ensure organization can be removed
+		assert_ok!(Dao::dissolve_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Ensure the organization has been removed by checking the length
+		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 0);
+
+		// Ensure organization count is 0
+		assert_eq!(Dao::organization_count(), 0);
 	});
 }
 
