@@ -179,6 +179,9 @@ pub mod pallet {
 
 		/// Task added to an organization [AccountID, Task Hash]
 		TaskAdded(T::AccountId, T::Hash),
+
+		/// Task removed from an organization [AccountID, Task Hash]
+		TaskRemoved(T::AccountId, T::Hash),
 	}
 
 	// Errors inform users that something went wrong.
@@ -385,7 +388,7 @@ pub mod pallet {
 			Self::remove_task_from_organization(&who, &org_name, &task)?;
 
 			// Emit an event.
-			//Self::deposit_event(Event::TaskAdded(who, task));
+			Self::deposit_event(Event::TaskRemoved(who, task));
 			
 			Ok(())
 		}
