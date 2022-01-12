@@ -632,7 +632,7 @@ fn only_creator_can_add_task_to_organization() {
 fn can_not_add_tasks_to_organization_that_does_not_exist() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create zero hash
 		let hash = sp_core::H256::zero();
 
 		// Throw error if organization is not found
@@ -709,7 +709,7 @@ fn only_creator_can_remove_task_to_organization() {
 fn can_not_remove_tasks_from_organization_that_does_not_exist() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create zero hash
 		let hash = sp_core::H256::zero();
 
 		// Throw error if organization is not found
