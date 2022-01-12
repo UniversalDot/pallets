@@ -688,3 +688,19 @@ fn can_remove_task_from_organization_only_once() {
 
 	});
 }
+
+#[test]
+fn only_creator_can_remove_task_to_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+		let hash = sp_core::H256::zero();
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Throw error if another than Creator is trying to remove members
+		assert_noop!(Dao::remove_tasks(Origin::signed(2), ORG_NAME.to_vec(), hash), Error::<Test>::NotOrganizationCreator);
+	});
+}
