@@ -210,6 +210,8 @@ pub mod pallet {
 		InvalidOrganization,
 		/// The user is not a member of this organization.
 		NotMember,
+		/// Task doesn't exist
+		TaskNotExist,
 		/// Task has been already added to organization.
 		TaskAlreadyExists,
 	}
@@ -516,7 +518,7 @@ pub mod pallet {
 
 			// Find task and remove from Vector
 			let mut tasks = <Pallet<T>>::organization_tasks(&org_name);
-			let index = tasks.binary_search(&task).ok().ok_or(<Error<T>>::NotMember)?;
+			let index = tasks.binary_search(&task).ok().ok_or(<Error<T>>::TaskNotExist)?;
 			tasks.remove(index);
 			
 			// Update organization tasks
