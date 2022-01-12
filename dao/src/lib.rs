@@ -324,8 +324,8 @@ pub mod pallet {
 			// Check that the extrinsic was signed and get the signer.
 			let who = ensure_signed(origin)?;
 
-			// call public function to create org
-			Self::add_to_organization(&who, &org_name, &account)?;
+			// call function to add member to organization
+			Self::add_member_to_organization(&who, &org_name, &account)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::MemberAdded(who, account));
@@ -340,7 +340,7 @@ pub mod pallet {
 			// Check that the extrinsic was signed and get the signer.
 			let who = ensure_signed(origin)?;
 
-			// call public function to create org
+			// call function to add task to organization
 			Self::add_task_to_organization(&who, &org_name, &task)?;
 
 			// Emit an event.
@@ -356,7 +356,7 @@ pub mod pallet {
 			// Check that the extrinsic was signed and get the signer.
 			let who = ensure_signed(origin)?;
 
-			// call public function to create org
+			// call function to remove member from organization
 			Self::remove_member_from_organization(&who, &org_name, &account)?;
 
 			// Emit an event.
@@ -372,7 +372,7 @@ pub mod pallet {
 			// Check that the extrinsic was signed and get the signer.
 			let who = ensure_signed(origin)?;
 
-			// call public function to create org
+			// call function to remove organization
 			Self::remove_org(&who, &org_name)?;
 
 			// Emit an event.
@@ -411,7 +411,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn add_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+		pub fn add_member_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
 			// Check if organization exists
 			let mut members = Self::organization(&org_name);
 			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
