@@ -639,3 +639,29 @@ fn can_not_add_tasks_to_organization_that_does_not_exist() {
 		assert_noop!(Dao::add_tasks(Origin::signed(2), Vec::new(), hash), Error::<Test>::InvalidOrganization);
 	});
 }
+
+#[test]
+fn can_remove_task_from_organization() {
+	new_test_ext().execute_with(|| {
+
+		// Create Static Organization name
+		const ORG_NAME: &'static [u8] = &[7];
+		let hash = sp_core::H256::zero();
+
+		// Ensure organization can be created
+		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+
+		// Add task to organization
+		assert_ok!(Dao::add_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+
+		// Check only 1 task was added
+		assert_eq!(Dao::organization_tasks(ORG_NAME.to_vec()).len(), 1);
+
+		// Remove task from organization
+		assert_ok!(Dao::remove_tasks(Origin::signed(1), ORG_NAME.to_vec(), hash));
+
+		// Ensure the organization tasks are 0
+		assert_eq!(Dao::organization_tasks(ORG_NAME.to_vec()).len(), 0);
+
+	});
+}
