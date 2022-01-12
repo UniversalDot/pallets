@@ -23,7 +23,7 @@ fn creating_vision_increases_vision_count() {
 		// Ensure the DAO can create a vision document
 		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
-		//Ensure vision count is 1
+		// Ensure vision count is 1
 		assert_eq!(Dao::vision_count(), 1);
 	});
 }
@@ -67,13 +67,13 @@ fn removing_vision_decreases_vision_count() {
 		// Ensure the DAO can create a vision document
 		assert_ok!(Dao::create_vision(Origin::signed(1), VISION.to_vec()));
 
-		//Ensure vision count is 1
+		// Ensure vision count is 1
 		assert_eq!(Dao::vision_count(), 1);
 
 		// Ensure the DAO can remove a vision document
 		assert_ok!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()));
 
-		//Ensure vision count is 0
+		// Ensure vision count is 0
 		assert_eq!(Dao::vision_count(), 0);
 	});
 }
@@ -118,7 +118,7 @@ fn user_can_sign_onto_vision() {
 		// Ensure a user can sign onto vision. 
 		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
 
-		// Ensure the length of VisionSigners has increased
+		// Ensure the length of VisionSigner has increased
 		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
 	});
 }
@@ -247,7 +247,7 @@ fn creating_organization_increases_organization_count() {
 fn can_create_multiple_organization() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create Static Organization names
 		const ORG_NAME1: &'static [u8] = &[7];
 		const ORG_NAME2: &'static [u8] = &[8];
 
@@ -342,7 +342,7 @@ fn can_add_user_to_organization() {
 		// Ensure organization can be created
 		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
 
-		//Ensure users can be added to a DAO
+		// Ensure users can be added to a DAO
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
 		// Ensure the organization has 2 members (creator abd user4)
@@ -380,7 +380,7 @@ fn can_only_add_members_if_not_already_in_organization() {
 		// Throw error if another than Creator is trying to add members
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2));
 		
-		// TODO: Fix test and implementation
+		// Ensure adding existing member throws an error
 		assert_noop!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 2), Error::<Test>::AlreadyMember );
 	});
 }
@@ -432,6 +432,7 @@ fn organization_exists_check_before_removing_user_from_org() {
 		// Throw error if org_name is not found
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
+		// Ensure error is thrown when removing members from non-existing organization
 		assert_noop!(Dao::remove_members(Origin::signed(1), Vec::new(), 4), Error::<Test>::InvalidOrganization );
 	});
 }
@@ -453,7 +454,7 @@ fn can_remove_users_from_organization() {
 		// User can be removed from organization
 		assert_ok!(Dao::remove_members(Origin::signed(1), ORG_NAME.to_vec(), 4));
 
-		//  Validate Ensure length of users in org is 2
+		// Validate Ensure length of users in org is 2
 		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 2);
 
 	});
@@ -485,7 +486,7 @@ fn can_only_remove_users_that_belong_to_organization() {
 fn user_can_view_organization_it_belongs_to_member_of() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create Static Organization names
 		const ORG_NAME1: &'static [u8] = &[7];
 		const ORG_NAME2: &'static [u8] = &[8];
 
@@ -493,7 +494,7 @@ fn user_can_view_organization_it_belongs_to_member_of() {
 		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME1.to_vec()));
 		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME2.to_vec()));
 
-		//Ensure users can be added to a DAO
+		// Ensure users can be added to a DAO
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME2.to_vec(), 4));
 
@@ -538,7 +539,7 @@ fn user_can_be_removed_from_organization_it_belongs_to_member_of() {
 fn user_can_not_be_removed_from_organization_that_does_not_exist() {
 	new_test_ext().execute_with(|| {
 
-		// Create Static Organization name
+		// Create Static Organization names
 		const ORG_NAME1: &'static [u8] = &[7];
 		const ORG_NAME2: &'static [u8] = &[8];
 		const ORG_NAME3: &'static [u8] = &[1];
@@ -550,14 +551,14 @@ fn user_can_not_be_removed_from_organization_that_does_not_exist() {
 		// Ensure user 4 is member of 0 organizations
 		assert_eq!(Dao::member_of(4).len(), 0);
 
-		// Ensure user 4 can be added to a DAO
+		// Ensure user 4 can be added to 2 organizations
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME1.to_vec(), 4));
 		assert_ok!(Dao::add_members(Origin::signed(1), ORG_NAME2.to_vec(), 4));
 
 		// Ensure the user 4 is member of 2 organizations
 		assert_eq!(Dao::member_of(4).len(), 2);
 
-		// Throws error when attempting to remove user from uncreated organization
+		// Throws error when attempting to remove user from non-existing organization
 		assert_noop!(Dao::remove_members(Origin::signed(1), ORG_NAME3.to_vec(), 4), Error::<Test>::InvalidOrganization );
 
 		// Ensure user 4 belongs to 1 organizations
