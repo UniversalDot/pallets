@@ -372,6 +372,22 @@ pub mod pallet {
 			Ok(())
 		}
 
+		/// Function for removing tasks from an organization [origin, name_org, task_hash]
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		pub fn remove_tasks(origin: OriginFor<T>, org_name: Vec<u8>, task: T::Hash) -> DispatchResult {
+			
+			// Check that the extrinsic was signed and get the signer.
+			let who = ensure_signed(origin)?;
+
+			// call function to add task to organization
+			Self::remove_task_from_organization(&who, &org_name, &task)?;
+
+			// Emit an event.
+			//Self::deposit_event(Event::TaskAdded(who, task));
+			
+			Ok(())
+		}
+
 		/// Function for dissolving an organization [origin, name_org]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
 		pub fn dissolve_organization(origin: OriginFor<T>, org_name: Vec<u8>) -> DispatchResult {
@@ -486,6 +502,25 @@ pub mod pallet {
 			// Update Organization Members
 			<Organization<T>>::insert(org_name, members);
 			<MemberOf<T>>::insert(&account, &current_organizations);
+			
+			Ok(())
+		}
+
+		pub fn remove_task_from_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, task: &T::Hash ) -> Result<(), Error<T>> {
+			// Check if organization exists
+			let org = <Pallet<T>>::organization(&org_name);
+			ensure!(org.len() != 0 , Error::<T>::InvalidOrganization);
+
+			// check if its DAO original creator
+			Self::is_dao_founder(&from_initiator, &org_name)?;
+
+			// Find task and remove from Vector
+			let mut tasks = <Pallet<T>>::organization_tasks(&org_name);
+			let index = tasks.binary_search(&task).ok().ok_or(<Error<T>>::NotMember)?;
+			tasks.remove(index);
+			
+			// Update organization tasks
+			<OrganizationTasks<T>>::insert(org_name, tasks);
 			
 			Ok(())
 		}
