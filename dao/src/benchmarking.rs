@@ -204,6 +204,30 @@ benchmarks! {
 		assert_eq!(PalletDao::<T>::organization(name.clone()).len(), 1);
 		assert_last_event::<T>(Event::<T>::MemberRemoved (caller, account ).into());
 	}
+
+	remove_tasks {
+		/* setup initial state */
+		let caller: T::AccountId = whitelisted_caller();
+
+		let s in 1 .. u8::MAX.into();
+		let name = vec![0u8, s as u8];
+		
+		// Create hash
+		let task_hash_h256 = "task hash";
+		let hash = T::Hashing::hash_of(&task_hash_h256);
+
+		// Create organization 
+		let _ = PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
+		// Add task to be removed
+		let _ = PalletDao::<T>::add_tasks(RawOrigin::Signed(caller.clone()).into(), name.clone(), hash.clone());
+
+
+	}: remove_tasks(RawOrigin::Signed(caller.clone()), name.clone(), hash.clone())
+		/* the code to be benchmarked */
+	verify {
+		/* verifying final state */
+		assert_last_event::<T>(Event::<T>::TaskRemoved ( caller, hash ).into());
+	}
 }
 
 impl_benchmark_test_suite!(PalletDao, crate::mock::new_test_ext(), crate::mock::Test,);
