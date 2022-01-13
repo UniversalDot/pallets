@@ -18,11 +18,11 @@
 //! Benchmarking setup for pallet-template
 
 use super::*;
-
 #[allow(unused)]
 use crate::Pallet as PalletDao;
 use frame_benchmarking::{account, benchmarks, impl_benchmark_test_suite, whitelisted_caller};
 use frame_system::RawOrigin;
+use frame_support::sp_runtime::traits::Hash;
 
 const SEED: u32 = 1;
 
@@ -157,6 +157,28 @@ benchmarks! {
 	verify {
 		/* verifying final state */
 		assert_last_event::<T>(Event::<T>::MemberAdded (caller, account ).into());
+	}
+
+	add_tasks {
+		/* setup initial state */
+		let caller: T::AccountId = whitelisted_caller();
+
+		let s in 1 .. u8::MAX.into();
+		let name = vec![0u8, s as u8];
+		
+		// Create hash
+		let task_hash_h256 = "task hash";
+		let hash = T::Hashing::hash_of(&task_hash_h256);
+
+		// Create organization before adding members to it
+		let _ = PalletDao::<T>::create_organization(RawOrigin::Signed(caller.clone()).into(), name.clone());
+
+
+	}: add_tasks(RawOrigin::Signed(caller.clone()), name.clone(), hash.clone())
+		/* the code to be benchmarked */
+	verify {
+		/* verifying final state */
+		assert_last_event::<T>(Event::<T>::TaskAdded (caller, hash ).into());
 	}
 
 	remove_members {
