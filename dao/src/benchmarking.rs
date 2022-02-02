@@ -20,7 +20,7 @@
 use super::*;
 #[allow(unused)]
 use crate::Pallet as PalletDao;
-use frame_benchmarking::{account, benchmarks, impl_benchmark_test_suite, whitelisted_caller};
+use frame_benchmarking::{account, benchmarks, impl_benchmark_test_suite, whitelisted_caller, vec};
 use frame_system::RawOrigin;
 use frame_support::sp_runtime::traits::Hash;
 
