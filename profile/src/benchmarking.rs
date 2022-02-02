@@ -21,7 +21,7 @@ use super::*;
 
 #[allow(unused)]
 use crate::Pallet as PalletProfile;
-use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
+use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller, vec};
 use frame_system::RawOrigin;
 
 use frame_support::{
