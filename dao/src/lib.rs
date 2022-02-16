@@ -83,8 +83,7 @@ mod benchmarking;
 pub mod pallet {
 	use frame_support::{dispatch::DispatchResult, pallet_prelude::*};
 	use frame_system::pallet_prelude::*;
-	use frame_support::{
-		sp_runtime::traits::Hash};
+
 	use sp_std::vec::Vec;
 	use scale_info::TypeInfo;
 
@@ -413,9 +412,9 @@ pub mod pallet {
 
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
-		pub fn new_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
+		pub fn new_org(from_initiator: &T::AccountId, org_name: &[u8]) -> Result<(), Error<T>> {
 			
-			let mut org = <Pallet<T>>::organization(&org_name);
+			let mut org = <Pallet<T>>::organization(org_name);
 			org.push(from_initiator.clone());
 
 			// Insert vector into Hashmap
@@ -428,7 +427,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn remove_org(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<(), Error<T>> {
+		pub fn remove_org(from_initiator: &T::AccountId, org_name: &[u8]) -> Result<(), Error<T>> {
 			
 			// check if its DAO original creator
 			Self::is_dao_founder(from_initiator, org_name)?;
@@ -443,16 +442,16 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn add_member_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+		pub fn add_member_to_organization(from_initiator: &T::AccountId, org_name: &[u8], account: &T::AccountId ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let mut members = Self::organization(&org_name);
-			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
+			let mut members = Self::organization(org_name);
+			ensure!(!members.is_empty() , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator
-			Self::is_dao_founder(&from_initiator, &org_name)?;
+			Self::is_dao_founder(from_initiator, org_name)?;
 
 			// Check if already a member
-			ensure!(!members.contains(&account), <Error<T>>::AlreadyMember);
+			ensure!(!members.contains(account), <Error<T>>::AlreadyMember);
 			
 			// Insert account into organization
 			members.push(account.clone());
@@ -466,37 +465,37 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn add_task_to_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, task: &T::Hash ) -> Result<(), Error<T>> {
+		pub fn add_task_to_organization(from_initiator: &T::AccountId, org_name: &[u8], task: &T::Hash ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let members = Self::organization(&org_name);
-			ensure!(members.len() != 0 , Error::<T>::InvalidOrganization);
+			let members = Self::organization(org_name);
+			ensure!(!members.is_empty() , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator
-			Self::is_dao_founder(&from_initiator, &org_name)?;
+			Self::is_dao_founder(from_initiator, org_name)?;
 
 			// Check if already contains the task
-			let mut tasks = Self::organization_tasks(&org_name);
-			ensure!(!tasks.contains(&task), <Error<T>>::TaskAlreadyExists);
+			let mut tasks = Self::organization_tasks(org_name);
+			ensure!(!tasks.contains(task), <Error<T>>::TaskAlreadyExists);
 			
 			// Insert task into organization
-			tasks.push(task.clone());
+			tasks.push(*task);
 			<OrganizationTasks<T>>::insert(org_name, &tasks);
 
 			
 			Ok(())
 		}
 
-		pub fn remove_member_from_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, account: &T::AccountId ) -> Result<(), Error<T>> {
+		pub fn remove_member_from_organization(from_initiator: &T::AccountId, org_name: &[u8], account: &T::AccountId ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let org = <Pallet<T>>::organization(&org_name);
-			ensure!(org.len() != 0 , Error::<T>::InvalidOrganization);
+			let org = <Pallet<T>>::organization(org_name);
+			ensure!(!org.is_empty() , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator
-			Self::is_dao_founder(&from_initiator, &org_name)?;
+			Self::is_dao_founder(from_initiator, org_name)?;
 
 			// Find member and remove from Vector
-			let mut members = <Pallet<T>>::organization(&org_name);
-			let index = members.binary_search(&account).ok().ok_or(<Error<T>>::NotMember)?;
+			let mut members = <Pallet<T>>::organization(org_name);
+			let index = members.binary_search(account).ok().ok_or(<Error<T>>::NotMember)?;
 			members.remove(index);
 			
 			// Find current organizations and remove user as MemberOf
@@ -511,17 +510,17 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn remove_task_from_organization(from_initiator: &T::AccountId, org_name: &Vec<u8>, task: &T::Hash ) -> Result<(), Error<T>> {
+		pub fn remove_task_from_organization(from_initiator: &T::AccountId, org_name: &[u8], task: &T::Hash ) -> Result<(), Error<T>> {
 			// Check if organization exists
-			let org = <Pallet<T>>::organization(&org_name);
-			ensure!(org.len() != 0 , Error::<T>::InvalidOrganization);
+			let org = <Pallet<T>>::organization(org_name);
+			ensure!(!org.is_empty() , Error::<T>::InvalidOrganization);
 
 			// check if its DAO original creator
-			Self::is_dao_founder(&from_initiator, &org_name)?;
+			Self::is_dao_founder(from_initiator, org_name)?;
 
 			// Find task and remove from Vector
-			let mut tasks = <Pallet<T>>::organization_tasks(&org_name);
-			let index = tasks.binary_search(&task).ok().ok_or(<Error<T>>::TaskNotExist)?;
+			let mut tasks = <Pallet<T>>::organization_tasks(org_name);
+			let index = tasks.binary_search(task).ok().ok_or(<Error<T>>::TaskNotExist)?;
 			tasks.remove(index);
 			
 			// Update organization tasks
@@ -530,50 +529,50 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn member_signs_vision(from_initiator: &T::AccountId, vision_document: &Vec<u8>) -> Result<(), Error<T>> {
+		pub fn member_signs_vision(from_initiator: &T::AccountId, vision_document: &[u8]) -> Result<(), Error<T>> {
 
 			// Verify that the specified vision has been created.
-            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
+            ensure!(Vision::<T>::contains_key(vision_document), Error::<T>::NoSuchVision);
 
 			// TODO: Perhaps use vision Hash instead of vision document
 			// let hash_vision = T::Hashing::hash_of(&vision_document);
 
-			let mut members = <Pallet<T>>::vision_signer(&vision_document);
+			let mut members = <Pallet<T>>::vision_signer(vision_document);
 
 			// Ensure not signed already
-			ensure!(!members.contains(&from_initiator), <Error<T>>::AlreadySigned);
+			ensure!(!members.contains(from_initiator), <Error<T>>::AlreadySigned);
 			members.push(from_initiator.clone());
 			
 			// Update storage.
-			<VisionSigner<T>>::insert(&vision_document, members);
+			<VisionSigner<T>>::insert(vision_document, members);
 
 			Ok(())
 		}
 
-		pub fn member_unsigns_vision(from_initiator: &T::AccountId, vision_document: &Vec<u8>) -> Result<(), Error<T>> {
+		pub fn member_unsigns_vision(from_initiator: &T::AccountId, vision_document: &[u8]) -> Result<(), Error<T>> {
 
 			// Verify that the specified vision has been created.
-            ensure!(Vision::<T>::contains_key(&vision_document), Error::<T>::NoSuchVision);
+            ensure!(Vision::<T>::contains_key(vision_document), Error::<T>::NoSuchVision);
 
 			// TODO: Perhaps use vision Hash instead of vision document
 			// let hash_vision = T::Hashing::hash_of(&vision_document);
 
-			let mut members = <Pallet<T>>::vision_signer(&vision_document);
+			let mut members = <Pallet<T>>::vision_signer(vision_document);
 
 			// Ensure not signed already
-			let index = members.binary_search(&from_initiator).ok().ok_or(<Error<T>>::NotSigned)?;
+			let index = members.binary_search(from_initiator).ok().ok_or(<Error<T>>::NotSigned)?;
 			members.remove(index);
 			
 			// Update storage.
-			<VisionSigner<T>>::insert(&vision_document, members);
+			<VisionSigner<T>>::insert(vision_document, members);
 
 			Ok(())
 		}
 
 
 
-		pub fn is_dao_founder(from_initiator: &T::AccountId, org_name: &Vec<u8>) -> Result<bool, Error<T>> {
-			let first_account = Self::organization(&org_name);
+		pub fn is_dao_founder(from_initiator: &T::AccountId, org_name: &[u8]) -> Result<bool, Error<T>> {
+			let first_account = Self::organization(org_name);
 			if first_account[0] == *from_initiator {
 				Ok(true)
 			} else { Err(Error::<T>::NotOrganizationCreator) }
