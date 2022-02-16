@@ -262,7 +262,7 @@ pub mod pallet {
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(from_initiator: &T::AccountId, requirements: &Vec<u8>, budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(from_initiator: &T::AccountId, requirements: &[u8], budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
 
 			// Ensure user has a profile before creating a task
 			ensure!(pallet_profile::Pallet::<T>::has_profile(from_initiator).unwrap(), <Error<T>>::NoProfile);
@@ -271,11 +271,11 @@ pub mod pallet {
 			let task = Task::<T> {
 				initiator: from_initiator.clone(),
 				volunteer: from_initiator.clone(),
-				requirements: requirements.clone(),
+				requirements: requirements.to_owned(),
 				status: Created,
-				budget: budget.clone(),
+				budget: *budget,
 				current_owner: from_initiator.clone(),
-				deadline: deadline.clone(),
+				deadline: *deadline,
 			};
 
 			// Create hash of task
@@ -366,7 +366,7 @@ pub mod pallet {
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
 			//Check if the owner is the one who created task
-			ensure!(Self::is_task_initiator(&task_id, &task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);
+			ensure!(Self::is_task_initiator(task_id, task_initiator)?, <Error<T>>::OnlyInitiatorClosesTask);
 
 			// Remove from ownership
 			<TasksOwned<T>>::try_mutate(&task_initiator, |owned| {
@@ -379,11 +379,11 @@ pub mod pallet {
 
 			// Transfer balance to volunteer
 			let volunteer = task.volunteer.clone();
-			let budget = task.budget.clone();
-			Self::transfer_balance(&task_initiator, &volunteer, budget)?;
+			let budget = task.budget;
+			Self::transfer_balance(task_initiator, &volunteer, budget)?;
 
 			// Reward reputation points to profiles who created/completed a task
-			Self::handle_reputation(&task_id).expect("Add reputation works");
+			Self::handle_reputation(task_id).expect("Add reputation works");
 
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);
@@ -413,8 +413,8 @@ pub mod pallet {
 			log::info!("budget {:?}.", budget);
 			log::info!("signer {:?}.", task_initiator);
 			log::info!("task_volunteer {:?}.", task_volunteer);
-			ensure!(<T as self::Config>::Currency::free_balance(&task_initiator) >= budget, <Error<T>>::NotEnoughBalance);
-			let result = <T as self::Config>::Currency::transfer(&task_initiator, &task_volunteer, budget, ExistenceRequirement::KeepAlive);
+			ensure!(<T as self::Config>::Currency::free_balance(task_initiator) >= budget, <Error<T>>::NotEnoughBalance);
+			let result = <T as self::Config>::Currency::transfer(task_initiator, task_volunteer, budget, ExistenceRequirement::KeepAlive);
 			log::info!("Result Output {:?}.", result);
 
 			Ok(())
