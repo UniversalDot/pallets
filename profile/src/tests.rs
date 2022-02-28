@@ -128,25 +128,30 @@ fn user_can_only_delete_own_profile() {
 #[test]
 fn user_can_update_profile() {
 	new_test_ext().execute_with(|| {
-		// Create vector of interests
-		let mut vec = Vec::new();
-		vec.push(7);
-		const USERNAME:&'static [u8] = &[1];
+		// Create profile properties
+		let interests = vec![1];
+		let username = vec![1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(10), username.to_vec(), interests.to_vec()));
 
 		// Create new vector of interests
-		let mut vec2 = Vec::new();
-		vec2.push(99);
+		let interests = vec![6];
+		let username =  vec![7];
 
 		// Ensure user can update profile with new interests
-		assert_ok!(Profile::update_profile(Origin::signed(1), vec2));
+		assert_ok!(Profile::update_profile(Origin::signed(10), username.to_vec(), interests.to_vec()));
 		
+		// Get profile for current account
+		let profile = Profile::profiles(10).expect("should found the profile");
+
 		// Ensure count is NOT reduced when removing profile
 		assert_eq!(Profile::profile_count(), 1);
-		// TODO: Make sure this test is cover appropriately
-		// assert_eq!(Profile::profiles(Origin::signed(1)).len(), 1);
+		
+		// Ensure that the values have been updated successfully
+		assert_eq!(profile.name, &[7]);
+		assert_eq!(profile.interests, &[6]);
+
 	});
 }
 
@@ -166,6 +171,6 @@ fn user_can_only_update_own_profile() {
 		vec2.push(99);
 
 		// Ensure another user can NOT update others profile.
-		assert_noop!(Profile::update_profile(Origin::signed(2), vec2), Error::<Test>::NoUpdateAuthority);
+		assert_noop!(Profile::update_profile(Origin::signed(2), USERNAME.to_vec(), vec2), Error::<Test>::NoUpdateAuthority);
 	});
 }
