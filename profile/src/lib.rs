@@ -25,7 +25,7 @@
 //!
 //! The Profile Pallet creates a user profile per AccountID.
 //! The Profile is used to enrich the AccountID information with user specific
-//! metadata such as personal interests, reputation, etc. 
+//! metadata such as personal interests, name, reputation, etc. 
 //!
 //! ## Interface
 //!
