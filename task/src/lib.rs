@@ -23,7 +23,7 @@
 //!
 //! ## Overview
 //!
-//! The Task Pallet creates a way of users to interact with one another.
+//! The Task Pallet creates a way for users to interact with one another.
 //! 
 //! There are two types of Users who can interact with tasks. We call them
 //! Initiators and Volunteers. 
@@ -31,8 +31,8 @@
 //! Initiators are people who have the permission to Create and Remove Tasks.
 //! Volunteers are people who have the permission to Start and Complete Tasks.
 //! 
-//! Anybody can be become an Initiator or Volunteer. In other words, 
-//! one doesn't need a permission to become Initiator or Volunteer. 
+//! Anybody can become an Initiator or Volunteer. In other words, 
+//! one doesn't need permission to become an Initiator or Volunteer. 
 //! 
 //! When Tasks are created, there is some associated metadata that shall be defined.
 //! This includes the following:
