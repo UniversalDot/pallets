@@ -131,6 +131,7 @@ fn verify_inputs_outputs_to_tasks(){
 		// Ensure that task properties are assigned correctly
 		assert_eq!(task.current_owner, 10);
 		assert_eq!(task.budget, 7);
+		assert_eq!(task.title, &[1]);
 	});
 }
 
