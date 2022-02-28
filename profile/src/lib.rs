@@ -76,6 +76,7 @@ pub mod pallet {
 	#[scale_info(skip_type_params(T))]
 	pub struct Profile<T: Config> {
 		pub owner: AccountOf<T>,
+		pub name: Vec<u8>,
 		pub interests: Vec<u8>,
 		pub balance: Option<BalanceOf<T>>,
 		pub reputation: u32,
@@ -143,13 +144,13 @@ pub mod pallet {
 
 		/// Dispatchable call that enables every new actor to create personal profile in storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+		pub fn create_profile(origin: OriginFor<T>, username: Vec<u8>, interests: Vec<u8>) -> DispatchResult {
 			
 			// Check that the extrinsic was signed and get the signer.
 			let account = ensure_signed(origin)?;
 
 			// Call helper function to generate Profile Struct
-			let _profile_id = Self::generate_profile(&account, interests)?;
+			let _profile_id = Self::generate_profile(&account, username, interests)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileCreated{ who:account });
@@ -195,7 +196,7 @@ pub mod pallet {
 	// ** Helper internal functions ** //
 	impl<T:Config> Pallet<T> {
 		// Generates initial Profile.
-		pub fn generate_profile(owner: &T::AccountId, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn generate_profile(owner: &T::AccountId, username: Vec<u8>, interests_vec: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Check if profile already exists for owner
 			ensure!(!Profiles::<T>::contains_key(&owner), Error::<T>::ProfileAlreadyCreated);
@@ -206,6 +207,7 @@ pub mod pallet {
 			// Populate Profile struct
 			let profile = Profile::<T> {
 				owner: owner.clone(),
+				name: username,
 				interests: interests_vec,
 				balance: Some(balance),
 				reputation: 0,
