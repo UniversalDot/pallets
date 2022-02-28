@@ -17,6 +17,26 @@ fn create_profile_works() {
 }
 
 #[test]
+fn verify_inputs_outputs_to_profile(){
+	new_test_ext().execute_with( || {
+		// Assign values to profile properties
+		const USERNAME:&'static [u8] = &[1];
+		const INTERESTS:&'static [u8] = &[7];
+
+		// Create Profile
+		assert_ok!(Profile::create_profile(Origin::signed(10), USERNAME.to_vec(), INTERESTS.to_vec()));
+
+		// Get profile for current account
+		let profile = Profile::profiles(10).expect("should found the profile");
+		
+		// Ensure that profile properties are assigned correctly
+		assert_eq!(profile.name, &[1]);
+		assert_eq!(profile.reputation, 0);
+		assert_eq!(profile.interests, &[7]);
+	});
+}
+
+#[test]
 fn create_profile_increases_profile_count() {
 	new_test_ext().execute_with(|| {
 		// Create vector of interests
