@@ -36,7 +36,7 @@
 //! 
 //! When Tasks are created, there is some associated metadata that shall be defined.
 //! This includes the following:
-//! - Task Description (Defining the Task description)
+//! - Task Specification (Defining the Task specification)
 //! - Task Budget (The cost of completion for the Task)
 //! - Task Deadline (The specified time until which the task should be completed)
 //! 
@@ -97,7 +97,7 @@ pub mod pallet {
 	#[scale_info(skip_type_params(T))]
 	pub struct Task<T: Config> {
 		pub title: Vec<u8>,
-		pub description: Vec<u8>,
+		pub specification: Vec<u8>,
 		pub initiator: AccountOf<T>,
 		pub volunteer: AccountOf<T>,
 		pub current_owner: AccountOf<T>,
@@ -191,15 +191,15 @@ pub mod pallet {
 	// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		/// Function call that creates tasks.  [ origin, description, budget, deadline]
+		/// Function call that creates tasks.  [ origin, specification, budget, deadline]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn create_task(origin: OriginFor<T>, title: Vec<u8>, description: Vec<u8>, budget: BalanceOf<T>, deadline: u32) -> DispatchResultWithPostInfo {
+		pub fn create_task(origin: OriginFor<T>, title: Vec<u8>, specification: Vec<u8>, budget: BalanceOf<T>, deadline: u32) -> DispatchResultWithPostInfo {
 			
 			// Check that the extrinsic was signed and get the signer.
 			let signer = ensure_signed(origin)?;
 
 			// Update storage.
-			let task_id = Self::new_task(&signer, &title, &description, &budget, &deadline)?;
+			let task_id = Self::new_task(&signer, &title, &specification, &budget, &deadline)?;
 			
 			// TODO: Check if user has balance to create task
 			// T::Currency::reserve(&signer, budget).map_err(|_| "locker can't afford to lock the amount requested")?;
@@ -263,7 +263,7 @@ pub mod pallet {
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(from_initiator: &T::AccountId, title: &[u8], description: &[u8], budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(from_initiator: &T::AccountId, title: &[u8], specification: &[u8], budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
 
 			// Ensure user has a profile before creating a task
 			ensure!(pallet_profile::Pallet::<T>::has_profile(from_initiator).unwrap(), <Error<T>>::NoProfile);
@@ -271,7 +271,7 @@ pub mod pallet {
 			// Init Task Object
 			let task = Task::<T> {
 				title: title.to_owned(),
-				description: description.to_owned(),
+				specification: specification.to_owned(),
 				initiator: from_initiator.clone(),
 				volunteer: from_initiator.clone(),
 				status: Created,
