@@ -160,13 +160,13 @@ pub mod pallet {
 
 		/// Dispatchable call that ensures user can update existing personal profile in storage.
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
-		pub fn update_profile(origin: OriginFor<T>, interests: Vec<u8>) -> DispatchResult {
+		pub fn update_profile(origin: OriginFor<T>, username: Vec<u8>, interests: Vec<u8>) -> DispatchResult {
 
 			// Check that the extrinsic was signed and get the signer.
 			let account = ensure_signed(origin)?;
 			
 			// Since Each account can have one profile, we call into generate profile again
-			let _profile_id = Self::change_profile(&account, interests)?;
+			let _profile_id = Self::change_profile(&account, username, interests)?;
 
 			// Emit an event.
 			Self::deposit_event(Event::ProfileUpdated{ who: account });
@@ -227,13 +227,15 @@ pub mod pallet {
 		}
 
 		// Changes existing profile
-		pub fn change_profile(owner: &T::AccountId, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
+		pub fn change_profile(owner: &T::AccountId, new_username: Vec<u8>, new_interests: Vec<u8>) -> Result<T::Hash, Error<T>> {
 			
 			// Ensure that only owner can update profile
 			let mut profile = Self::profiles(owner).ok_or(<Error<T>>::NoUpdateAuthority)?;
 			
 			// Change interests of owner
 			profile.change_interests(new_interests);
+
+			profile.change_username(new_username);
 
 			// Get hash of profile
 			let profile_id = T::Hashing::hash_of(&profile);
@@ -298,6 +300,10 @@ pub mod pallet {
 
 		pub fn change_interests(&mut self, new_interests: Vec<u8>) {
 			self.interests = new_interests;
+		}
+
+		pub fn change_username(&mut self, new_username: Vec<u8>) {
+			self.name = new_username;
 		}
 	} 
 
