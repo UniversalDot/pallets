@@ -9,9 +9,10 @@ fn create_profile_works() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 	});
 }
 
@@ -21,9 +22,10 @@ fn create_profile_increases_profile_count() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Ensure count has decreased
 		assert_eq!(Profile::profile_count(), 1);
@@ -36,15 +38,16 @@ fn only_one_profile_per_account_allowed() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
 
-		assert_noop!(Profile::create_profile(Origin::signed(1), vec), Error::<Test>::ProfileAlreadyCreated );
+		assert_noop!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec), Error::<Test>::ProfileAlreadyCreated );
 	});
 }
 
@@ -54,9 +57,10 @@ fn delete_profile_works() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Ensure the user can delete their profile
 		assert_ok!(Profile::remove_profile(Origin::signed(1)));
@@ -69,9 +73,10 @@ fn delete_profile_decreases_profile_count() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Ensure teh user can delete their profile
 		assert_ok!(Profile::remove_profile(Origin::signed(1)));
@@ -87,9 +92,10 @@ fn user_can_only_delete_own_profile() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(),  vec));
 
 		// Ensure another user can NOT delete others profile
 		assert_noop!(Profile::remove_profile(Origin::signed(2)), Error::<Test>::NoDeletionAuthority);
@@ -105,9 +111,10 @@ fn user_can_update_profile() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Create new vector of interests
 		let mut vec2 = Vec::new();
@@ -129,9 +136,10 @@ fn user_can_only_update_own_profile() {
 		// Create vector of interests
 		let mut vec = Vec::new();
 		vec.push(7);
+		const USERNAME:&'static [u8] = &[1];
 
 		// Ensure the user can create profile
-		assert_ok!(Profile::create_profile(Origin::signed(1), vec));
+		assert_ok!(Profile::create_profile(Origin::signed(1), USERNAME.to_vec(), vec));
 
 		// Create new vector of interests
 		let mut vec2 = Vec::new();
