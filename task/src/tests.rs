@@ -2,7 +2,8 @@ use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
 
 pub const DEADLINE:u32 = 77;
-pub const USERNAME:[u8; 1] = [7];  
+pub const USERNAME:[u8; 1] = [7];
+pub const TITLE:[u8; 1] = [1];  
 
 #[test]
 fn create_new_task(){
@@ -15,7 +16,7 @@ fn create_new_task(){
 		vec.push(2);
 		
 		// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-		assert_ok!(Task::create_task(Origin::signed(1), vec, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec, 7, DEADLINE));
 	});
 }
 
@@ -30,7 +31,7 @@ fn increase_task_count_when_creating_task(){
 		vec.push(2);
 		
 		// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-		assert_ok!(Task::create_task(Origin::signed(1), vec, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec, 7, DEADLINE));
 
 		// Assert that count is incremented by 1 after task creation
 		assert_eq!(Task::task_count(), 1);
@@ -51,8 +52,8 @@ fn increase_task_count_when_creating_two_tasks(){
 		vec2.push(7);
 		
 		// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
-		assert_ok!(Task::create_task(Origin::signed(1), vec2, 99, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec2, 99, DEADLINE));
 
 		// Assert that count is incremented to 2 after task creation
 		assert_eq!(Task::task_count(), 2);
@@ -75,7 +76,7 @@ fn cant_own_more_tax_than_max_tasks(){
 			vec1.push(n);
 			
 			// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-			assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+			assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 		}	
 
 		// Assert that count is incremented to 2 after task creation
@@ -85,7 +86,7 @@ fn cant_own_more_tax_than_max_tasks(){
 		vec2.push(7);
 
 		// Assert that when creating the 77 Task, Error is thrown
-		assert_noop!(Task::create_task(Origin::signed(1), vec2, 7, DEADLINE), Error::<Test>::ExceedMaxTasksOwned);
+		assert_noop!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec2, 7, DEADLINE), Error::<Test>::ExceedMaxTasksOwned);
 
 	});
 
@@ -101,7 +102,7 @@ fn assign_task_to_current_owner(){
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
-		assert_ok!(Task::create_task(Origin::signed(10), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(10), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Get task through the hash
 		let hash = Task::tasks_owned(10)[0];
@@ -121,7 +122,7 @@ fn verify_inputs_outputs_to_tasks(){
 		let mut vec1 = Vec::new();
 		vec1.push(2);
 
-		assert_ok!(Task::create_task(Origin::signed(10), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(10), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Get task through the hash
 		let hash = Task::tasks_owned(10)[0];
@@ -145,7 +146,7 @@ fn start_tasks_assigns_new_current_owner(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -174,7 +175,7 @@ fn start_tasks_assigns_task_to_volunteer(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -203,7 +204,7 @@ fn completing_tasks_assigns_new_current_owner(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -240,7 +241,7 @@ fn only_creator_deletes_task(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -280,7 +281,7 @@ fn only_started_task_can_be_completed(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget, deadline]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -310,7 +311,7 @@ fn when_task_is_removed_ownership_is_cleared(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -353,7 +354,7 @@ fn decrease_task_count_when_removing_task(){
 		vec.push(2);
 		
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec, 8, DEADLINE));
 
 		// Get hash of task owned
 		let hash = Task::tasks_owned(1)[0];
@@ -390,7 +391,7 @@ fn increase_profile_reputation_when_task_completed(){
 		vec1.push(2);
 
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec1, 7, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec1, 7, DEADLINE));
 
 		// Ensure new task is assigned to new current_owner (user 1)
 		let hash = Task::tasks_owned(1)[0];
@@ -427,7 +428,7 @@ fn only_add_reputation_when_task_has_been_completed(){
 		vec.push(2);
 		
 		// Ensure new task can be created with [signer, requirements vector, budget]
-		assert_ok!(Task::create_task(Origin::signed(1), vec, 8, DEADLINE));
+		assert_ok!(Task::create_task(Origin::signed(1), TITLE.to_vec(), vec, 8, DEADLINE));
 
 		// Get hash of task owned
 		let hash = Task::tasks_owned(1)[0];
