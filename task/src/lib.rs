@@ -270,8 +270,8 @@ pub mod pallet {
 			
 			// Init Task Object
 			let task = Task::<T> {
-				title: title.to_owned(),
-				specification: specification.to_owned(),
+				title: title.to_vec(),
+				specification: specification.to_vec(),
 				initiator: from_initiator.clone(),
 				volunteer: from_initiator.clone(),
 				status: Created,
