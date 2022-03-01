@@ -74,12 +74,12 @@ version = '0.4.14'
 [dependencies.pallet-task]
 default-features = false
 git = 'https://github.com/UniversalDot/pallets.git'
-version = '0.0.40'
+version = '0.0.41'
 
 [dependencies.pallet-profile]
 default-features = false
 git = 'https://github.com/UniversalDot/pallets.git'
-version = '0.0.67'
+version = '0.0.68'
 
 [dependencies.pallet-balances]
 version = '4.0.0-dev'
