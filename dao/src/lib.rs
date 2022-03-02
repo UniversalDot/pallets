@@ -148,9 +148,9 @@ pub mod pallet {
 
 
 	#[pallet::storage]
-	#[pallet::getter(fn vision_signer)]
+	#[pallet::getter(fn applicants_to_organization)]
 	/// Storage Map to indicate which user agree with a proposed Vision [Vision, Vec[Account]]
-	pub(super) type VisionSigner<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
+	pub(super) type ApplicantsToOrganization<T: Config> = StorageMap<_, Twox64Concat, Vec<u8>, Vec<T::AccountId>, ValueQuery>;
 
 
 	#[pallet::event]
@@ -541,14 +541,14 @@ pub mod pallet {
 			// TODO: Perhaps use vision Hash instead of vision document
 			// let hash_vision = T::Hashing::hash_of(&vision_document);
 
-			let mut members = <Pallet<T>>::vision_signer(vision_document);
+			let mut members = <Pallet<T>>::applicants_to_organization(vision_document);
 
 			// Ensure not signed already
 			ensure!(!members.contains(from_initiator), <Error<T>>::AlreadySigned);
 			members.push(from_initiator.clone());
 			
 			// Update storage.
-			<VisionSigner<T>>::insert(vision_document, members);
+			<ApplicantsToOrganization<T>>::insert(vision_document, members);
 
 			Ok(())
 		}
@@ -561,14 +561,14 @@ pub mod pallet {
 			// TODO: Perhaps use vision Hash instead of vision document
 			// let hash_vision = T::Hashing::hash_of(&vision_document);
 
-			let mut members = <Pallet<T>>::vision_signer(vision_document);
+			let mut members = <Pallet<T>>::applicants_to_organization(vision_document);
 
 			// Ensure not signed already
 			let index = members.binary_search(from_initiator).ok().ok_or(<Error<T>>::NotSigned)?;
 			members.remove(index);
 			
 			// Update storage.
-			<VisionSigner<T>>::insert(vision_document, members);
+			<ApplicantsToOrganization<T>>::insert(vision_document, members);
 
 			Ok(())
 		}
