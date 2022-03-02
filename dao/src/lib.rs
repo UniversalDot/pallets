@@ -54,11 +54,15 @@
 //! 
 //! - `create_organization` - Function used to create a DAO organization. 
 //! 
-//! - `add_members` - Function user for a visionary to add members to his organization. 
+//! - `add_members` - Function used for a visionary to add members to his organization. 
 //! 
-//! - `remove_members` - Function user for a visionary to remove members from his organization. 
+//! - `remove_members` - Function used for a visionary to remove members from his organization. 
 //! 
-//! - `dissolve_organization` - Function user for a visionary to dissolve his organization. 
+//! - `dissolve_organization` - Function used for a visionary to dissolve his organization. 
+//! 
+//! - `add_tasks` - Function used for a visionary to add tasks to his organization.
+//! 
+//! - `remove_tasks` - Function used for a visionary to remove tasks from his organization.
 //!
 //! ## Related Modules
 //!
