@@ -119,7 +119,7 @@ fn user_can_sign_onto_vision() {
 		assert_ok!(Dao::sign_vision(Origin::signed(1), VISION.to_vec()));
 
 		// Ensure the length of VisionSigner has increased
-		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
+		assert_eq!(Dao::applicants_to_organization(VISION.to_vec()).len(), 1);
 	});
 }
 
@@ -137,13 +137,13 @@ fn user_can_unsign_from_vision() {
 		assert_ok!(Dao::sign_vision(Origin::signed(2), VISION.to_vec()));
 
 		// Ensure the length of VisionSigners has increased
-		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 1);
+		assert_eq!(Dao::applicants_to_organization(VISION.to_vec()).len(), 1);
 
 		// Ensure a user can unsign onto vision. 
 		assert_ok!(Dao::unsign_vision(Origin::signed(2), VISION.to_vec()));
 
 		// Ensure the length of VisionSigners has increased
-		assert_eq!(Dao::vision_signer(VISION.to_vec()).len(), 0);
+		assert_eq!(Dao::applicants_to_organization(VISION.to_vec()).len(), 0);
 	});
 }
 
