@@ -219,13 +219,16 @@ fn can_create_an_organization() {
 	new_test_ext().execute_with(|| {
 
 		// Create Static Organization name
-		const ORG_NAME: &'static [u8] = &[7];
+		const ORG_NAME: &'static [u8] = &[10];
 
 		// Ensure organization can be created
-		assert_ok!(Dao::create_organization(Origin::signed(1), ORG_NAME.to_vec()));
+		assert_ok!(Dao::create_organization(Origin::signed(7), ORG_NAME.to_vec()));
+
+		let org = Dao::organization(ORG_NAME);
 
 		// Ensure the length of organization is equal to 1
 		assert_eq!(Dao::organization(ORG_NAME.to_vec()).len(), 1);
+		assert_eq!(org, &[7]);
 	});
 }
 
