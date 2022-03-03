@@ -1,6 +1,6 @@
 [package]
 name = 'pallet-dao'
-version = '0.0.24'
+version = '0.0.25'
 description = 'Custom pallet for creation decentrilize autonomous organization.'
 authors = ['UNIVERSALDOT FOUNDATION <https://github.com/UniversalDot>']
 homepage = 'https://universaldot.foundation'
@@ -70,6 +70,12 @@ version = '4.0.0-dev'
 [dependencies.log]
 default-features = false
 version = '0.4.14'
+
+# [dependencies.pallet-did]
+# default-features = false
+# git = 'https://github.com/Delmonicos/pallet-did'
+# package = 'pallet-did'
+# version = '3.0.0'
 
 [dependencies.pallet-task]
 default-features = false
