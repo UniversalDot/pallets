@@ -38,6 +38,7 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 	let mut data = Vec::new();
 	data.push(u8::MAX);
 
+	// Populate data fields
 	let initiator: T::AccountId = whitelisted_caller();
 	let volunteer: T::AccountId = whitelisted_caller();
 	let owner: T::AccountId = whitelisted_caller();
@@ -86,9 +87,9 @@ benchmarks! {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 2000;
-
 		let title = vec![0u8, s as u8];
 		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
@@ -114,9 +115,9 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_start: T::AccountId = whitelisted_caller();
 
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 2000; 
-
 		let title = vec![0u8, s as u8];
 		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
@@ -139,7 +140,7 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_complete: T::AccountId = whitelisted_caller();
 
-		// Variants for testing input into function
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 2000;
 		let title = vec![0u8, s as u8]; 
@@ -165,7 +166,7 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_complete: T::AccountId = whitelisted_caller();
 
-		// Variants for testing input into function
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 4000;
 		let title = vec![0u8, s as u8]; 
