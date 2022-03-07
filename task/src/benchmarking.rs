@@ -47,10 +47,11 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 
 	// Create object
 	let info = Task {
+		title: data.clone(),
+		specification: data.clone(),
 		initiator: initiator,
 		volunteer: volunteer,
 		current_owner: owner,
-		requirements: data,
 		status: status,
 		budget: balance,
 		deadline: deadline,
@@ -62,8 +63,11 @@ fn create_task_info<T: Config>(_num_fields: u32) -> Task<T> {
 // Helper function to create a profile
 fn create_profile<T: Config>(){
 
+	let username = Vec::new();
+	let interests = Vec::new();
+
 	let caller: T::AccountId = whitelisted_caller();
-	let _profile = PalletProfile::<T>::create_profile(RawOrigin::Signed(caller).into(), Vec::new());
+	let _profile = PalletProfile::<T>::create_profile(RawOrigin::Signed(caller).into(), username, interests);
 
 }
 
@@ -82,10 +86,11 @@ benchmarks! {
 		/* setup initial state */
 		let caller: T::AccountId = whitelisted_caller();
 
-		let s in 1 .. u8::MAX.into(); // max bytes for requirements
+		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 2000;
 
-		let requirements = vec![0u8, s as u8];
+		let title = vec![0u8, s as u8];
+		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller);
 
 		// Create profile before creating a task
@@ -94,7 +99,7 @@ benchmarks! {
 		
 	}: 
 	/* the code to be benchmarked */
-	create_task(RawOrigin::Signed(caller.clone()), requirements, budget, x)
+	create_task(RawOrigin::Signed(caller.clone()), title, specification, budget, x)
 	
 	verify {
 		/* verifying final state */
@@ -109,15 +114,16 @@ benchmarks! {
 		let caller_create: T::AccountId = whitelisted_caller();
 		let caller_start: T::AccountId = whitelisted_caller();
 
-		let s in 1 .. u8::MAX.into(); // max bytes for requirements
+		let s in 1 .. u8::MAX.into(); // max bytes for specification
 		let x in 1 .. 2000; 
 
-		let requirements = vec![0u8, s as u8];
+		let title = vec![0u8, s as u8];
+		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), title, specification, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
 		
 	}: start_task(RawOrigin::Signed(caller_start.clone()), hash_task)
@@ -134,14 +140,15 @@ benchmarks! {
 		let caller_complete: T::AccountId = whitelisted_caller();
 
 		// Variants for testing input into function
-		let s in 1 .. u8::MAX.into(); // max bytes for requirements
-		let x in 1 .. 2000; 
-		let requirements = vec![0u8, s as u8];
+		let s in 1 .. u8::MAX.into(); // max bytes for specification
+		let x in 1 .. 2000;
+		let title = vec![0u8, s as u8]; 
+		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), title, specification, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
 		let _ = PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
 
@@ -159,14 +166,15 @@ benchmarks! {
 		let caller_complete: T::AccountId = whitelisted_caller();
 
 		// Variants for testing input into function
-		let s in 1 .. u8::MAX.into(); // max bytes for requirements
-		let x in 1 .. 4000; 
-		let requirements = vec![0u8, s as u8];
+		let s in 1 .. u8::MAX.into(); // max bytes for specification
+		let x in 1 .. 4000;
+		let title = vec![0u8, s as u8]; 
+		let specification = vec![0u8, s as u8];
 		let budget = <T as pallet::Config>::Currency::total_balance(&caller_create);
 
 		// Create profile before creating a task
 		create_profile::<T>();		
-		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), requirements, budget, x.into());
+		let _ = PalletTask::<T>::create_task(RawOrigin::Signed(caller_create.clone()).into(), title, specification, budget, x.into());
 		let hash_task = PalletTask::<T>::tasks_owned(&caller_create)[0];
 		let _ = PalletTask::<T>::start_task(RawOrigin::Signed(caller_complete.clone()).into(), hash_task.clone());
 
