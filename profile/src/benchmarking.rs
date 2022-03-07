@@ -70,13 +70,10 @@ benchmarks! {
 		
 		let caller: T::AccountId = whitelisted_caller();
 
+		// Populate data fields
 		let x in 1 .. 100;  // # of profiles
 		let s in 1 .. u8::MAX.into(); // max bytes for interests
-		
-		// Create profile
 		let profile = create_profile_info::<T>(1);
-		
-		// Create vector username and interests
 		let interests = vec![0u8, s as u8];
 		let username = vec![0u8, s as u8];
 
@@ -93,7 +90,7 @@ benchmarks! {
 		let create_account_caller: T::AccountId = whitelisted_caller();
 		let update_account_caller: T::AccountId = whitelisted_caller();
 
-		// Create vector of interests
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for interests
 		let interests = vec![0u8, s as u8];
 		let username = vec![0u8, s as u8];
@@ -114,7 +111,7 @@ benchmarks! {
 		let create_account_caller: T::AccountId = whitelisted_caller();
 		let delete_account_caller: T::AccountId = whitelisted_caller();
 
-		// Create vector of interests
+		// Populate data fields
 		let s in 1 .. u8::MAX.into(); // max bytes for interests
 		let interests = vec![0u8, s as u8];
 		let username = vec![0u8, s as u8];
