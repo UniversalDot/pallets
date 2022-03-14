@@ -55,6 +55,9 @@ fn can_remove_vision() {
 
 		// Ensure the DAO can remove a vision document
 		assert_ok!(Dao::remove_vision(Origin::signed(1), VISION.to_vec()));
+
+		// TODO: Enforce stronger check on Vision test
+		assert_eq!(Dao::vision(VISION.to_vec()).0, 0);
 	});
 }
 
