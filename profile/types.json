@@ -1,0 +1,7 @@
+{
+    "Profile": {
+      "name": "Vec<u8>",
+      "interests": "Vec<u8>",
+      "reputation": "u32"
+    }
+}
