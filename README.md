@@ -19,6 +19,8 @@ To run clippy locally, run:
 ```bash
 cargo clippy
 ```
+### GIT Branching
+To see the branching strategy please refer to the following [guide](https://github.com/UniversalDot/documents/blob/master/designs/architecture/Git-Branches.drawio.png)
 
 ## Add Pallet to Runtime
 To add a specific pallet to a Runtime, navigate to the [Universal-dot-node](https://github.com/UniversalDot/universal-dot-node). In the /Runtime/Cargo.toml add each pallet dependency. For example, to add the Profile pallet, the following configuration should be added:
