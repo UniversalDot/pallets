@@ -1,6 +1,9 @@
 # Pallets
-Custom pallets developed by UniversalDot Foundation
+Custom pallets developed by UniversalDot Foundation. 
 
+Pallets are developed separately from [Runtime](https://github.com/UniversalDot/universal-dot-node) and injected into the Runtime. 
+
+Custom Pallet cargo versions shall remain consistent with Runtime package versions.
 
 ## Development
 To build each pallet, run: 
@@ -15,6 +18,16 @@ To run clippy locally, run:
 
 ```bash
 cargo clippy
+```
+
+## Add Pallet to Runtime
+To add a specific pallet to a Runtime, navigate to the [Universal-dot-node](https://github.com/UniversalDot/universal-dot-node). In the /Runtime/Cargo.toml add each pallet dependency. For example, to add the Profile pallet, the following configuration should be added:
+
+```bash
+[dependencies.pallet-profile]
+default-features = false
+git = 'https://github.com/UniversalDot/pallets.git'
+version = '0.0.67'
 ```
 
 ## Testing
