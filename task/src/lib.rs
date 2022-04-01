@@ -184,6 +184,7 @@ pub mod pallet {
 		NoPermissionToComplete,
 		/// This account has no Profile yet. 
 		NoProfile,
+        ProfileAddReputationFailed, // TODO: remove this when pallet_profile returns DispatchError
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -263,7 +264,7 @@ pub mod pallet {
 	// *** Helper functions *** //
 	impl<T:Config> Pallet<T> {
 
-		pub fn new_task(from_initiator: &T::AccountId, title: &[u8], specification: &[u8], budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, Error<T>> {
+		pub fn new_task(from_initiator: &T::AccountId, title: &[u8], specification: &[u8], budget: &BalanceOf<T>, deadline: &u32) -> Result<T::Hash, DispatchError> {
 
 			// Ensure user has a profile before creating a task
 			ensure!(pallet_profile::Pallet::<T>::has_profile(from_initiator).unwrap(), <Error<T>>::NoProfile);
@@ -298,7 +299,7 @@ pub mod pallet {
 			Ok(task_id)
 		}
 
-		pub fn assign_task(to: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
+		pub fn assign_task(to: &T::AccountId, task_id: &T::Hash) -> Result<(), DispatchError> {
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
@@ -327,7 +328,7 @@ pub mod pallet {
 		}
 
 
-		pub fn mark_finished(to: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
+		pub fn mark_finished(to: &T::AccountId, task_id: &T::Hash) -> Result<(), DispatchError> {
 			
 			// Check if task exists
 			let mut task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
@@ -363,7 +364,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), Error<T>> {
+		pub fn delete_task(task_initiator: &T::AccountId, task_id: &T::Hash) -> Result<(), DispatchError> {
 			// Check if task exists
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 			
@@ -385,7 +386,7 @@ pub mod pallet {
 			Self::transfer_balance(task_initiator, &volunteer, budget)?;
 
 			// Reward reputation points to profiles who created/completed a task
-			Self::handle_reputation(task_id).expect("Add reputation works");
+			Self::handle_reputation(task_id)?;
 
 			// remove task once closed
 			<Tasks<T>>::remove(task_id);
@@ -398,40 +399,29 @@ pub mod pallet {
 		}
 
 		// Function to check if the current signer is the task_initiator
-		pub fn is_task_initiator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, Error<T>> {
+		pub fn is_task_initiator(task_id: &T::Hash, task_closer: &T::AccountId) -> Result<bool, DispatchError> {
 			match Self::tasks(task_id) {
 				Some(task) => Ok(task.initiator == *task_closer),
-				None => Err(<Error<T>>::TaskNotExist)
+				None => Err(<Error<T>>::TaskNotExist.into())
 			}
 		}
 
 		// Function to transfer balance from one account to another
 		#[transactional]
-		pub fn transfer_balance(task_initiator: &T::AccountId, task_volunteer: &T::AccountId, budget: BalanceOf<T>) -> Result<(), Error<T>> {
-			// TODO: Investigate why Currency transfer doesn't work 
-			// TODO: See proper testing https://docs.substrate.io/how-to-guides/v3/testing/transfer-function/
-
-			//let task_initiator = task.initiator.clone();
-			log::info!("budget {:?}.", budget);
-			log::info!("signer {:?}.", task_initiator);
-			log::info!("task_volunteer {:?}.", task_volunteer);
-			ensure!(<T as self::Config>::Currency::free_balance(task_initiator) >= budget, <Error<T>>::NotEnoughBalance);
-			let result = <T as self::Config>::Currency::transfer(task_initiator, task_volunteer, budget, ExistenceRequirement::KeepAlive);
-			log::info!("Result Output {:?}.", result);
-
-			Ok(())
+		pub fn transfer_balance(task_initiator: &T::AccountId, task_volunteer: &T::AccountId, budget: BalanceOf<T>) -> Result<(),  DispatchError> {
+			<T as self::Config>::Currency::transfer(task_initiator, task_volunteer, budget, ExistenceRequirement::KeepAlive)
 		}
 
 		// Handles reputation update for profiles
-		pub fn handle_reputation(task_id: &T::Hash) -> Result<(), Error<T>> {
+		pub fn handle_reputation(task_id: &T::Hash) -> Result<(), DispatchError> {
 
 			// Check if task exists
 			let task = Self::tasks(&task_id).ok_or(<Error<T>>::TaskNotExist)?;
 
 			// Ensure that reputation is added only when task is in status Closed
 			if task.status == TaskStatus::Closed {
-				pallet_profile::Pallet::<T>::add_reputation(&task.initiator).expect("can add reputation");
-				pallet_profile::Pallet::<T>::add_reputation(&task.volunteer).expect("can add reputation");
+				pallet_profile::Pallet::<T>::add_reputation(&task.initiator).map_err(|_| Error::<T>::ProfileAddReputationFailed)?;
+				pallet_profile::Pallet::<T>::add_reputation(&task.volunteer).map_err(|_| Error::<T>::ProfileAddReputationFailed)?;
 			}
 
 			Ok(())

@@ -1,5 +1,6 @@
 use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok};
+use pallet_balances::Error as BalancesError;
 
 pub const DEADLINE:u32 = 77;
 pub const USERNAME:[u8; 1] = [7];
@@ -368,11 +369,13 @@ fn decrease_task_count_when_removing_task(){
 }
 
 #[test]
-fn transfer_ballance_works(){
+fn transfer_balance_works(){
 	new_test_ext().execute_with( || {
 		
 		// Transfer balance works using Mock
+        // initially use has 10 units
 		assert_ok!(Task::transfer_balance(&1, &2, 7));
+		assert_noop!(Task::transfer_balance(&1, &2, 7), BalancesError::<Test>::InsufficientBalance);
 	});
 }
 
