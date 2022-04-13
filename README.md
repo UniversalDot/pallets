@@ -1,5 +1,7 @@
 # Pallets
-Custom pallets developed by UniversalDot Foundation. 
+This is a playground for new pallets that are developed for Substrate. 
+
+The pallets used in production have been moved to the [node](https://github.com/UniversalDot/universal-dot-node). 
 
 Pallets are developed separately from [Runtime](https://github.com/UniversalDot/universal-dot-node) and injected into the Runtime. 
 
