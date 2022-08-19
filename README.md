@@ -1,4 +1,7 @@
 # Pallets
+
+UPDATE: This repository has been archived. Pallets that are used in production are moved to [universal-dot-node](https://github.com/UniversalDot/universal-dot-node/tree/universal-develop/pallets).
+
 This is a playground for new pallets that are developed for Substrate. 
 
 The pallets used in production have been moved to the [node](https://github.com/UniversalDot/universal-dot-node). 
